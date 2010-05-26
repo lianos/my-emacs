@@ -1,3 +1,11 @@
+;; ============================================================================
+;; The first part of this config sets up the load path and simply includes /
+;; requires the libraries used most.
+;; 
+;; The second half of the file contains personal tweaks to the libraries and
+;; emacs itself
+;; ============================================================================
+
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins"))
 ;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/ecb-2.32"))
 ;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/speedbar-0.14beta4"))
@@ -9,13 +17,29 @@
 (require 'fixme)
 (require 'color-theme)
 
-;; =========== The most important settings: swap ctl-x to ctl-l =========
+;; ============================================================================
+;; Swap ctrl-x to be ctrl-l : Banish emacs claw!
+;; ============================================================================
 (global-set-key (kbd "C-l") ctl-x-map)
 (global-set-key (kbd "C-x") 'recenter)
 
+;; ============================================================================
+;; Set up OS-vars to enable os-specific tweaking of emacs, eg.
+;; (if macosx-p
+;;     (progn ...))
+;; ============================================================================
+(defvar mswindows-p (string-match "windows" (symbol-name system-type)))
+(defvar macosx-p (string-match "darwin" (symbol-name system-type)))
+(defvar linux-p (string-match "linux" (symbol-name system-type)))
 
-;; =========== Programming Language Customizations
+;; ============================================================================
+;; Programming language specific customizations
+;; ============================================================================
 (require 'my-programming-r)
+
+;; ============================================================================
+;; Finally auto-generated customizations
+;; ============================================================================
 
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
