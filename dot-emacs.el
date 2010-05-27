@@ -44,6 +44,7 @@
 
 ;; ============================================================================
 ;; Finally auto-generated customizations
+;; TODO: Set emacs to write custom-set-* stuff to a non version-controlled file
 ;; ============================================================================
 
 (custom-set-variables
