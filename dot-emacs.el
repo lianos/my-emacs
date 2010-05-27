@@ -1,34 +1,4 @@
 ;; ============================================================================
-;; The first part of this config sets up the load path and simply includes /
-;; requires the libraries used most.
-;; 
-;; The second half of the file contains personal tweaks to the libraries and
-;; emacs itself
-;; ============================================================================
-
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins"))
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/ecb-2.40"))
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/color-theme-6.6.0"))
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/my"))
-
-(require 'color-theme)
-(load-file "~/.emacs.d/plugins/cedet-1.0pre7/common/cedet.el")
-(require 'ecb)
-(require 'fixme)
-
-;; my customizations to the packages loaded by default
-
-(require 'my-cedet)
-(require 'my-ecb)
-(require 'my-local-config)  ;; this file isn't version controlled
-
-;; ============================================================================
-;; Swap ctrl-x to be ctrl-l : Banish emacs claw!
-;; ============================================================================
-(global-set-key (kbd "C-l") ctl-x-map)
-(global-set-key (kbd "C-x") 'recenter)
-
-;; ============================================================================
 ;; Set up OS-vars to enable os-specific tweaking of emacs, eg.
 ;; (if macosx-p
 ;;     (progn ...))
@@ -38,15 +8,46 @@
 (defvar linux-p (string-match "linux" (symbol-name system-type)))
 
 ;; ============================================================================
+;; Alter emacs search path
+;; ============================================================================
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/ecb-2.40"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/color-theme-6.6.0"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/my"))
+
+;; ============================================================================
+;; Load packages by default
+;; ============================================================================
+(require 'color-theme)
+(load-file "~/.emacs.d/plugins/cedet-1.0pre7/common/cedet.el")
+(require 'ecb)
+(require 'fixme)
+
+;; ============================================================================
+;; Swap ctrl-x to be ctrl-l : Banish emacs claw!
+;; I've found this is necessary to be loaded after provided libraries because
+;; some of them set keyboard binidngs straight to "C-x" and not the ctl-x-map
+;; (I think)
+;; ============================================================================
+(global-set-key (kbd "C-l") ctl-x-map)
+(global-set-key (kbd "C-x") 'recenter)
+
+;; ============================================================================
+;; My customization to packages and general local/machine settings
+;; ============================================================================
+(require 'my-cedet)
+(require 'my-ecb)
+(require 'my-local-config)  ;; this file isn't version controlled
+
+;; ============================================================================
 ;; Programming language specific customizations
 ;; ============================================================================
 (require 'my-programming-r)
 
 ;; ============================================================================
-;; Finally auto-generated customizations
+;; Auto-generated custom settings (from M-x customize ...)
 ;; TODO: Set emacs to write custom-set-* stuff to a non version-controlled file
 ;; ============================================================================
-
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
