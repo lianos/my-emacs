@@ -7,15 +7,20 @@
 ;; ============================================================================
 
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins"))
-;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/ecb-2.32"))
-;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/speedbar-0.14beta4"))
-;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/eieio-0.17"))
-;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/semantic-1.4.4"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/ecb-2.40"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/color-theme-6.6.0"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/my"))
 
-(require 'fixme)
 (require 'color-theme)
+(load-file "~/.emacs.d/plugins/cedet-1.0pre7/common/cedet.el")
+(require 'ecb)
+(require 'fixme)
+
+;; my customizations to the packages loaded by default
+
+(require 'my-cedet)
+(require 'my-ecb)
+(require 'my-local-config)  ;; this file isn't version controlled
 
 ;; ============================================================================
 ;; Swap ctrl-x to be ctrl-l : Banish emacs claw!
@@ -46,7 +51,8 @@
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- )
+ '(ecb-options-version "2.40")
+)
 
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
