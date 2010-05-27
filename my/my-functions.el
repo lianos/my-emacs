@@ -17,7 +17,12 @@
   "Send buffer path to clipboard"
   (interactive)
   (set-clipboard-contents-from-string (buffer-file-name)))
-
 (define-key ctl-x-map "c" 'send-buffer-path-to-clipboard)
+
+(defun send-buffer-dirpath-to-clipboard ()
+  "Send directory path of buffer to clibpoard"
+  (interactive)
+  (set-clipboard-contents-from-string (file-name-directory (buffer-file-name))))
+(define-key ctl-x-map "p" 'send-buffer-dirpath-to-clipboard)
 
 (provide 'my-functions)
