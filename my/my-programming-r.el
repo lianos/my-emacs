@@ -10,6 +10,12 @@
 (define-key ess-mode-map (kbd "M-r") 'comint-previous-matching-input-from-input)
 (define-key ess-mode-map (kbd "M-s") 'comint-next-matching-input-from-input)
 
+;; Show functino argument completion while editing R code and interacting with
+;; an inferior R process
+(define-key ess-mode-map [f2] 'ess-r-args-show)
+(define-key ess-mode-map [f3] 'ess-r-args-insert)
+(define-key inferior-ess-mode-map [f2] 'ess-r-args-show)
+(define-key inferior-ess-mode-map [f3] 'ess-r-args-insert)
 
 ;; ess-R-object-tooltip.el
 ;; 
@@ -70,11 +76,6 @@
                         (set-buffer curbuf)
                         (tooltip-show-at-point bs 0 30)))))))))
     (kill-buffer tmpbuf)))
-
-;; my default key map
 (define-key ess-mode-map "\C-c\C-g" 'ess-R-object-tooltip)
-
-;; (provide 'ess-R-object-tooltip)
-
 
 (provide 'my-programming-r)
