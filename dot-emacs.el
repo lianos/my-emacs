@@ -35,6 +35,7 @@
 ;; ============================================================================
 ;; My customization to packages and general local/machine settings
 ;; ============================================================================
+(require 'my-globals)
 (require 'my-cedet)
 (require 'my-ecb)
 (require 'my-local-config)  ;; this file isn't version controlled
