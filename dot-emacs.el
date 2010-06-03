@@ -13,6 +13,8 @@
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/ecb-2.40"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/color-theme-6.6.0"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/wrap-region"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/yasnippet-0.6.1c"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/my"))
 
 ;; ============================================================================
@@ -22,6 +24,8 @@
 (load-file "~/.emacs.d/plugins/cedet-1.0pre7/common/cedet.el")
 (require 'ecb)
 (require 'fixme)
+(require 'wrap-region)
+(require 'yasnippet)
 
 ;; ============================================================================
 ;; Swap ctrl-x to be ctrl-l : Banish emacs claw!
@@ -39,6 +43,8 @@
 (require 'my-cedet)
 (require 'my-ecb)
 (require 'my-local-config)  ;; this file isn't version controlled
+(require 'my-wrap-region)
+(require 'my-yasnippet)
 
 ;; ============================================================================
 ;; Programming language specific customizations
@@ -54,8 +60,7 @@
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(ecb-options-version "2.40")
-)
+ '(ecb-options-version "2.40"))
 
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
