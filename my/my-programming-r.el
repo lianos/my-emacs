@@ -17,6 +17,51 @@
 (define-key inferior-ess-mode-map [f2] 'ess-r-args-show)
 (define-key inferior-ess-mode-map [f3] 'ess-r-args-insert)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Bind lots of stuff to shift-RET
+;; http://www.kieranhealy.org/blog/archives/2009/10/12/make-shift-enter-do-a-lot-in-ess/
+;; ESS: Emacs Speaks Statistics
+;; Use shift-enter to split window & launch R (if not running), execute highlighted
+;; region (if R running & area highlighted), or execute current line
+;; (and move to next line, skipping comments). Nice. 
+;; See http://www.emacswiki.org/emacs/EmacsSpeaksStatistics,
+;; FelipeCsaszar. Adapted to spilit vertically instead of
+;; horizontally. 
+(setq ess-ask-for-ess-directory nil)
+(setq ess-local-process-name "R")
+(setq ansi-color-for-comint-mode 'filter)
+;; read only bad idea? http://stackoverflow.com/questions/2710442
+;; (setq comint-prompt-read-only t)
+(setq comint-scroll-to-bottom-on-input t)
+(setq comint-scroll-to-bottom-on-output t)
+(setq comint-move-point-for-output t)
+(defun my-ess-start-R ()
+  (interactive)
+  (if (not (member "*R*" (mapcar (function buffer-name) (buffer-list))))
+      (progn
+	(delete-other-windows)
+	(setq w1 (selected-window))
+	(setq w1name (buffer-name))
+	(setq w2 (split-window w1 nil t))
+	(R)
+	(set-window-buffer w2 "*R*")
+	(set-window-buffer w1 w1name))))
+(defun my-ess-eval ()
+  (interactive)
+  (my-ess-start-R)
+  (if (and transient-mark-mode mark-active)
+      (call-interactively 'ess-eval-region)
+    (call-interactively 'ess-eval-line-and-step)))
+
+(add-hook 'ess-mode-hook
+	  '(lambda()
+	     (local-set-key [(shift return)] 'my-ess-eval)))
+(add-hook 'inferior-ess-mode-hook
+	  '(lambda()
+	     (local-set-key [C-up] 'comint-previous-input)
+	     (local-set-key [C-down] 'comint-next-input)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ess-R-object-tooltip.el
 ;; 
 ;; http://blogisticreflections.wordpress.com/2009/10/01/r-object-tooltips-in-ess/
