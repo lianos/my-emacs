@@ -5,4 +5,4 @@
 ;; wrap-region package (experimental)
 (setq autopair-autowrap t) 
 
-(provide my-autopair)
+(provide 'my-autopair)
