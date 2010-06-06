@@ -13,13 +13,14 @@
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/ecb-2.40"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/color-theme-6.6.0"))
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/wrap-region"))
+;; (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/wrap-region"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/yasnippet-0.6.1c"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/my"))
 
 ;; ============================================================================
 ;; Load packages by default
 ;; ============================================================================
+(require 'autopair)
 (require 'color-theme)
 (load-file "~/.emacs.d/plugins/cedet-1.0pre7/common/cedet.el")
 (require 'ecb)
