@@ -17,12 +17,26 @@
   "Send buffer path to clipboard"
   (interactive)
   (set-clipboard-contents-from-string (buffer-file-name)))
-(define-key ctl-x-map "c" 'send-buffer-path-to-clipboard)
 
 (defun send-buffer-dirpath-to-clipboard ()
   "Send directory path of buffer to clibpoard"
   (interactive)
   (set-clipboard-contents-from-string (file-name-directory (buffer-file-name))))
+
+(define-key ctl-x-map "c" 'send-buffer-path-to-clipboard)
 (define-key ctl-x-map "p" 'send-buffer-dirpath-to-clipboard)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Scrolling
+;; Scroll up/down w/o moving point
+(defun gcm-scroll-down ()
+  (interactive)
+  (scroll-up 1))
+(defun gcm-scroll-up ()
+  (interactive)
+  (scroll-down 1))
+  
+(global-set-key [M-down] 'gcm-scroll-down)
+(global-set-key [M-up]   'gcm-scroll-up)
 
 (provide 'my-functions)

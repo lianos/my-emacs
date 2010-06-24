@@ -4,13 +4,23 @@
 (add-hook 'ess-mode-hook
           (lambda ()
             (setq tab-width 2)))
+            
+;; General ess settings
+(setq ess-ask-for-ess-directory t)
+(setq ess-local-process-name "R")
+(setq ansi-color-for-comint-mode 'filter)
+;; read only bad idea? http://stackoverflow.com/questions/2710442
+;; (setq comint-prompt-read-only t)
+(setq comint-scroll-to-bottom-on-input t)
+(setq comint-scroll-to-bottom-on-output t)
+(setq comint-move-point-for-output t)
 
-;; change some of the key bindings
+
 ;; Scrolls back in history matching the command prefix entered so far
 (define-key ess-mode-map (kbd "M-r") 'comint-previous-matching-input-from-input)
 (define-key ess-mode-map (kbd "M-s") 'comint-next-matching-input-from-input)
 
-;; Show functino argument completion while editing R code and interacting with
+;; Show function argument completion while editing R code and interacting with
 ;; an inferior R process
 (define-key ess-mode-map [f2] 'ess-r-args-show)
 (define-key ess-mode-map [f3] 'ess-r-args-insert)
@@ -27,14 +37,6 @@
 ;; See http://www.emacswiki.org/emacs/EmacsSpeaksStatistics,
 ;; FelipeCsaszar. Adapted to spilit vertically instead of
 ;; horizontally. 
-(setq ess-ask-for-ess-directory nil)
-(setq ess-local-process-name "R")
-(setq ansi-color-for-comint-mode 'filter)
-;; read only bad idea? http://stackoverflow.com/questions/2710442
-;; (setq comint-prompt-read-only t)
-(setq comint-scroll-to-bottom-on-input t)
-(setq comint-scroll-to-bottom-on-output t)
-(setq comint-move-point-for-output t)
 (defun my-ess-start-R ()
   (interactive)
   (if (not (member "*R*" (mapcar (function buffer-name) (buffer-list))))
@@ -46,6 +48,7 @@
   (R)
   (set-window-buffer w2 "*R*")
   (set-window-buffer w1 w1name))))
+
 (defun my-ess-eval ()
   (interactive)
   (my-ess-start-R)
@@ -56,6 +59,7 @@
 (add-hook 'ess-mode-hook
     '(lambda()
        (local-set-key [(shift return)] 'my-ess-eval)))
+
 (add-hook 'inferior-ess-mode-hook
     '(lambda()
        (local-set-key [C-up] 'comint-previous-input)
