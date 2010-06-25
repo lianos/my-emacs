@@ -1,4 +1,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Use "%" to jump to the matching parenthesis.
+;; Taken from http://www.crsr.net/Notes/Emacs.html
+(defun goto-match-paren (arg)
+  "Go to the matching parenthesis if on parenthesis, otherwise insert
+   the character typed."
+  (interactive "p")
+  (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
+        ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
+        (t                    (self-insert-command))))
+(global-set-key (kbd "C-.") 'goto-match-paren)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Clipboard functions
 ;; http://www.emacswiki.org/emacs/CopyAndPaste
 (defun set-clipboard-contents-from-string (str)
