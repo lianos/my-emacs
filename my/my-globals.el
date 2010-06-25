@@ -17,4 +17,15 @@
 (fset 'yes-or-no-p 'y-or-n-p) ;; allows typing of just "y/n" instead of "yes/no"
 (setq next-line-add-newlines nil) ;; beeps when trying to move down past end of file
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Scrolling
+;; http://zhangda.wordpress.com/2009/05/21
+(setq-default scroll-up-aggressively 0.01
+              scroll-down-aggressively 0.01
+              scroll-margin 1
+              scroll-conservatively 0)
+
+;; http://stackoverflow.com/questions/445873/emacs-mouse-scrolling
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil)))
+
 (provide 'my-globals)
