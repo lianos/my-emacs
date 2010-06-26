@@ -1,3 +1,3 @@
 (wrap-region-global-mode t)
 
-(provide my-wrap-region)
+(provide 'my-wrap-region)
