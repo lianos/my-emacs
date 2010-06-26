@@ -16,11 +16,13 @@
 (global-font-lock-mode t)       ;; turn on syntax highlight for all major modes
 (fset 'yes-or-no-p 'y-or-n-p)   ;; type just "y/n" instead of "yes/no"
 (setq next-line-add-newlines nil) ;; beeps when trying to move down past end of file
-(global-hl-line-mode 1)         ;; Highlight the current line
 (setq visible-bell t)           ;; Turn off the beeping
 (transient-mark-mode t)         ;; highlights regions between point and mark
 (setq search-highlight t)       ;; highlights incremental search
 (setq scroll-step 1)            ;; scroll past endn of screen 1 line at a time
+
+;;(global-hl-line-mode 1)         ;; Highlight the current line
+(toggle-hl-line-when-idle 1)      ;; Highlihgt current line when emacs is idle
 
 
 ;; Allow us to invoke "extended commands" (M-x) w/ ctrl sequence

@@ -14,6 +14,7 @@
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/ecb-2.40"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/color-theme-6.6.0"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/yasnippet-0.6.1c"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/wrap-region"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/my"))
 
 ;; ============================================================================
@@ -25,6 +26,7 @@
 (require 'color-theme)
 (require 'ecb)
 (require 'fixme)
+(require 'hl-line+)
 (require 'ido)
 (require 'wrap-region)
 (require 'yasnippet)
@@ -42,12 +44,12 @@
 ;; My customization to packages and general local/machine settings
 ;; ============================================================================
 (require 'my-globals)
+(require 'my-local-config)  ;; this file isn't version controlled
 
 (require 'my-autopair)
 (require 'my-cedet)
 (require 'my-ecb)
 (require 'my-ido)
-(require 'my-local-config)  ;; this file isn't version controlled
 (require 'my-yasnippet)
 
 ;; ============================================================================
