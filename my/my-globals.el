@@ -43,4 +43,15 @@
 (define-key ctl-x-map "t" 'beginning-of-buffer) ; the above 2 aren't so handy in the terminal
 (define-key ctl-x-map "e" 'end-of-buffer)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Scrolling
+;; http://zhangda.wordpress.com/2009/05/21
+(setq-default scroll-up-aggressively 0.01
+              scroll-down-aggressively 0.01
+              scroll-margin 1
+              scroll-conservatively 0)
+
+;; http://stackoverflow.com/questions/445873/emacs-mouse-scrolling
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil)))
+
 (provide 'my-globals)
