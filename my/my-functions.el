@@ -9,6 +9,7 @@ a movement command, otherwise insert %.
   (interactive "p")
   (message "%s" last-command)
   (if (not (memq last-command '(set-mark
+                                set-mark-command
                                 cua-set-mark
                                 goto-match-paren
                                 down-list
