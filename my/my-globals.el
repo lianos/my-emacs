@@ -1,3 +1,13 @@
+;; ============================================================================
+;; Swap ctrl-x to be ctrl-l : Banish emacs claw!
+;; I've found this is necessary to be loaded after provided libraries because
+;; some of them set keyboard binidngs straight to "C-x" and not the ctl-x-map
+;; (I think)
+;; ============================================================================
+(global-set-key (kbd "C-l") ctl-x-map)
+(global-set-key (kbd "C-x") 'recenter)
+
+
 (setq color-theme-is-global t)
 ;; Use black bacground color scheme if running in a terminal
 (if (not window-system)

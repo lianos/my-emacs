@@ -1,17 +1,11 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Use "%" to jump to the matching parenthesis.
-;; Taken from http://www.crsr.net/Notes/Emacs.html
+;; Defines custom functions and binds them to keyboard shortcuts.
+;; 
+;; These functions were primarily found in random places on the internet,
+;; or ones I made myself.
 (defun goto-match-paren (arg)
-  "Go to the matching parenthesis if on parenthesis, otherwise insert
-   the character typed."
-  (interactive "p")
-  (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
-        ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
-        (t                    (self-insert-command))))
-
-(defun goto-match-paren (arg)
-  "Go to the matching parenthesis if on parenthesis AND last command is a movement command, otherwise insert %.
-vi style of % jumping to matching brace."
+  "Go to the matching parenthesis if on parenthesis AND last command is
+a movement command, otherwise insert %.
+(vi style of % jumping to matching brace.)"
   (interactive "p")
   (message "%s" last-command)
   (if (not (memq last-command '(set-mark
@@ -46,15 +40,12 @@ vi style of % jumping to matching brace."
                                 scroll-right
                                 mouse-set-point
                                 next-buffer
-                                previous-buffer
-                                )
-                 ))
+                                previous-buffer)))
       (self-insert-command (or arg 1))
     (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
           ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
           (t (self-insert-command (or arg 1))))))
 
-;; (global-set-key (kbd "C-%") 'goto-match-paren)
 (global-set-key (kbd "%") 'goto-match-paren)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
