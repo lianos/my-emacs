@@ -2,5 +2,5 @@
 #key : fun
 # --
 ${1:name} <- function(${2:args}) {
-  $0
+$>$0
 }

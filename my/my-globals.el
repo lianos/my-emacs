@@ -5,6 +5,7 @@
     (color-theme-initialize)
     (color-theme-charcoal-black)))
 
+(setq inhibit-startup-message t)        ;; inhibit GNU start screen
 (global-linum-mode 1)           ;; always show line numbers (emacs23 only)
 (setq column-number-mode t)     ;; Display column numbers
 (setq line-number-mode   t)     ;; Display line numbers
@@ -24,6 +25,9 @@
 ;;(global-hl-line-mode 1)         ;; Highlight the current line
 (toggle-hl-line-when-idle 1)      ;; Highlihgt current line when emacs is idle
 
+;; set C-\ to autocomplete from words in current buffer
+(global-set-key "\C-\\"      'dabbrev-expand)
+(define-key esc-map "\C-\\"  'dabbrev-completion)
 
 ;; Allow us to invoke "extended commands" (M-x) w/ ctrl sequence
 (define-key ctl-x-map "\C-m" 'execute-extended-command)
