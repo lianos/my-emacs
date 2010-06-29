@@ -7,14 +7,6 @@
 (global-set-key (kbd "C-l") ctl-x-map)
 (global-set-key (kbd "C-x") 'recenter)
 
-
-(setq color-theme-is-global t)
-;; Use black bacground color scheme if running in a terminal
-(if (not window-system)
-  (progn
-    (color-theme-initialize)
-    (color-theme-charcoal-black)))
-
 (setq inhibit-startup-message t)        ;; inhibit GNU start screen
 (global-linum-mode 1)           ;; always show line numbers (emacs23 only)
 (setq column-number-mode t)     ;; Display column numbers
@@ -30,10 +22,9 @@
 (setq visible-bell t)           ;; Turn off the beeping
 (transient-mark-mode t)         ;; highlights regions between point and mark
 (setq search-highlight t)       ;; highlights incremental search
-(setq scroll-step 1)            ;; scroll past endn of screen 1 line at a time
 
-;;(global-hl-line-mode 1)         ;; Highlight the current line
-(toggle-hl-line-when-idle 1)      ;; Highlihgt current line when emacs is idle
+(global-hl-line-mode 1)         ;; Highlight the current line
+;;(toggle-hl-line-when-idle 1)  ;; Highlihgt current line only when idle (hl-line+.el)
 
 ;; set C-\ to autocomplete from words in current buffer
 (global-set-key "\C-\\"      'dabbrev-expand)
@@ -62,10 +53,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scrolling
 ;; http://zhangda.wordpress.com/2009/05/21
-(setq-default scroll-up-aggressively 0.01
-              scroll-down-aggressively 0.01
-              scroll-margin 1
-              scroll-conservatively 0)
+;; (setq-default scroll-up-aggressively 0.01
+;;               scroll-down-aggressively 0.01
+;;               scroll-margin 1
+;;               scroll-conservatively 0)
+
+;; From: http://www.djcbsoftware.nl/dot-emacs.html
+(setq 
+  scroll-margin 0                        ;; do smooth scrolling, ...
+  scroll-conservatively 100000           ;; ... the defaults ...
+  scroll-up-aggressively 0               ;; ... are very ...
+  scroll-down-aggressively 0             ;; ... annoying
+  scroll-preserve-screen-position t)     ;; preserve screen pos with C-v/M-v 
 
 ;; http://stackoverflow.com/questions/445873/emacs-mouse-scrolling
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil)))

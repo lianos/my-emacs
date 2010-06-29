@@ -13,6 +13,7 @@
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/ecb-2.40"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/color-theme-6.6.0"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/color-themes"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/yasnippet-0.6.1c"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/wrap-region"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/my"))
@@ -26,7 +27,7 @@
 (require 'color-theme)
 (require 'ecb)
 (require 'fixme)
-(require 'hl-line+)
+;;(require 'hl-line+)
 (require 'ido)
 (require 'wrap-region)
 (require 'yasnippet)
@@ -34,20 +35,24 @@
 ;; ============================================================================
 ;; My customization to packages and general local/machine settings
 ;; ============================================================================
+;(require 'my-color-theme)   ;; Defines alternate color themes needed downstream
+
 (require 'my-globals)
-(require 'my-functions)
-(require 'my-local-config)  ;; this file isn't version controlled
+(require 'my-color-theme)
 
-(require 'my-autopair)
-(require 'my-cedet)
-(require 'my-ecb)
-(require 'my-ido)
-(require 'my-yasnippet)
-
-;; ============================================================================
-;; Programming language specific customizations
-;; ============================================================================
-(require 'my-programming-r)
+; (require 'my-functions)
+; (require 'my-local-config)  ;; this file isn't version controlled
+; 
+; (require 'my-autopair)
+; (require 'my-cedet)
+; (require 'my-ecb)
+; (require 'my-ido)
+; (require 'my-yasnippet)
+; 
+; ;; ============================================================================
+; ;; Programming language specific customizations
+; ;; ============================================================================
+; (require 'my-programming-r)
 
 ;; ============================================================================
 ;; Auto-generated custom settings (from M-x customize ...)
