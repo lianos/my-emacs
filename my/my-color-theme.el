@@ -1,4 +1,8 @@
 ;; TODO: Figure out how to auto-include all *.el files in ../color-themes
+;;  Check: 
+;;    http://www.cs.huji.ac.il/~osigor/emacs/load.html
+;;    http://www.cs.huji.ac.il/~osigor/emacs/src/htmlized/elisp-load-dir.el.html
+
 (require 'zenburn)
 
 (setq color-theme-is-global t)

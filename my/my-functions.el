@@ -41,7 +41,9 @@ a movement command, otherwise insert %.
                                 scroll-right
                                 mouse-set-point
                                 next-buffer
-                                previous-buffer)))
+                                previous-buffer
+                                previous-line
+                                next-line)))
       (self-insert-command (or arg 1))
     (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
           ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
