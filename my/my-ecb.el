@@ -1,6 +1,6 @@
 ;; Look at (and set) the most important ECB options like so:
 ;; M-x ecb-customize-most-important RET
-(setq ecb-layout-name "left14")
+(setq ecb-layout-name "left13")
 (setq ecb-tip-of-the-day nil)
 
 ;;(ecb-default-highlight-face ((t (:background "cornflower blue" :foreground "yellow"))))
