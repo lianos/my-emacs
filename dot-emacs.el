@@ -28,6 +28,7 @@
 (require 'fixme)
 (require 'hl-line+)
 (require 'ido)
+(require 'ssh)
 (require 'wrap-region)
 (require 'yasnippet)
 
