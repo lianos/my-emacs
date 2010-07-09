@@ -55,6 +55,6 @@
 ;; ============================================================================
 ;; Auto-generated custom settings (from M-x customize ...)
 ;; ============================================================================
-(setq custom-file "~/.emacs.d/my-local-config.el")
+(setq custom-file "~/.emacs.d/my/my-local-config.el")
 (load custom-file 'noerror)
 
