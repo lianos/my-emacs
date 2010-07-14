@@ -1,4 +1,4 @@
-(load (expand-file-name "~/.emacs.d/plugins/ess-5.10/lisp/ess-site"))
+(load (expand-file-name "~/.emacs.d/plugins/ess/lisp/ess-site"))
 (require 'ess-site)
 
 (add-hook 'ess-mode-hook
