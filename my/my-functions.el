@@ -3,9 +3,9 @@
 ;; These functions were primarily found in random places on the internet,
 ;; or ones I made myself.
 (defun goto-match-paren (arg)
-  "Go to the matching parenthesis if on parenthesis AND last command is
-a movement command, otherwise insert %.
-(vi style of % jumping to matching brace.)"
+  "Go to the matching parenthesis if on parenthesis AND last command is a
+movement command, otherwise insert %. This is vi-esque style of jumping to
+the matching brace"
   (interactive "p")
   (message "%s" last-command)
   (if (not (memq last-command '(set-mark
