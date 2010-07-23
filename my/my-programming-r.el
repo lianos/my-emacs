@@ -5,6 +5,19 @@
           (lambda ()
             (setq tab-width 2)))
 
+;; Tweak font locking
+(add-hook 'ess-mode-hook
+ '(lambda()
+    (font-lock-add-keywords nil
+    '(("\\<\\(if\\|for\\|function\\|return\\)\\>[\n[:blank:]]*(" 1
+font-lock-keyword-face) ; must go first to override highlighting below
+      ("\\<\\([.A-Za-z][._A-Za-z0-9]*\\)[\n[:blank:]]*(" 1
+font-lock-function-name-face) ; highlight function names
+      ("[(,][\n[:blank:]]*\\([.A-Za-z][._A-Za-z0-9]*\\)[\n[:blank:]]*=" 1
+font-lock-reference-face) ;highlight argument names
+      ))
+    ))
+
 (setq ess-ask-for-ess-directory t)
 (setq ess-local-process-name "R")
 (setq ansi-color-for-comint-mode 'filter)
