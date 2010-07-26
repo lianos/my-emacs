@@ -2,6 +2,21 @@
 ;; 
 ;; These functions were primarily found in random places on the internet,
 ;; or ones I made myself.
+
+;; Change \M-; to a better comment-dwim. This will comment the current
+;; line if the mark isn't active, not add a comment to the end of the line
+;; http://www.emacswiki.org/emacs/CommentingCode
+;; http://www.opensubscriber.com/message/emacs-devel@gnu.org/10971693.html
+(defun comment-dwim-line (&optional arg)
+  (interactive "*P")
+  (comment-normalize-vars)
+  (if (and (not (region-active-p)) (not (looking-at "[ \t]*$")))
+      (comment-or-uncomment-region (line-beginning-position)
+				   (line-end-position))
+    (comment-dwim arg)))
+(global-set-key "\M-;" 'comment-dwim-line)
+
+
 (defun goto-match-paren (arg)
   "Go to the matching parenthesis if on parenthesis AND last command is a
 movement command, otherwise insert %. This is vi-esque style of jumping to
