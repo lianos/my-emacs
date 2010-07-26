@@ -76,7 +76,7 @@
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil)))
 
 (global-hl-line-mode nil)         ;; Highlight the current line
-(toggle-hl-line-when-idle 1)  ;; Activate Highlight after idle (hl-line+.el)
+;;(toggle-hl-line-when-idle 1)  ;; Activate Highlight after idle (hl-line+.el)
 
 ;; ============================================================================
 ;; Version specific emacs settings

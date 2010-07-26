@@ -13,7 +13,7 @@
        font-lock-keyword-face) ; must go first to override highlighting below
       ("\\<\\([.A-Za-z][._A-Za-z0-9]*\\)[\n[:blank:]]*(" 1
        font-lock-function-name-face) ; highlight function names
-      ("[(,][\n[:blank:]]*\\([.A-Za-z][._A-Za-z0-9]*\\)[\n[:blank:]]*=" 1
+      ("\\([(,]\\|[\n[:blank:]]*\\)\\([.A-Za-z][._A-Za-z0-9]*\\)[\n[:blank:]]*=[^=]" 2
        font-lock-reference-face) ;highlight argument names
       ))
     ))
