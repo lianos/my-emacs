@@ -24,6 +24,7 @@
 (setq comint-scroll-to-bottom-on-input t)
 (setq comint-scroll-to-bottom-on-output t)
 (setq comint-move-point-for-output t)
+(setq inferior-ess-r-help-command ".help.ESS(\"%s\", help_type=\"html\")")
 
 ;; Setting comint-prompt-read-only to true is supposed to be a bad idea?
 ;; See: http://stackoverflow.com/questions/2710442
