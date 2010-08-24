@@ -1,0 +1,1 @@
+find-grep-dired Search all files in a directory
