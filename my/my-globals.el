@@ -13,6 +13,7 @@
 (define-key ctl-x-map "\C-l" 'recenter)
 (define-key ctl-x-map "l" 'goto-line)
 
+(define-key ctl-x-map "\C-b" 'ibuffer)
 
 (global-set-key "\C-\\"      'dabbrev-expand)     ;; C-\ autocompletes using
 (define-key esc-map "\C-\\"  'dabbrev-completion) ;; words in current buffer
@@ -41,6 +42,12 @@
 ;; Global settings
 ;; ============================================================================
 
+(setq initial-major-mode 'R-mode)  ;; Sets the scratch buffer to R-mode
+(setq initial-scratch-message
+  "## This buffer is for notes you don't want to save, and for R evaluation.
+## The variables 'initial-major-mode' and 'initial-scratch-message' were changed
+## to make this happen, see: http://www.emacswiki.org/emacs/RecreateScratchBuffer
+")
 
 (setq inhibit-startup-message t)        ;; inhibit GNU start screen
 (setq column-number-mode t)     ;; Display column numbers
@@ -57,6 +64,7 @@
 (transient-mark-mode t)         ;; highlights regions between point and mark
 (setq search-highlight t)       ;; highlights incremental search
 (put 'downcase-region 'disabled nil) ;; set downcase-region to work w/o warning
+(setq uniquify-buffer-name-style 'post-forward)
 
 ;; Scrolling
 ;; http://zhangda.wordpress.com/2009/05/21

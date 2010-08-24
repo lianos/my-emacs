@@ -28,7 +28,9 @@
 (require 'fixme)
 (require 'hl-line+)
 (require 'ido)
+(require 'ibuffer)
 (require 'ssh)
+(require 'uniquify)
 (require 'wrap-region)
 (require 'yasnippet)
 
@@ -44,6 +46,7 @@
 (require 'my-cua)
 (require 'my-ecb)
 (require 'my-ido)
+(require 'my-ibuffer)
 (require 'my-yasnippet)
 
 (require 'my-local-config)  ;; this file isn't version controlled
