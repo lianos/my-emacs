@@ -124,7 +124,7 @@
 
 ;; Variables (not user-changeable)
 
-(defvar ess-version "5.11"
+(defvar ess-version "5.12"
   "Version of ESS currently loaded.")
 
 (defvar no-doc
@@ -636,7 +636,7 @@ If nil, ESS will try finding one from a list."
 
 ;; ---- ./ess-roxy.el : ------------
 
-(defcustom ess-roxy-tags-noparam '("export")
+(defcustom ess-roxy-tags-noparam '("export" "nord")
   "The tags used in roxygen fields that can be used alone.  Used
 to decide highlighting and tag completion."
   :group 'ess-roxy
@@ -648,15 +648,19 @@ to decide highlighting and tag completion."
 				 "name" "note" "param"
 				 "include" "references" "return"
 				 "seealso" "source" "docType"
-				 "title" "TODO" "usage")
+				 "title" "TODO" "usage" "import"
+                                 "exportClass" "exportPattern" "S3method"
+                                 "importFrom" "importClassesFrom"
+                                 "importMethodsFrom" "useDynLib"
+                                 "rdname" "slot")
   "The tags used in roxygen fields that require a parameter.
 Used to decide highlighting and tag completion."
   :group 'ess-roxy
   :type '(repeat string))
 
 (defcustom ess-roxy-template-alist
-  (list (cons "description"  "<description>")
-	(cons "details" "<details>")
+  (list (cons "description"  ".. content for \\description{} (no empty lines) ..")
+	(cons "details" ".. content for \\details{} ..")
 	(cons "title" "")
 	(cons "param"  "")
 	(cons "return" "")
@@ -669,6 +673,12 @@ therefore also be at the beginning of this template to give
 syntactically correct roxygen entries)"
   :group 'ess-roxy
   :type '(alist :value-type (group string)))
+
+(defcustom ess-roxy-fill-param-p nil
+  "Non-nil causes parameter descriptions to be filled (word-wrapped) upon `ess-roxy-update-entry'."
+  :group 'ess-roxy
+  :type '(choice (const :tag "Off" nil)
+                 (const :tag "On" t)))
 
 (defcustom ess-roxy-hide-show-p nil
   "Non-nil means ess-roxy uses hs-minor-mode for block hiding with TAB."
@@ -1061,7 +1071,7 @@ order for it to work right.  And Emacs is too smart for it."
 ;;; ess-editor and ess-pager,
 ;;; and inferior-ess-language-start
 ;;; apply in principle to the 15 files essd[s-]*.el
-;;; Several of the files (essd-sp4.el and essd-sp6w.el) have more
+;;; Several of the files (ess-sp4-d.el and ess-sp6w-d.el) have more
 ;;; than one *-customize-alist.
 ;;; These variables are currently used only with the S language files for
 ;;; S S-Plus R.
@@ -1430,6 +1440,12 @@ session.")
 
 (make-variable-buffer-local 'ess-object-list)
 
+(defvar ess-help-topics-list nil
+  ;; List of currently known help topics.
+  "Cache of help topics")
+
+(make-variable-buffer-local 'ess-help-topics-list)
+
 ;;*;; Miscellaneous system variables
 
 (defvar ess-temp-point nil
@@ -1481,7 +1497,7 @@ dialects' alists.  Increase this, if you have a fast(er) machine."
   :type 'integer)
 
 ;; NOTA BENE: Other languages/dialect currently set `ess-loop-timeout'
-;;            **directly** in their essd-*.el alist !!
+;;            **directly** in their ess-*-d.el alist !!
 
 ;;;*;;; Font-lock support
 
@@ -1754,7 +1770,7 @@ Defaults to `ess-S-non-functions'."
  ; ess-mode: editing S source
 
 ;;; This syntax table is required by ess-mode.el, ess-inf.el and
-;;; ess-trans.el, so we provide it here.
+;;; ess-trns.el, so we provide it here.
 (defvar ess-mode-syntax-table nil "Syntax table for `ess-mode'.")
 (make-variable-buffer-local 'ess-mode-syntax-table)
 

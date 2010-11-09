@@ -259,13 +259,13 @@ between .s or .S files and assembly mode.
           )
 	 auto-mode-alist)))
 
-;; Rscript and littler interpreters recognized
-(setq interpreter-mode-alist
-      (append
-       '(("Rscript" . r-mode)
-	 ("r"       . r-mode)
-	 )
-       interpreter-mode-alist))
+;; Rscript and littler interpreters recognized.  XEmacs entries can 
+;; be regexps, which complicates matters as "r" on its own matches 
+;; other interpeters like "perl".
+(add-to-list 'interpreter-mode-alist '("Rscript" . r-mode))
+(add-to-list 'interpreter-mode-alist
+	     (cons (if (featurep 'xemacs) "r$" "r")    'r-mode))
+
 
 ;; (1.4) Customize the dialects for your setup.
 
@@ -403,8 +403,8 @@ sending `inferior-ess-language-start' to S-Plus.")
 (require 'ess-sas-d)
 (ess-message "[ess-site:] require 'essd-els ...")
 (require 'essd-els)  ;; S-elsewhere, on another machine by telnet
-;; (ess-message "[ess-site:] require 'essd-omg ...")
-;; (require 'essd-omg)  ;; for omegahat
+;; (ess-message "[ess-site:] require 'ess-omg-d ...")
+;; (require 'ess-omg-d)  ;; for omegahat
 (ess-message "[ess-site:] require 'ess-bugs-l ...")
 (require 'ess-bugs-l)  ;; for batch BUGS
 
@@ -454,6 +454,7 @@ sending `inferior-ess-language-start' to S-Plus.")
 
 (autoload 'ess-transcript-mode "ess-trns"
   "Major mode for editing S transcript files." t)
+(autoload 'ess-transcript-clean-region "ess-trns" no-doc t)
 
 (autoload 'ess-rdired "ess-rdired"
   "View *R* objects in a dired-like buffer." t)

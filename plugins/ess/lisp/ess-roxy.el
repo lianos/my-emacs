@@ -40,6 +40,14 @@
 ;; - preview
 ;;   - C-c C-e C-r :: create a preview of the Rd file as generated
 ;;     using roxygen
+;;     
+;; Known issues:
+;;
+;; - hideshow mode does not work very well. In particular, if ordinary
+;;   comments precede a roxygen entry, then both will be hidden in the
+;;   same overlay from start and not unfoldable using TAB since the
+;;   roxygen prefix is not present. The planned solution is implement
+;;   a replacement for hideshow.
 
 ;; this *is* enabled now via ess-mode-hook in ./ess-site.el
 
@@ -240,8 +248,12 @@ function at point. if here is supplied start inputting
 	  (progn
 	    (insert (concat "\n"
 			    ess-roxy-str " @param " (car arg-des) " "))
-	    (insert (concat (car (cdr arg-des))))
-	    (ess-roxy-fill-field))))))
+	    (insert 
+	     (ess-replace-in-string (concat (car (cdr arg-des))) "\n" 
+				    (concat "\n" ess-roxy-str)))
+	    (if ess-roxy-fill-param-p
+		(ess-roxy-fill-field))
+	    )))))
 
 (defun ess-roxy-merge-args (fun ent)
   "Take two args lists (alists) and return their union. Result
@@ -250,7 +262,7 @@ association from ent are preferred over entries from fun. Also,
 drop entries from ent that are not in fun and are associated with
 the empty string."
   (let ((res-arg nil)
-	(arg-des))
+	(arg-des))			
     (while (stringp (car (car fun)))
       (setq arg-des (pop fun))
       (if (assoc (car arg-des) ent)
@@ -264,9 +276,12 @@ the empty string."
     (nreverse res-arg)))
 
 (defun ess-roxy-update-entry ()
-  "Update the current entry or the entry above the function which
-the point is in. Add basic roxygen documentation if no roxygen
-entry is available."
+  "Update the entry at the point or the entry above the function
+which the point is in. Add a template empty roxygen documentation
+if no roxygen entry is available. The template can be customized
+via the variable `ess-roxy-template-alist'. The parameter
+descriptions can are filled if `ess-roxy-fill-param-p' is
+non-nil."
   (interactive)
   (save-excursion
     (let* ((args-fun (ess-roxy-get-args-list-from-def))
@@ -376,21 +391,17 @@ point is"
 		    (setq args-text (buffer-substring-no-properties
 				     field-beg field-end))
 		    (setq args-text
-			  (ess-replace-in-string args-text
-						 ess-roxy-str ""))
+		    	  (ess-replace-in-string args-text
+		    				 ess-roxy-str ""))
 		    (setq args-text
 			  (ess-replace-in-string
-			   args-text "@param" ""))
-		    (setq args-text
-			  (ess-replace-in-string args-text "\n" ""))
-		    (setq args-text (replace-regexp-in-string
-				     "^ +" "" args-text))
-		    (setq arg-name (replace-regexp-in-string
-				    " .*" ""  args-text))
+			   args-text "[[:space:]]*@param *" ""))
+		    ;; (setq args-text
+		    ;; 	  (ess-replace-in-string args-text "\n" ""))
+		    (string-match "[^[:space:]]*" args-text)
+		    (setq arg-name (match-string 0 args-text))
 		    (setq desc (replace-regexp-in-string
-				(concat "^" arg-name) "" args-text))
-		    (setq desc (replace-regexp-in-string
-				"^ +" "" desc))
+				(concat "^" arg-name " *") "" args-text))
 		    (setq args (cons (list (concat arg-name)
 					   (concat desc)) args))))
 	      (forward-line -1))
@@ -502,7 +513,7 @@ list of strings."
 	     (ess-beginning-of-function)
 	     (buffer-substring-no-properties
 	      (progn
-		(search-forward-regexp "function *" nil nil 1)
+		(search-forward-regexp "[=,-] *function *" nil nil 1)
 		(+ (point) 1))
 	      (progn
 		(ess-roxy-match-paren)

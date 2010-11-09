@@ -1,4 +1,18 @@
-Changes/New Features in 5.11:
+Changes/New Features in 5.12:
+        * ESS[SAS] Font-locking:  update of PROCs keywords (up to SAS
+          9.22); error/warnings.
+
+        * ESS[R]: Roxygen improvements: S4 classes;  also optionally
+          keep spaces when filling arguments
+
+        * ESS[Rd]: support new keywords:  section-name \subsection plus
+          a dozen "new" keywords; should match R  2.12.x now.
+
+        * `ess-display-help-on-object' (`C-c C-v')  now _cashes_ the
+          list of topics, thus speeding up the improvemed  feature
+          introduced in 5.9.
+
+     Changes/New Features in 5.11:
         * Filename completion within buffers now adds only trailing
           characters to complete the filename, rather than expanding to
           an absolute file path.  This filename completion is bound to
