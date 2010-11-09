@@ -12,18 +12,22 @@
             ;;    ))
             ("GenomicFeaturesX"
 	     (filename . "GenomicFeaturesX/"))
-            ("GenomeAnnoations"
-	     (filename . "GenomeAnnotations/"))
+            ;; ("GenomeAnnoations"
+	    ;;  (filename . "GenomeAnnotations/"))
 	    ("SeqStore"
 	     (filename . "SeqStore/"))
-	    ("DGEseq"
-	     (filename . "DGEseq/"))
-	    ("TailSeq"
-	     (filename . "TailSeq/"))
+	    ("TagSeq"
+	     (filename . "TagSeq/"))
+	    ;; ("DGEseq"
+	    ;;  (filename . "DGEseq/"))
+	    ;; ("TailSeq"
+	    ;;  (filename . "TailSeq/"))
 	    ;; ("mayr"
 	    ;;  (filename . "mayr.project"))
 	    ("Programming/R"
 	     (mode . ess-mode))
+            ;; ("R Processes"
+	    ;;  ())
             ("Programming" ;; prog stuff not already in MyProjectX
               (or
                 (mode . c-mode)

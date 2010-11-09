@@ -3,7 +3,8 @@
 
 (add-hook 'ess-mode-hook
           (lambda ()
-            (setq tab-width 2)))
+            (setq tab-width 2)
+	    (setq yas/buffer-local-condition t)))
 
 ;; Tweak font locking
 (add-hook 'ess-mode-hook
