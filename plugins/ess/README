@@ -3,7 +3,7 @@
 
 This is the README file for the distribution of ESS version
 
-   5.11
+   5.12
 
    ESS is a GNU Emacs and XEmacs mode for interactive statistical
 programming and data analysis.  Languages supported: the S family (S,
@@ -482,6 +482,20 @@ shell, simply type `M-x S+6-msdos RET'.
 
 1.10 New Features
 =================
+
+     Changes/New Features in 5.12:
+        * ESS[SAS] Font-locking:  update of PROCs keywords (up to SAS
+          9.22); error/warnings.
+
+        * ESS[R]: Roxygen improvements: S4 classes;  also optionally
+          keep spaces when filling arguments
+
+        * ESS[Rd]: support new keywords:  section-name \subsection plus
+          a dozen "new" keywords; should match R  2.12.x now.
+
+        * `ess-display-help-on-object' (`C-c C-v')  now _cashes_ the
+          list of topics, thus speeding up the improvemed  feature
+          introduced in 5.9.
 
      Changes/New Features in 5.11:
         * Filename completion within buffers now adds only trailing

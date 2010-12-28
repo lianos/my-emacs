@@ -14,7 +14,7 @@ File: ess.info,  Node: Top,  Next: Introduction,  Prev: (dir),  Up: (dir)
 ESS: Emacs Speaks Statistics
 ****************************
 
-ESS version 5.11
+ESS version 5.12
 
      by  A.J. Rossini,
          R.M. Heiberger,
@@ -206,6 +206,20 @@ File: ess.info,  Node: New features,  Next: Credits,  Prev: Features,  Up: Intro
 
 1.2 New features in ESS
 =======================
+
+     Changes/New Features in 5.12:
+        * ESS[SAS] Font-locking:  update of PROCs keywords (up to SAS
+          9.22); error/warnings.
+
+        * ESS[R]: Roxygen improvements: S4 classes;  also optionally
+          keep spaces when filling arguments
+
+        * ESS[Rd]: support new keywords:  section-name \subsection plus
+          a dozen "new" keywords; should match R  2.12.x now.
+
+        * `ess-display-help-on-object' (`C-c C-v')  now _cashes_ the
+          list of topics, thus speeding up the improvemed  feature
+          introduced in 5.9.
 
      Changes/New Features in 5.11:
         * Filename completion within buffers now adds only trailing
@@ -2869,7 +2883,7 @@ File: ess.info,  Node: Customization Examples and Solutions to Problems,  Prev: 
 1. Suppose that you are primarily an SPLUS 3.4 user, occasionally
 using S version 4, and sick and tired of the buffer-name *S+3*    we've
 stuck you with.  Simply edit the "ess-dialect" alist entry in    the
-essd-sp3.el and essd-s4.el files to be "S" instead of "S4" and
+ess-sp3-d.el and ess-s4-d.el files to be "S" instead of "S4" and
 "S+3".  This will ensure that all the inferior process buffer names
 are "*S*".
 
@@ -3154,7 +3168,7 @@ maintained in the source code as comments *Note Roxygen::.
 * Styles::                     Changing indentation styles
 
 
-File: ess.info,  Node: Styles,  Up: Indenting
+File: ess.info,  Node: Styles,  Prev: Indenting,  Up: Indenting
 
 7.5.1 Changing indentation styles
 ---------------------------------
@@ -3539,65 +3553,61 @@ toggle visibility of Roxygen entries and the Roxygen template.
    All ESS Roxygen support is defined in `ess-roxy.el' which is loaded
 by default in ESS. The following special Emacs commands are provided.
 
-`C-c C-o'
-     `ess-roxy-update-entry': Generate a Roxygen template or update the
-     parameter list in Roxygen entry at point (or above the function at
-     the point). Documented parameters that are not in the function are
-     placed last in the list, parameters that are not documented and
-     not in the definition are dropped.
+   * `C-c C-o' (`ess-roxy-update-entry')
+     Generate a Roxygen template or update the parameter list in Roxygen
+     entry at point (or above the function at the point). Documented
+     parameters that are not in the function are placed last in the
+     list, parameters that are not documented and not in the definition
+     are dropped. Parameter descriptions are filled if
+     `ess-roxy-fill-param-p' is non-nil.
 
-`C-c C-e C-c'
-     `ess-roxy-toggle-roxy-region': Toggle the presence of the leading
-     Roxygen string on all lines in the marked region. Convenient for
-     transferring text to Roxygen entries and to evaluate example
-     fields.
+   * `C-c C-e C-c' (`ess-roxy-toggle-roxy-region')
+     Toggle the presence of the leading Roxygen string on all lines in
+     the marked region. Convenient for transferring text to Roxygen
+     entries and to evaluate example fields.
 
-`C-c C-e C-r'
-     `ess-roxy-preview-Rd': Use the attached R process to parse the
-     entry at point obtain the input for an Rd file. Convenient for
-     checking syntax. When used with the prefix argument, i.e. `C-u C-c
-     C-e C-r', place the content in a buffer associated with a Rd file
-     with the same name as the documentation. Requires the Roxygen
-     package to be installed.
+   * `C-c C-e C-r' (`ess-roxy-preview-Rd')
+     Use the attached R process to parse the entry at point obtain the
+     input for an Rd file. Convenient for checking syntax. When used
+     with the prefix argument, i.e. `C-u C-c C-e C-r', place the
+     content in a buffer associated with a Rd file with the same name
+     as the documentation. Requires the Roxygen package to be installed.
 
-`C-c C-e p `ess-roxy-previous-entry''
+   * `C-c C-e p' (`ess-roxy-previous-entry')
      Go to start of the Roxygen entry above point.
 
-`C-c C-e n'
-     `ess-roxy-next-entry': Go to end of the Roxygen entry above point.
+   * `C-c C-e n'  (`ess-roxy-next-entry')
+     Go to end of the Roxygen entry above point.
 
-`C-c C-e C-h'
-     `ess-roxy-hide-all': Use the hideshow mode to fold away the
-     visibility of all Roxygen entries. Hide-show support must be
-     enabled for this binding to get defined.
+   * `C-c C-e C-h' (`ess-roxy-hide-all')
+     Use the hideshow mode to fold away the visibility of all Roxygen
+     entries. Hide-show support must be enabled for this binding to get
+     defined.
 
-   ESS also advices several standard editing functions in order to make
-Roxygen editing more intuitive. The advised functions are as follows.
+     ESS also advices the following standard editing functions in order
+     to make Roxygen editing more intuitive:
 
-`C-c TAB'
-     `ess-R-complete-object-name': Complete Roxygen tag at point. E.g.
-     doing `C-c TAB' when the point is at the end of `@par' completes
-     to `@param'.
+   * `C-c TAB' (`ess-R-complete-object-name')
+     Complete Roxygen tag at point. E.g. doing `C-c TAB' when the point
+     is at the end of `@par' completes to `@param'.
 
-`M-h'
-     `mark-paragraph': If the transient mark mode is active, place mark
-     and point at start end end of the field at point and activate the
-     mark.
+   * `M-h' (`mark-paragraph')
+     If the transient mark mode is active, place mark and point at
+     start end end of the field at point and activate the mark.
 
-`TAB'
-     `ess-indent-command': If hide-show support is enabled, fold away
-     the visibility of the Roxygen entry at point.
+   * `TAB' (`ess-indent-command')
+     If hide-show support is enabled, fold away the visibility of the
+     Roxygen entry at point.
 
-`M-q'
-     `fill-paragraph': Fill the Roxygen field at point.
+   * `M-q' (`fill-paragraph')
+     Fill the Roxygen field at point.
 
-`C-a'
-     `move-beginning-of-line': Move to the point directly to the right
-     of the Roxygen start string.
-
-`ENTER'
-     `newline-and-indent': Insert a new line and the Roxygen prefix
+   * `C-a' (`move-beginning-of-line')
+     Move to the point directly to the right of the Roxygen start
      string.
+
+   * `ENTER' (`newline-and-indent')
+     Insert a new line and the Roxygen prefix string.
 
 
 File: ess.info,  Node: Help,  Next: ESS for SAS,  Prev: Editing R documentation,  Up: Top
@@ -4343,8 +4353,8 @@ File: ess.info,  Node: ESS(BUGS)--Model files,  Next: ESS(BUGS)--Command files, 
 ==========================
 
 Model files with the `.bug' extension are edited in ESS[BUGS] mode if
-`(require 'essd-bugs)' was performed or edited in ESS[JAGS] mode if
-`(require 'essd-jags)'.  Three keys are bound for your use in
+`(require 'ess-bugs-d)' was performed or edited in ESS[JAGS] mode if
+`(require 'ess-jags-d)'.  Three keys are bound for your use in
 ESS[BUGS], `F2', `C-c C-c' and `='.  `F2' performs the same action as
 it does in ESS[SAS], *Note ESS(SAS)--Function keys for batch
 processing::.  `C-c C-c' performs the function `ess-bugs-next-action'
@@ -4468,8 +4478,8 @@ File: ess.info,  Node: ESS(JAGS)--Model files,  Next: ESS(JAGS)--Command files, 
 ==========================
 
 Model files with the `.bug' extension are edited in ESS[BUGS] mode if
-`(require 'essd-bugs)' was performed or edited in ESS[JAGS] mode if
-`(require 'essd-jags)'.  Three keys are bound for your use in
+`(require 'ess-bugs-d)' was performed or edited in ESS[JAGS] mode if
+`(require 'ess-jags-d)'.  Three keys are bound for your use in
 ESS[BUGS], `F2', `C-c C-c' and `='.  `F2' performs the same action as
 it does in ESS[SAS], *Note ESS(SAS)--Function keys for batch
 processing::.  `C-c C-c' performs the function `ess-bugs-next-action'
@@ -4549,6 +4559,7 @@ ESS has a few miscellaneous features, which didn't fit anywhere else.
 * TAGS::                        Using TAGS for S files
 * Rdired::                      Directory editor for R objects
 * Rutils::                      R object/package management and help utilities
+* Org::                         Interaction with Org mode
 
 
 File: ess.info,  Node: Highlighting,  Next: Parens,  Prev: Miscellaneous,  Up: Miscellaneous
@@ -4767,7 +4778,7 @@ the object, `v' will view it, and `d' will mark the object for deletion
 (`x' will actually perform the deletion).
 
 
-File: ess.info,  Node: Rutils,  Prev: Rdired,  Up: Miscellaneous
+File: ess.info,  Node: Rutils,  Next: Org,  Prev: Rdired,  Up: Miscellaneous
 
 13.8 Rutils
 ===========
@@ -4829,6 +4840,25 @@ buffer, so can be bound to a user-defined key:
 `ess-rutils-repospkgs', and `ess-rutils-objs') show results in a
 separate buffer and window, in `ess-rutils-mode', providing useful key
 bindings in this mode (type `?' in this buffer for a description).
+
+
+File: ess.info,  Node: Org,  Prev: Rutils,  Up: Miscellaneous
+
+13.9 Interaction with Org mode
+==============================
+
+Org-mode (`http://orgmode.org' now supports reproducible research and
+literate programming in many languages (including R) - see chapter 14
+of the Org manual
+(`http://orgmode.org/org.html#Working-With-Source-Code'.  For ESS
+users, this offers a document-based work environment within which to
+embed ESS usage.  R code lives in code blocks of an Org document, from
+which it can be edited in ess-mode, evaluated, extracted ("tangled") to
+pure code files.  The code can also be exported ("woven") with the
+surrounding text to several formats including HTML and LaTeX.  Results
+of evaluation including figures can be captured in the Org document, and
+data can be passed from the Org document (e.g. from a table) to the ESS
+R process.  (This section contributed by Dan Davison and Eric Schulte.)
 
 
 File: ess.info,  Node: Mailing lists/bug reports,  Next: Customization,  Prev: Miscellaneous,  Up: Top
@@ -5173,7 +5203,7 @@ Variable and command index
 * ess-execute-search:                    Hot keys.            (line  27)
 * ess-fancy-comments:                    Indenting.           (line  28)
 * ess-function-template:                 Edit buffer.         (line  17)
-* ess-indent-command:                    Roxygen.             (line  82)
+* ess-indent-command:                    Roxygen.             (line  79)
 * ess-keep-dump-files:                   Source Files.        (line  27)
 * ess-list-object-completions:           Completion.          (line  36)
 * ess-load-file <1>:                     Loading.             (line  13)
@@ -5182,18 +5212,18 @@ Variable and command index
 * ess-parse-errors:                      Hot keys.            (line  53)
 * ess-quit <1>:                          Help.                (line 150)
 * ess-quit:                              Other.               (line  18)
-* ess-R-complete-object-name:            Roxygen.             (line  72)
+* ess-R-complete-object-name:            Roxygen.             (line  71)
 * ess-R-mode-font-lock-keywords:         Highlighting.        (line  27)
 * ess-remote:                            ESS processes on Remote Computers.
                                                               (line   6)
 * ess-request-a-process:                 Multiple ESS processes.
                                                               (line  15)
 * ess-resynch:                           Completion details.  (line  24)
-* ess-roxy-hide-all:                     Roxygen.             (line  64)
-* ess-roxy-next-entry:                   Roxygen.             (line  61)
+* ess-roxy-hide-all:                     Roxygen.             (line  63)
+* ess-roxy-next-entry:                   Roxygen.             (line  60)
 * ess-roxy-preview-Rd:                   Roxygen.             (line  50)
-* ess-roxy-previous-entry:               Roxygen.             (line  58)
-* ess-roxy-toggle-roxy-region:           Roxygen.             (line  44)
+* ess-roxy-previous-entry:               Roxygen.             (line  57)
+* ess-roxy-toggle-roxy-region:           Roxygen.             (line  45)
 * ess-roxy-update-entry:                 Roxygen.             (line  37)
 * ess-rutils-apropos:                    Rutils.              (line  30)
 * ess-rutils-htmldocs:                   Rutils.              (line  48)
@@ -5221,15 +5251,15 @@ Variable and command index
 * ess-transcript-send-command:           Resubmit.            (line  10)
 * ess-transcript-send-command-and-move:  Transcript resubmit. (line  22)
 * exit():                                Hot keys.            (line  61)
-* fill-paragraph:                        Roxygen.             (line  86)
+* fill-paragraph:                        Roxygen.             (line  83)
 * inferior-ess-program:                  Customizing startup. (line  44)
 * inferior-ess-R-font-lock-keywords:     Highlighting.        (line  20)
 * inferior-ess-send-input <1>:           Transcript resubmit. (line  13)
 * inferior-ess-send-input:               Command-line editing.
                                                               (line  10)
-* mark-paragraph:                        Roxygen.             (line  77)
-* move-beginning-of-line:                Roxygen.             (line  89)
-* newline-and-indent:                    Roxygen.             (line  93)
+* mark-paragraph:                        Roxygen.             (line  75)
+* move-beginning-of-line:                Roxygen.             (line  86)
+* newline-and-indent:                    Roxygen.             (line  90)
 * objects():                             Hot keys.            (line  21)
 * printer():                             printer.             (line  11)
 * q():                                   Hot keys.            (line  61)
@@ -5250,97 +5280,98 @@ Node: Top278
 Node: Introduction2104
 Node: Features5086
 Node: New features8507
-Node: Credits47829
-Node: Latest version51321
-Node: Manual53105
-Node: Installation55647
-Node: Unix installation56125
-Node: Microsoft Windows installation60226
-Node: Requirements69667
-Node: Interactive ESS70176
-Node: Starting up71030
-Node: Multiple ESS processes71841
-Node: ESS processes on Remote Computers72876
-Node: S+elsewhere and ESS-elsewhere76026
-Node: Customizing startup78789
-Node: Entering commands81469
-Node: Command-line editing82768
-Node: Completion84052
-Node: Completion details86847
-Ref: Completion details-Footnote-188253
-Node: Transcript88533
-Node: Last command90308
-Node: Process buffer motion91798
-Node: Transcript resubmit93319
-Node: Saving transcripts95928
-Node: Command History97974
-Node: History expansion100598
-Node: Hot keys103806
-Node: Statistical Process running in ESS?107273
-Node: Emacsclient108578
-Node: Other109385
-Node: Transcript Mode110431
-Node: Resubmit111587
-Node: Clean112671
-Node: ESS for the S family113390
-Node: ESS(S)--Editing files113797
-Node: iESS(S)--Inferior ESS processes114849
-Node: ESS-help--assistance with viewing help120540
-Node: Philosophies for using ESS(S)120870
-Node: Scenarios for use (possibilities--based on actual usage)122006
-Node: Customization Examples and Solutions to Problems126697
-Node: Editing128489
-Node: Edit buffer129670
-Node: Loading131704
-Node: Error Checking132755
-Node: Evaluating code133801
-Node: Indenting137236
-Node: Styles140384
-Node: Other edit buffer commands141813
-Node: Source Files143730
-Node: Source Directories148260
-Node: Editing R documentation151399
-Node: R documentation files151910
-Node: Roxygen155812
-Node: Help159593
-Node: ESS for SAS163917
-Node: ESS(SAS)--Design philosophy164639
-Node: ESS(SAS)--Editing files165593
-Node: ESS(SAS)--TAB key167453
-Node: ESS(SAS)--Batch SAS processes168751
-Node: ESS(SAS)--Function keys for batch processing173775
-Node: iESS(SAS)--Interactive SAS processes183366
-Node: iESS(SAS)--Common problems187116
-Node: ESS(SAS)--Graphics188648
-Node: ESS(SAS)--Windows189431
-Node: ESS for BUGS190010
-Node: ESS(BUGS)--Model files191030
-Node: ESS(BUGS)--Command files194200
-Node: ESS(BUGS)--Log files195516
-Node: ESS for JAGS196066
-Node: ESS(JAGS)--Model files197045
-Node: ESS(JAGS)--Command files199476
-Node: ESS(JAGS)--Log files200252
-Node: Miscellaneous200548
-Node: Highlighting201273
-Node: Parens202688
-Node: Graphics203276
-Node: printer203792
-Node: X11204565
-Node: winjava205096
-Node: Imenu205509
-Node: Toolbar206357
-Node: TAGS206772
-Node: Rdired208131
-Node: Rutils209402
-Node: Mailing lists/bug reports211701
-Node: Bugs211966
-Node: Reporting Bugs213629
-Node: Mailing Lists214442
-Node: Help with emacs215207
-Node: Customization215761
-Node: Key Index216526
-Node: Concept Index216681
-Node: Variable and command index224844
+Node: Credits48384
+Node: Latest version51876
+Node: Manual53660
+Node: Installation56202
+Node: Unix installation56680
+Node: Microsoft Windows installation60781
+Node: Requirements70222
+Node: Interactive ESS70731
+Node: Starting up71585
+Node: Multiple ESS processes72396
+Node: ESS processes on Remote Computers73431
+Node: S+elsewhere and ESS-elsewhere76581
+Node: Customizing startup79344
+Node: Entering commands82024
+Node: Command-line editing83323
+Node: Completion84607
+Node: Completion details87402
+Ref: Completion details-Footnote-188808
+Node: Transcript89088
+Node: Last command90863
+Node: Process buffer motion92353
+Node: Transcript resubmit93874
+Node: Saving transcripts96483
+Node: Command History98529
+Node: History expansion101153
+Node: Hot keys104361
+Node: Statistical Process running in ESS?107828
+Node: Emacsclient109133
+Node: Other109940
+Node: Transcript Mode110986
+Node: Resubmit112142
+Node: Clean113226
+Node: ESS for the S family113945
+Node: ESS(S)--Editing files114352
+Node: iESS(S)--Inferior ESS processes115404
+Node: ESS-help--assistance with viewing help121095
+Node: Philosophies for using ESS(S)121425
+Node: Scenarios for use (possibilities--based on actual usage)122561
+Node: Customization Examples and Solutions to Problems127252
+Node: Editing129046
+Node: Edit buffer130227
+Node: Loading132261
+Node: Error Checking133312
+Node: Evaluating code134358
+Node: Indenting137793
+Node: Styles140941
+Node: Other edit buffer commands142388
+Node: Source Files144305
+Node: Source Directories148835
+Node: Editing R documentation151974
+Node: R documentation files152485
+Node: Roxygen156387
+Node: Help160270
+Node: ESS for SAS164594
+Node: ESS(SAS)--Design philosophy165316
+Node: ESS(SAS)--Editing files166270
+Node: ESS(SAS)--TAB key168130
+Node: ESS(SAS)--Batch SAS processes169428
+Node: ESS(SAS)--Function keys for batch processing174452
+Node: iESS(SAS)--Interactive SAS processes184043
+Node: iESS(SAS)--Common problems187793
+Node: ESS(SAS)--Graphics189325
+Node: ESS(SAS)--Windows190108
+Node: ESS for BUGS190687
+Node: ESS(BUGS)--Model files191707
+Node: ESS(BUGS)--Command files194879
+Node: ESS(BUGS)--Log files196195
+Node: ESS for JAGS196745
+Node: ESS(JAGS)--Model files197724
+Node: ESS(JAGS)--Command files200157
+Node: ESS(JAGS)--Log files200933
+Node: Miscellaneous201229
+Node: Highlighting202012
+Node: Parens203427
+Node: Graphics204015
+Node: printer204531
+Node: X11205304
+Node: winjava205835
+Node: Imenu206248
+Node: Toolbar207096
+Node: TAGS207511
+Node: Rdired208870
+Node: Rutils210141
+Node: Org212452
+Node: Mailing lists/bug reports213372
+Node: Bugs213637
+Node: Reporting Bugs215300
+Node: Mailing Lists216113
+Node: Help with emacs216878
+Node: Customization217432
+Node: Key Index218197
+Node: Concept Index218352
+Node: Variable and command index226515
 
 End Tag Table

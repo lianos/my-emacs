@@ -26,6 +26,7 @@
 (require 'color-theme)
 (require 'ecb)
 (require 'fixme)
+(require 'goto-last-change)
 (require 'hl-line+)
 (require 'ido)
 (require 'ibuffer)

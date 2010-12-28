@@ -3,5 +3,5 @@
 # --
 if (!exists("do.${1:prefix}.setup") || do.$1.setup) {
 $>$0
-$>do.$1.setup <- TRUE
+$>do.$1.setup <- FALSE
 }
