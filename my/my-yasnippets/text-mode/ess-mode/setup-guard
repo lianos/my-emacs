@@ -1,7 +1,7 @@
 #name : setup guard | script
 #key : setup
 # --
-if (!exists("${1:prefix}.setup") || $1.setup) {
+if (!exists("do.${1:prefix}.setup") || do.$1.setup) {
 $>$0
-$>$1.setup <- TRUE
+$>do.$1.setup <- TRUE
 }
