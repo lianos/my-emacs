@@ -23,6 +23,8 @@
 (load-file "~/.emacs.d/plugins/cedet-1.0pre7/common/cedet.el")
 
 (require 'autopair)
+(require 'browse-kill-ring)
+(browse-kill-ring-default-keybindings)
 (require 'color-theme)
 (require 'ecb)
 (require 'fixme)
