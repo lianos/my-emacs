@@ -29,6 +29,7 @@
 (vendor 'yasnippet)
 
 (load "my/globals")
+(load "my/bindings")
 (load "my/cua")
 (load "my/tabs")
 
