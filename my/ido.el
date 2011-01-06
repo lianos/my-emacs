@@ -55,4 +55,4 @@
 (global-set-key "\C-ci" 'ido-goto-symbol) ; or any key you see fit
 
 
-(provide 'my-ido)
+;; (provide 'my-ido)

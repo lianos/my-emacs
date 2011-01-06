@@ -1,4 +1,4 @@
-(load (expand-file-name "~/.emacs.d/plugins/ess/lisp/ess-site"))
+(load (expand-file-name "~/.emacs.d/vendor/ess/lisp/ess-site"))
 (require 'ess-site)
 
 (add-hook 'ess-mode-hook
@@ -145,4 +145,4 @@
 ;;        (local-set-key [C-down] 'comint-next-input)))
 
 
-(provide 'my-programming-r)
+;; (provide 'my-programming-r)

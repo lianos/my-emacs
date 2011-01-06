@@ -22,4 +22,4 @@
 ;;     (color-theme-zenburn)))
 
 
-(provide 'my-color-theme)
+;; (provide 'my-color-theme)

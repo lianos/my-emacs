@@ -15,4 +15,4 @@
 ;; (setq ecb-source-path (quote (("/path/to/proj1" "proj1")
 ;;                               ("/path/to/proj2" "proj2"))))
 
-(provide 'my-ecb)
+;; (provide 'my-ecb)

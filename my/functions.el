@@ -3,6 +3,28 @@
 ;; These functions were primarily found in random places on the internet,
 ;; or ones I made myself.
 
+;; For loading libraries from the vendor directory and then loading my
+;; customizations for that library. Taken from:
+;; https://github.com/rmm5t/dotfiles/blob/master/emacs.d/rmm5t/defuns.el
+(defun vendor (library &rest autoload-functions)
+  (let* ((file (symbol-name library))
+         (normal (concat "~/.emacs.d/vendor/" file))
+         (suffix (concat normal ".el"))
+         (personal (concat "~/.emacs.d/my/" file))
+	 (found nil))
+    (cond
+     ((file-directory-p normal) (add-to-list 'load-path normal) (set 'found t))
+     ((file-directory-p suffix) (add-to-list 'load-path suffix) (set 'found t))
+     ((file-exists-p suffix)  (set 'found t)))
+    (when found
+      (if autoload-functions
+          (dolist (autoload-function autoload-functions)
+            (autoload autoload-function (symbol-name library) nil t))
+        (require library)))
+    (when (file-exists-p (concat personal ".el"))
+      (load personal))))
+
+
 ;; Change \M-; to a better comment-dwim. This will comment the current
 ;; line if the mark isn't active, not add a comment to the end of the line
 ;; http://www.emacswiki.org/emacs/CommentingCode
@@ -107,4 +129,4 @@ the matching brace"
 (global-set-key [M-down] 'gcm-scroll-down)
 (global-set-key [M-up]   'gcm-scroll-up)
 
-(provide 'my-functions)
+;; (provide 'my-functions)

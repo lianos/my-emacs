@@ -65,10 +65,17 @@
 (fset 'yes-or-no-p 'y-or-n-p)   ;; type just "y/n" instead of "yes/no"
 (setq next-line-add-newlines nil) ;; don't add new lines when scrolling past end
 (setq visible-bell t)           ;; Turn off the beeping
-(transient-mark-mode t)         ;; highlights regions between point and mark
+(setq transient-mark-mode t)     ;; highlights regions between point and mark
 (setq search-highlight t)       ;; highlights incremental search
 (put 'downcase-region 'disabled nil) ;; set downcase-region to work w/o warning
 (setq uniquify-buffer-name-style 'post-forward)
+
+;; Explicitly show the end of a buffer
+(set-default 'indicate-empty-lines t)
+
+;; Trailing whitespace is unnecessary
+(add-hook 'before-save-hook (lambda () (delete-trailing-whitespace)))
+
 
 ;; Scrolling
 ;; http://zhangda.wordpress.com/2009/05/21
@@ -88,7 +95,7 @@
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil)))
 
 (global-hl-line-mode nil)         ;; Highlight the current line
-;;(toggle-hl-line-when-idle 1)  ;; Activate Highlight after idle (hl-line+.el)
+;; (toggle-hl-line-when-idle 1)  ;; Activate Highlight after idle (hl-line+.el)
 
 ;; ============================================================================
 ;; Version specific emacs settings
@@ -111,4 +118,4 @@
           (insert (combine-and-quote-strings ns-input-file "\n"))
           (setq ns-input-file nil)))))
 
-(provide 'my-globals)
+;; (provide 'my-globals)

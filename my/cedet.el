@@ -4,4 +4,4 @@
 (semantic-load-enable-code-helpers)      ; Enable prototype help and smart completion
 (global-srecode-minor-mode 1)            ; Enable template insertion menu
 
-(provide 'my-cedet)
+;; (provide 'my-cedet)
