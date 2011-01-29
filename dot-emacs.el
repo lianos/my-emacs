@@ -3,15 +3,15 @@
 
 ;; ============================================================================
 ;; Set up OS-vars to enable os-specific tweaking of emacs, eg.
-;; (if macosx-p
-;;     (progn ...))
-;; ============================================================================
+;;   (if macosx-p
+;;       (progn ...))
 (defvar mswindows-p (string-match "windows" (symbol-name system-type)))
 (defvar macosx-p (string-match "darwin" (symbol-name system-type)))
 (defvar linux-p (string-match "linux" (symbol-name system-type)))
 
 (load "my/functions")
 (load "my/env")
+(load "my/platform-specific-settings")
 
 (require 'uniquify)
 
@@ -26,7 +26,6 @@
 (vendor 'ido)
 (vendor 'ibuffer)
 (vendor 'ssh)
-;;(vendor 'wrap-region)
 (vendor 'yasnippet)
 
 (load "my/globals")
