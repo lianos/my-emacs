@@ -13,6 +13,8 @@
 (load "my/functions")
 (load "my/env")
 
+(require 'uniquify)
+
 (vendor 'autopair)
 (vendor 'browse-kill-ring)
 (vendor 'color-theme)
@@ -24,8 +26,7 @@
 (vendor 'ido)
 (vendor 'ibuffer)
 (vendor 'ssh)
-(vendor 'uniquify)
-(vendor 'wrap-region)
+;;(vendor 'wrap-region)
 (vendor 'yasnippet)
 
 (load "my/globals")
