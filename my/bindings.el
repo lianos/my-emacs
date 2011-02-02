@@ -18,9 +18,6 @@
 ;; goto last edit -- easy way to jump to where you were before in the buffer
 (define-key ctl-x-map "\C-\\" 'goto-last-change)
 
-;; (global-set-key "\C-\\"      'dabbrev-expand)     ;; C-\ autocompletes using
-;; (define-key esc-map "\C-\\"  'dabbrev-completion) ;; words in current buffer
-
 ;; Allow us to invoke "extended commands" (M-x) w/ ctrl sequence
 (define-key ctl-x-map "\C-m" 'execute-extended-command)
 
@@ -37,6 +34,8 @@
 (define-key ctl-x-map "t" 'beginning-of-buffer)
 (define-key ctl-x-map "e" 'end-of-buffer)
 
+(global-set-key (kbd "<f6>") 'bookmark-jump)
+(global-set-key (kbd "<f7>") 'bookmark-set	)
 
 ;; Clears Meta-g from any binding, we are effectively setting it up as another
 ;; prefix key
