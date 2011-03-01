@@ -35,6 +35,11 @@
 (define-key ess-mode-map (kbd "M-r") 'comint-previous-matching-input-from-input)
 (define-key ess-mode-map (kbd "M-s") 'comint-next-matching-input-from-input)
 
+;; Sets R's width and length arguments to "max out" the frame it is running
+;; in. The "inferior-ess-mode-map" is active in the buffer running the R 
+;; process itself (not buffers that are editing R files).
+(define-key inferior-ess-mode-map (kbd "C-c w") 'ess-execute-screen-options)
+
 ;; Show function argument completion while editing R code and interacting with
 ;; an inferior R process
 (define-key ess-mode-map [f2] 'ess-r-args-show)
