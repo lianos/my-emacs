@@ -4,7 +4,7 @@
 (add-hook 'ess-mode-hook
           (lambda ()
             (setq tab-width 2)
-	    (setq yas/buffer-local-condition t)))
+            (setq yas/buffer-local-condition t)))
 
 ;; Tweak font locking
 (add-hook 'ess-mode-hook
@@ -46,6 +46,108 @@
 (define-key ess-mode-map [f3] 'ess-r-args-insert)
 (define-key inferior-ess-mode-map [f2] 'ess-r-args-show)
 (define-key inferior-ess-mode-map [f3] 'ess-r-args-insert)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; auto yasnippet generation.
+;; See this thread on ESS mailing list:: 
+;;   https://stat.ethz.ch/pipermail/ess-help/2011-March/006758.html
+(defun r-autoyas-exit-snippet-delete-remaining ()
+ "Exit yas snippet and delete the remaining argument list."
+ (interactive "*")
+ (let ((deletefrom (point)))
+   (yas/exit-all-snippets)
+   (delete-region deletefrom (point))))
+
+(defun r-autoyas-expand (&optional funname no-paren)
+ "Insert argument list (in parentheses) of R function before the
+point as intelligent yas snippets and expand the snippets."
+ (interactive "*")
+ (if (null funname)
+     (setq funname (ess-r-args-current-function)))
+ (ess-command (concat "r.autoyas.create('" funname "')\n")
+              (get-buffer-create "*r-autoyas*"))
+ (unless (null funname)
+   (let (snippet)
+     (with-current-buffer "*r-autoyas*"
+       (if (< (length (buffer-string)) 10);; '[1] " "' if no valid fun
+           (message "No valid function!")
+         (delete-region 1 6)
+         (goto-char (point-max))
+         (delete-backward-char 2)
+         (goto-char (point-min))
+         (replace-string "\\\"" "\"")
+         (goto-char (point-min))
+         (replace-string "\\\\" "\\")
+         (setq snippet (buffer-string))
+         (when no-paren
+           (setq snippet (substring snippet 1 -1)))
+         ))
+     (when snippet
+       (yas/expand-snippet snippet)
+       ))))
+
+(defun r-autoyas-inject-commands ()
+ (process-send-string (get-process ess-current-process-name)
+                      "r.autoyas.esc <- function(str) {
+ str <- gsub('$', '\\\\$', str, fixed=TRUE)
+ str <- gsub('`', '\\\\`', str, fixed=TRUE)
+ return(str)
+ };
+ r.autoyas.create <- function(funname) {
+ if (!existsFunction(funname)) return(' ')
+ formals <- formals(funname)
+ nr <- 0
+ closebrackets <- 0
+ str <- NULL
+ for (field in names(formals)) {
+ type <- typeof(formals[[field]])
+ if (type=='symbol' & field!='...') {
+ nr <- nr+1
+ str <- append(str, paste(', ${',nr,':',field,'}', sep=''))
+ } else if (type=='symbol' & field=='...') {
+ nr <- nr+2
+ str <- append(str, paste('${',nr-1,':, ${',nr,':',field,'}}', sep=''))
+ } else if (type=='character') {
+ nr <- nr+2
+ str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':\\'',gsub('\\'', '\\\\\\'', r.autoyas.esc(encodeString(formals[[field]])), fixed=TRUE),'\\'}}', sep=''))
+ } else if (type=='logical') {
+ nr <- nr+2
+ str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':',as.character(formals[[field]]),'}}', sep=''))
+ } else if (type=='double') {
+ nr <- nr+2
+ str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':',as.character(formals[[field]]),'}}', sep=''))
+ } else if (type=='NULL') {
+ nr <- nr+2
+ str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':NULL}}', sep=''))
+ } else if (type=='language') {
+ nr <- nr+2
+ str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':',r.autoyas.esc(deparse(formals[[field]])),'}}', sep=''))
+ }
+ }
+ str <- paste(str, sep='', collapse='')
+ if (grepl(', ', str, fixed=TRUE)) str <- sub(', ', '', str) # remove 1st ', ' (from 1st field)
+ str <- paste('(',str,')', sep='')
+ str
+ }\n")
+ )
+
+(defadvice yas/abort-snippet (around r-delete-remaining)
+ (if (member major-mode '(ess-mode inferior-ess-mode))
+     (r-autoyas-exit-snippet-delete-remaining)
+   ad-do-it)
+ )
+
+(ad-activate 'yas/abort-snippet)
+(add-hook 'ess-post-run-hook 'r-autoyas-inject-commands)
+
+(define-key ess-mode-map (kbd "C-M-<tab>")
+ '(lambda ()(interactive)(r-autoyas-expand nil t)))
+
+;; The keybinds are disabled for now -- autopair is hosing this for now
+;; and I don't have the time to fix it, atm.
+;; (define-key ess-mode-map (kbd "(") '(lambda () (interactive)
+;;                                      (skeleton-pair-insert-maybe nil)
+;;                                      (r-autoyas-expand nil t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ess-R-object-tooltip.el
