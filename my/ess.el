@@ -49,105 +49,125 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; auto yasnippet generation.
-;; See this thread on ESS mailing list:: 
-;;   https://stat.ethz.ch/pipermail/ess-help/2011-March/006758.html
+;; http://www.svenhartenstein.de/Software/R-autoyas
+;; this is the version from 2011-04-04
 (defun r-autoyas-exit-snippet-delete-remaining ()
- "Exit yas snippet and delete the remaining argument list."
- (interactive "*")
- (let ((deletefrom (point)))
-   (yas/exit-all-snippets)
-   (delete-region deletefrom (point))))
+  "Exit yas snippet and delete the remaining argument list."
+  (interactive "*")
+  (let ((deletefrom (point)))
+    (yas/exit-snippet (car (yas/snippets-at-point)))
+    (yas/check-commit-snippet)
+    (delete-region deletefrom (point))
+    ))
 
-(defun r-autoyas-expand (&optional funname no-paren)
- "Insert argument list (in parentheses) of R function before the
-point as intelligent yas snippets and expand the snippets."
- (interactive "*")
- (if (null funname)
-     (setq funname (ess-r-args-current-function)))
- (ess-command (concat "r.autoyas.create('" funname "')\n")
-              (get-buffer-create "*r-autoyas*"))
- (unless (null funname)
-   (let (snippet)
-     (with-current-buffer "*r-autoyas*"
-       (if (< (length (buffer-string)) 10);; '[1] " "' if no valid fun
-           (message "No valid function!")
-         (delete-region 1 6)
-         (goto-char (point-max))
-         (delete-backward-char 2)
-         (goto-char (point-min))
-         (replace-string "\\\"" "\"")
-         (goto-char (point-min))
-         (replace-string "\\\\" "\\")
-         (setq snippet (buffer-string))
-         (when no-paren
-           (setq snippet (substring snippet 1 -1)))
-         ))
-     (when snippet
-       (yas/expand-snippet snippet)
-       ))))
+(defun r-autoyas-expand (&optional funcname no-paren)
+  "Insert argument list (in parentheses if no-paren is nil) of R
+  function before the point as intelligent yas snippets and
+  expand the snippets."
+  (interactive "*")
+  (when no-paren
+    (delete-backward-char 1)
+    (delete-char 1))
+  (if (null funcname)
+      (setq funcname (ess-r-args-current-function)))
+  (ess-command (concat ".r.autoyas.create('" funcname "')\n")
+               (get-buffer-create "*r-autoyas*"))
+  (unless (null funcname)
+    (let (snippet)
+      (with-current-buffer "*r-autoyas*"
+        (if (< (length (buffer-string)) 10);; '[1] " "' if no valid fun
+            (message "No valid function!")
+          (delete-region 1 6)
+          (goto-char (point-max))
+          (delete-backward-char 2)
+          (goto-char (point-min))
+          (replace-string "\\\"" "\"")
+          (goto-char (point-min))
+          (replace-string "\\\\" "\\")
+          (setq snippet (buffer-string))))
+      (when snippet
+        (yas/expand-snippet snippet)))))
 
 (defun r-autoyas-inject-commands ()
- (process-send-string (get-process ess-current-process-name)
-                      "r.autoyas.esc <- function(str) {
- str <- gsub('$', '\\\\$', str, fixed=TRUE)
- str <- gsub('`', '\\\\`', str, fixed=TRUE)
- return(str)
- };
- r.autoyas.create <- function(funname) {
- if (!existsFunction(funname)) return(' ')
- formals <- formals(funname)
- nr <- 0
- closebrackets <- 0
- str <- NULL
- for (field in names(formals)) {
- type <- typeof(formals[[field]])
- if (type=='symbol' & field!='...') {
- nr <- nr+1
- str <- append(str, paste(', ${',nr,':',field,'}', sep=''))
- } else if (type=='symbol' & field=='...') {
- nr <- nr+2
- str <- append(str, paste('${',nr-1,':, ${',nr,':',field,'}}', sep=''))
- } else if (type=='character') {
- nr <- nr+2
- str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':\\'',gsub('\\'', '\\\\\\'', r.autoyas.esc(encodeString(formals[[field]])), fixed=TRUE),'\\'}}', sep=''))
- } else if (type=='logical') {
- nr <- nr+2
- str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':',as.character(formals[[field]]),'}}', sep=''))
- } else if (type=='double') {
- nr <- nr+2
- str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':',as.character(formals[[field]]),'}}', sep=''))
- } else if (type=='NULL') {
- nr <- nr+2
- str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':NULL}}', sep=''))
- } else if (type=='language') {
- nr <- nr+2
- str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':',r.autoyas.esc(deparse(formals[[field]])),'}}', sep=''))
- }
- }
- str <- paste(str, sep='', collapse='')
- if (grepl(', ', str, fixed=TRUE)) str <- sub(', ', '', str) # remove 1st ', ' (from 1st field)
- str <- paste('(',str,')', sep='')
- str
- }\n")
- )
+  (ess-eval-linewise
+   ".r.autoyas.esc <- function(str) {
+  str <- gsub('$', '\\\\$', str, fixed=TRUE)
+  str <- gsub('`', '\\\\`', str, fixed=TRUE)
+  return(str)
+  };
+  .r.autoyas.create <- function(funcname) {
+  if (existsFunction(deffun <- paste(funcname,'.default', sep=''))) {
+  funcname <- deffun
+  } else if(!existsFunction(funcname)) {
+  return(' ')
+  }
+  formals <- formals(funcname)
+  dots <- match('...', names(formals))
+  if (!is.na(dots) & !is.null(options()[['r.autoyas.dotreplace']][[funcname]])) {
+  formals2 <- NULL
+  if (dots > 1) formals2 <- formals[1:(dots-1)]
+  formals2 <- append(formals2, options()[['r.autoyas.dotreplace']][[funcname]])
+  if (dots < length(formals)) formals2 <- append(formals2, formals[(dots+1):length(formals)])
+  formals <- formals2
+  }
+  nr <- 0
+  closebrackets <- 0
+  str <- NULL
+  for (field in names(formals)) {
+  type <- typeof(formals[[field]])
+  if (type=='symbol' & field!='...') {
+  nr <- nr+2
+  str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':',' }}', sep=''))
+  } else if (type=='symbol' & field=='...') {
+  nr <- nr+2
+  str <- append(str, paste('${',nr-1,':, ${',nr,':',field,'}}', sep=''))
+  } else if (type=='character') {
+  nr <- nr+2
+  str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':\\'',gsub('\\'', '\\\\\\'', .r.autoyas.esc(encodeString(formals[[field]])), fixed=TRUE),'\\'}}', sep=''))
+  } else if (type=='logical') {
+  nr <- nr+2
+  str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':',as.character(formals[[field]]),'}}', sep=''))
+  } else if (type=='double') {
+  nr <- nr+2
+  str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':',as.character(formals[[field]]),'}}', sep=''))
+  } else if (type=='NULL') {
+  nr <- nr+2
+  str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':NULL}}', sep=''))
+  } else if (type=='language') {
+  nr <- nr+2
+  str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':',.r.autoyas.esc(deparse(formals[[field]])),'}}', sep=''))
+  }
+  }
+  str <- paste(str, sep='', collapse='')
+  if (grepl(', ', str, fixed=TRUE)) str <- sub(', ', '', str) # remove 1st ', ' (from 1st field)
+  str <- paste('(',str,')', sep='')
+  str
+  }\n"
+   t nil nil t)
+  )
 
 (defadvice yas/abort-snippet (around r-delete-remaining)
- (if (member major-mode '(ess-mode inferior-ess-mode))
-     (r-autoyas-exit-snippet-delete-remaining)
-   ad-do-it)
- )
+  (if (member major-mode '(ess-mode inferior-ess-mode))
+      (r-autoyas-exit-snippet-delete-remaining)
+    ad-do-it))
 
 (ad-activate 'yas/abort-snippet)
 (add-hook 'ess-post-run-hook 'r-autoyas-inject-commands)
 
-(define-key ess-mode-map (kbd "C-M-<tab>")
- '(lambda ()(interactive)(r-autoyas-expand nil t)))
+;;(define-key ess-mode-map (kbd "C-M-<tab>")
+;; '(lambda ()(interactive)(r-autoyas-expand nil t)))
+(define-key ess-mode-map (kbd "C-c ;")
+ '(lambda () (interactive)
+   (setq autopair-mode nil)
+   (r-autoyas-expand nil t)
+   (setq autopair-mode 1)))
+
 
 ;; The keybinds are disabled for now -- autopair is hosing this for now
 ;; and I don't have the time to fix it, atm.
 ;; (define-key ess-mode-map (kbd "(") '(lambda () (interactive)
-;;                                      (skeleton-pair-insert-maybe nil)
-;;                                      (r-autoyas-expand nil t)))
+;;                                   (skeleton-pair-insert-maybe nil)
+;;                                   (r-autoyas-expand nil t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ess-R-object-tooltip.el

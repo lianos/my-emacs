@@ -1,3 +1,91 @@
+2011-02-02  Richard M. Heiberger  <rmh@temple.edu>
+
+	* ess-custom.el (ess-program-files, ess-program-files-64)
+	(ess-SHOME-versions, ess-SHOME-versions-64)
+	(inferior-S+6-program-name, inferior-Sqpe+6-program-name)
+	(inferior-Sqpe+6-SHOME-name): Pathnames for all 32-bit and 64-bit
+	versions of Sqpe.  Add the most recent "/TIBCO/splus82" and make
+	it the default.
+	* ess-sp6w-d.el (ess-sqpe-versions-create): Give the function an
+	argument of pathnames and an indicator whether they are 32-bit or
+	64bit pathnames.
+	* ess-site.el (ess-s-versions-created): Use the revised functions
+	and variables to find all 32-bit and 64-bit versions of Sqpe.
+
+2011-02-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* ess-r-d.el (R): change use-dialog-box (to nil) only on windows.
+
+	* ess-inf.el (ess-get-directory): now use new inferior-R-version
+	which is set in the created R-X.Y version functions.
+
+2011-01-31  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* ess-site.el (ess-rterm-version-paths): now use *long* filenames
+	* ess-r-d.el (ess-r-versions-create): ditto; now produce "proper"
+	version names.
+	* ess-r-d.el (ess-rterm-arch-version): extend to return cons; and
+	use "-32bit" / "-64bit" in the bi-arch cases.
+
+
+2011-01-19  Stephen Eglen  <stephen@gnu.org>
+
+	* ess-rd.el (Rd-preview-help): Quote filename to prevent spaces in
+	filenames causing problems running the shell-command.
+	Fix up so that navigation shortcuts present in normal R Help buffers
+	work in the output buffer.
+	Add a short docstring and tidy code.
+
+2011-01-12  Richard M. Heiberger  <rmh@temple.edu>
+
+	* ess-site.el (ess-rterm-version-paths): extend to find all 32-bit
+	and 64-bit versions of R using both the newer R-2.12.x naming
+	convention using the architecture-specific i386 and x64
+	subdirectories and the older R-2.11.x naming convention.
+	* ess-r-d.el (ess-rterm-arch-version): Isolate this function from within
+	ess-r-versions-create to construct an architecture-specific name
+	for VERSION, an absolute path to R on Windows.
+	* ess-r-d.el (ess-r-versions-create): Remove
+	ess-rterm-arch-version into its own function.
+
+
+2010-12-13  Stephen Eglen  <stephen@gnu.org>
+
+	* ess-inf.el (ess-request-a-process): Set default to ess-dialect
+	rather than ess-language.  Patch from Vitalie S.
+
+2010-11-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* ess-inf.el (ess-eval-buffer-from-beg-to-here, *-from-here-to-end):
+	new functions thanks to Roland Rau, with
+	* ess-mode.el (ess-mode-map, ess-mode-menu): key bindings C-c [up]
+	/ [down] and corresponding menu entries.
+
+2010-11-25  Henning Redestig  <henning@psc.riken.jp>
+
+	* ess-roxy.el (ess-roxy-preview): Fixed introduced bug that broke
+	preview for functions with empty lines.
+
+2010-11-24  Henning Redestig  <henning@psc.riken.jp>
+
+	* ess-roxy.el (ess-roxy-get-function-args): fix bug that stopped
+	ess-roxy from updating setMethod definitions.
+
+2010-11-23  Henning Redestig  <henning@psc.riken.jp>
+
+	* ess-roxy.el (ess-roxy-preview): enable preview for all types of
+	entries (not only for functions)
+	(ess-roxy-toggle-roxy-region): make toggle region operate on the
+	visible region instead of the actual start and the
+	beginning of the region (behave more like comment-region)
+
+	* ess-mode.el (ess-mode-menu): link to new ess-roxy-preview-HTML
+	function in the roxygen menu
+
+	* ess-roxy.el (ess-roxy-preview-HTML): New function that
+	generates (and opens) a HTML version of a roxygen entry. Request
+	from Kevin Wright.
+
 2010-11-02  Sebastian P. Luque  <spluque@gmail.com>
 
 	* ess-help.el: Do not use (mapcar 'list ...) construct in

@@ -1023,7 +1023,6 @@ by this command. Then place point after the first, indented.\n\n"
               (autopair-document-bindings)))
 
 
-
 ;; monkey-patching: Compatibility with delete-selection-mode and cua-mode
 ;;
 ;; Ideally one would be able to use functions as the value of the

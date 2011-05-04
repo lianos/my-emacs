@@ -1,5 +1,24 @@
 @itemize @w{}
 
+Changes/New Features in 5.13:
+@itemize @bullet
+@item @ESS{[R]}: On Windows, for R 2.12.0 and later, the Rterm executables
+ (in subdirectories i386 / x64) now are found as well as for earlier R versions.
+@item @ESS{[S+]}: on Windows, both 32- and 64-bit versions of S+ (``S-PLUS'')
+ are found now and made available on the menu.
+@item @ESS{[R]}: When prompting for a starting directory, the R version is
+ (always?) correct now.
+@item @ESS{[R]}: on non-Windows platforms, the @code{use-dialog-box}
+ variable is no longer temporarily changed (to @code{nil} for R-x.y.z version
+ functions and to @code{t} for @command{R} itself), but rather the user
+ customization is obeyed.
+@item @ESS{[R]}: more Roxygen improvements.
+@item `Rd-preview-help' now generates preview buffers with navigation
+facilities the same as regular help buffers.
+@item @ESS{}: New functions and keys C-c [up] / [down]
+ for evaluating the buffer ``from beginning till here''.
+@end itemize
+
 Changes/New Features in 5.12:
 @itemize @bullet
 @item @ESS{[SAS]} Font-locking:
@@ -10,7 +29,7 @@ Changes/New Features in 5.12:
  section-name \subsection plus a dozen ``new'' keywords; should match R
  2.12.x now.
 @item @command{ess-display-help-on-object} (@kbd{C-c C-v})
- now @emph{cashes} the list of topics, thus speeding up the improvemed
+ now @emph{caches} the list of topics, thus speeding up the improvement
  feature introduced in 5.9.
 @end itemize
 
