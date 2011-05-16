@@ -11,7 +11,6 @@
 
 (load "my/functions")
 (load "my/env")
-(load "my/platform-specific-settings")
 
 (require 'uniquify)
 
@@ -35,6 +34,8 @@
 
 ;; Setup Programming Environments
 (load "my/ess")
+
+(load "my/platform-specific-settings")
 
 ;; ============================================================================
 ;; Auto-generated custom settings (from M-x customize ...)

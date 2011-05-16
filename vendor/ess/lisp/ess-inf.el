@@ -8,7 +8,7 @@
 
 ;; Original Author: David Smith <dsmith@stats.adelaide.edu.au>
 ;; Created: 7 Jan 1994
-;; Maintainers: ESS-core <ESS-core@stat.math.ethz.ch>
+;; Maintainers: ESS-core <ESS-core@r-project.org>
 
 ;; This file is part of ESS
 
@@ -445,25 +445,14 @@ This was rewritten by KH in April 1996."
 
 ;;*;; Requester functions called at startup
 
-;(defun ess-get-directory-ORIG (default)
-;  "Request and return S starting directory."
-;  (let ((the-dir
-;	 (expand-file-name
-;	  (file-name-as-directory
-;	   (read-file-name
-;	    (format "ESS [%s(%s): %s] starting data directory? "
-;		    ess-language ess-dialect inferior-ess-program)
-;	    (file-name-as-directory default)
-;	    (file-name-as-directory default) t nil)))))
-;    (if (file-directory-p the-dir) nil
-;      (error "%s is not a valid directory" the-dir))
-;    the-dir))
-
 (defun ess-get-directory (default)
+  (let ((prog-version (if (string= ess-dialect "R")
+			  inferior-R-version ; notably for the R-X.Y versions
+			inferior-ess-program)))
   (ess-prompt-for-directory
 	default
 	(format "ESS [%s(%s): %s] starting data directory? "
-		ess-language ess-dialect inferior-ess-program)))
+		ess-language ess-dialect prog-version))))
 
 (defun ess-prompt-for-directory (default prompt)
   "`prompt' for a directory, using `default' as the usual."
@@ -642,7 +631,7 @@ Returns the name of the selected process."
 			      'require-match
 			      ;; If in S buffer, don't offer current process
 			      (if (eq major-mode 'inferior-ess-mode)
-				  ess-language
+				  ess-dialect
 				ess-current-process-name
 				;; maybe ess-local-process-name IF exists?
 				)))))
@@ -1161,6 +1150,17 @@ this does not apply when using the S-plus GUI, see `ess-eval-region-ddeclient'."
 Arg has same meaning as for `ess-eval-region'."
   (interactive "P")
   (ess-eval-region (point-min) (point-max) vis "Eval buffer"))
+
+(defun ess-eval-buffer-from-beg-to-here (vis)
+  (interactive "P")
+  (ess-eval-region (point-min) (point) vis "Eval buffer from the beginning
+of the buffer until here, i.e. 'point'"))
+
+(defun ess-eval-buffer-from-here-to-end (vis)
+  (interactive "P")
+  (ess-eval-region (point) (point-max) vis "Eval buffer from here ('point') until
+the end of the buffer"))
+
 
 (defun ess-eval-function (vis)
   "Send the current function to the inferior ESS process.

@@ -5,7 +5,7 @@
 
 ;; Original Author: KH <Kurt.Hornik@ci.tuwien.ac.at>
 ;; Created: 25 July 1997
-;; Maintainers: ESS-core <ESS-core@stat.math.ethz.ch>
+;; Maintainers: ESS-core <ESS-core@r-project.org>
 
 ;; This file is part of ESS (Emacs Speaks Statistics).
 
@@ -33,7 +33,7 @@
   "Current version of ess-rd.el.")
 
 (defvar essddr-maintainer-address
-  "ESS Core Team <ess-core@stat.math.ethz.ch>"
+  "ESS Core Team <ess-core@r-project.org>"
   "Current maintainer of ess-rd.el.")
 
 (defun Rd-active-mark () nil)		;silence compiler.
@@ -140,12 +140,13 @@ All Rd mode abbrevs start with a grave accent (`).")
 (defvar Rd-keywords
   '(
     ;; the next two lines: only valid in R <= 2.8.1
-    "Alpha" "Gamma" "alpha" "beta" "epsilon" "lambda" "mu" "pi" "sigma"
-    "ge" "le" "left" "right"
+    ;; commented out on 2011-01-14 for ESS version 5.13:
+    ;; "Alpha" "Gamma" "alpha" "beta" "epsilon" "lambda" "mu" "pi" "sigma"
+    ;; "ge" "le" "left" "right"
     ;;
     "R" "RdOpts" "S3method" "S4method" "Sexpr" "acronym"
     "bold" "cite" "code" "command" "cr" "dQuote" "deqn" "dfn" "dontrun"
-    "dontshow" "dots" "email" "emph" "enc" "env" "eqn" "file"
+    "dontshow" "donttest" "dots" "email" "emph" "enc" "env" "eqn" "file"
     "href" "if" "ifelse"
     "item" "kbd" "ldots" "linkS4class" "link" "method"
     "newcommand" "option" "out"
@@ -475,17 +476,20 @@ following lines to your `.emacs' file:
 
 
 (defun Rd-preview-help ()
+  "Preview the current buffer contents using `Rd-to-help-command'."
   (interactive)
   (require 'ess-help)
   (let ((sbuf buffer-file-name)
 	(pbuf (get-buffer-create "R Help Preview")))
     (set-buffer pbuf)
     (erase-buffer)
-    (shell-command (format "%s %s" Rd-to-help-command sbuf) t)
+    (shell-command (format "%s '%s'" Rd-to-help-command sbuf) t)
+    (setq ess-help-sec-regex ess-help-R-sec-regex
+	  ess-help-sec-keys-alist ess-help-R-sec-keys-alist)
     (ess-nuke-help-bs)
     (ess-help-mode)
-    (if (not (get-buffer-window pbuf 'visible))
-	(display-buffer pbuf t))))
+    (unless (get-buffer-window pbuf 'visible)
+      (display-buffer pbuf t))))
 
 ;; Bug reporting
 (defun Rd-submit-bug-report ()

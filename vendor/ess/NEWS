@@ -1,4 +1,28 @@
-Changes/New Features in 5.12:
+Changes/New Features in 5.13:
+        * ESS[R]: On Windows, for R 2.12.0 and later, the Rterm
+          executables  (in subdirectories i386 / x64) now are found as
+          well as for earlier R versions.
+
+        * ESS[S+]: on Windows, both 32- and 64-bit versions of S+
+          ("S-PLUS")  are found now and made available on the menu.
+
+        * ESS[R]: When prompting for a starting directory, the R
+          version is  (always?) correct now.
+
+        * ESS[R]: on non-Windows platforms, the `use-dialog-box'
+          variable is no longer temporarily changed (to `nil' for
+          R-x.y.z version  functions and to `t' for `R' itself), but
+          rather the user  customization is obeyed.
+
+        * ESS[R]: more Roxygen improvements.
+
+        * `Rd-preview-help' now generates preview buffers with
+          navigation facilities the same as regular help buffers.
+
+        * ESS: New functions and keys C-c [up] / [down]  for evaluating
+          the buffer "from beginning till here".
+
+     Changes/New Features in 5.12:
         * ESS[SAS] Font-locking:  update of PROCs keywords (up to SAS
           9.22); error/warnings.
 
@@ -8,8 +32,8 @@ Changes/New Features in 5.12:
         * ESS[Rd]: support new keywords:  section-name \subsection plus
           a dozen "new" keywords; should match R  2.12.x now.
 
-        * `ess-display-help-on-object' (`C-c C-v')  now _cashes_ the
-          list of topics, thus speeding up the improvemed  feature
+        * `ess-display-help-on-object' (`C-c C-v')  now _caches_ the
+          list of topics, thus speeding up the improvement  feature
           introduced in 5.9.
 
      Changes/New Features in 5.11:

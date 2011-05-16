@@ -56,8 +56,10 @@
   "Exit yas snippet and delete the remaining argument list."
   (interactive "*")
   (let ((deletefrom (point)))
-    (yas/exit-all-snippets)
-    (delete-region deletefrom (- (point) 1))))
+    (yas/exit-snippet (car (yas/snippets-at-point)))
+    (yas/check-commit-snippet)
+    (delete-region deletefrom (point))
+    ))
 
 (defun r-autoyas-expand (&optional funcname no-paren)
   "Insert argument list (in parentheses if no-paren is nil) of R
@@ -69,7 +71,7 @@
     (delete-char 1))
   (if (null funcname)
       (setq funcname (ess-r-args-current-function)))
-  (ess-command (concat "r.autoyas.create('" funcname "')\n")
+  (ess-command (concat ".r.autoyas.create('" funcname "')\n")
                (get-buffer-create "*r-autoyas*"))
   (unless (null funcname)
     (let (snippet)
@@ -88,13 +90,13 @@
         (yas/expand-snippet snippet)))))
 
 (defun r-autoyas-inject-commands ()
-  (process-send-string (get-process ess-current-process-name)
-                       "r.autoyas.esc <- function(str) {
+  (ess-eval-linewise
+   ".r.autoyas.esc <- function(str) {
   str <- gsub('$', '\\\\$', str, fixed=TRUE)
   str <- gsub('`', '\\\\`', str, fixed=TRUE)
   return(str)
   };
-  r.autoyas.create <- function(funcname) {
+  .r.autoyas.create <- function(funcname) {
   if (existsFunction(deffun <- paste(funcname,'.default', sep=''))) {
   funcname <- deffun
   } else if(!existsFunction(funcname)) {
@@ -122,7 +124,7 @@
   str <- append(str, paste('${',nr-1,':, ${',nr,':',field,'}}', sep=''))
   } else if (type=='character') {
   nr <- nr+2
-  str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':\\'',gsub('\\'', '\\\\\\'', r.autoyas.esc(encodeString(formals[[field]])), fixed=TRUE),'\\'}}', sep=''))
+  str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':\\'',gsub('\\'', '\\\\\\'', .r.autoyas.esc(encodeString(formals[[field]])), fixed=TRUE),'\\'}}', sep=''))
   } else if (type=='logical') {
   nr <- nr+2
   str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':',as.character(formals[[field]]),'}}', sep=''))
@@ -134,14 +136,15 @@
   str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':NULL}}', sep=''))
   } else if (type=='language') {
   nr <- nr+2
-  str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':',r.autoyas.esc(deparse(formals[[field]])),'}}', sep=''))
+  str <- append(str, paste('${',nr-1,':, ',field,'=${',nr,':',.r.autoyas.esc(deparse(formals[[field]])),'}}', sep=''))
   }
   }
   str <- paste(str, sep='', collapse='')
   if (grepl(', ', str, fixed=TRUE)) str <- sub(', ', '', str) # remove 1st ', ' (from 1st field)
   str <- paste('(',str,')', sep='')
   str
-  }\n")
+  }\n"
+   t nil nil t)
   )
 
 (defadvice yas/abort-snippet (around r-delete-remaining)
@@ -152,24 +155,20 @@
 (ad-activate 'yas/abort-snippet)
 (add-hook 'ess-post-run-hook 'r-autoyas-inject-commands)
 
-(add-hook 'ess-mode-hook
-          '(lambda ()
-             (load "~/.emacs.d/plugins/r-autoyas.el")))
-
 (define-key ess-mode-map (kbd "C-M-<tab>")
   '(lambda ()(interactive)
      (r-autoyas-expand nil nil)))
 
-;; play nice with skeleton-pair an fir autoyas when "(" is pressed
+;; have r-autoyas called whenever you type (
 ;; (setq skeleton-pair t)
 ;; (setq skeleton-pair-alist
-;;       '((?\( _ ?\))
-;;         (?[  _ ?])
-;;         (?{  _ ?})))
+;;           '((?\( _ ?\))
+;;             (?[  _ ?])
+;;             (?{  _ ?})))
 ;; 
 ;; (define-key ess-mode-map (kbd "(") '(lambda () (interactive)
-;;                                     (skeleton-pair-insert-maybe nil)
-;;                                     (r-autoyas-expand nil t))))
+;;                                       (skeleton-pair-insert-maybe nil)
+;;                                       (r-autoyas-expand nil t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ess-R-object-tooltip.el
