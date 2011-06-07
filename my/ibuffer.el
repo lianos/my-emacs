@@ -14,6 +14,8 @@
 	     (filename . "GenomicFeaturesX/"))
             ;; ("GenomeAnnoations"
 	    ;;  (filename . "GenomeAnnotations/"))
+            ("SeqTools"
+             (filename . "seqtools/"))
 	    ("SeqStore"
 	     (filename . "SeqStore/"))
 	    ("TagSeq"
@@ -26,6 +28,8 @@
 	    ;;  (filename . "mayr.project"))
 	    ("Programming/R"
 	     (mode . ess-mode))
+            ("ESS-help"
+             (name . "help[R]"))
             ;; ("R Processes"
 	    ;;  ())
             ("Programming" ;; prog stuff not already in MyProjectX
