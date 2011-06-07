@@ -1,4 +1,5 @@
 (cua-mode t)
 (setq cua-enable-cua-keys nil)
 
-;; (provide 'my-cua)
+(define-key ctl-x-map "r" 'cua-set-rectangle-mark)
+

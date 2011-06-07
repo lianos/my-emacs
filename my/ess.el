@@ -49,8 +49,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; auto yasnippet generation.
-;; http://www.svenhartenstein.de/Software/R-autoyas
-;; this is the version from 2011-04-04
+;; See::
+;;   http://www.svenhartenstein.de/Software/R-autoyas/
+;;   https://stat.ethz.ch/pipermail/ess-help/2011-March/006758.html
 (defun r-autoyas-exit-snippet-delete-remaining ()
   "Exit yas snippet and delete the remaining argument list."
   (interactive "*")
@@ -154,20 +155,20 @@
 (ad-activate 'yas/abort-snippet)
 (add-hook 'ess-post-run-hook 'r-autoyas-inject-commands)
 
-;;(define-key ess-mode-map (kbd "C-M-<tab>")
-;; '(lambda ()(interactive)(r-autoyas-expand nil t)))
-(define-key ess-mode-map (kbd "C-c ;")
- '(lambda () (interactive)
-   (setq autopair-mode nil)
-   (r-autoyas-expand nil t)
-   (setq autopair-mode 1)))
+(define-key ess-mode-map (kbd "C-M-<tab>")
+  '(lambda ()(interactive)
+     (r-autoyas-expand nil nil)))
 
-
-;; The keybinds are disabled for now -- autopair is hosing this for now
-;; and I don't have the time to fix it, atm.
+;; have r-autoyas called whenever you type (
+;; (setq skeleton-pair t)
+;; (setq skeleton-pair-alist
+;;           '((?\( _ ?\))
+;;             (?[  _ ?])
+;;             (?{  _ ?})))
+;; 
 ;; (define-key ess-mode-map (kbd "(") '(lambda () (interactive)
-;;                                   (skeleton-pair-insert-maybe nil)
-;;                                   (r-autoyas-expand nil t)))
+;;                                       (skeleton-pair-insert-maybe nil)
+;;                                       (r-autoyas-expand nil t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ess-R-object-tooltip.el
