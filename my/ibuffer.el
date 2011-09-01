@@ -10,6 +10,7 @@
             ;;    (mode . mail-mode)
             ;;    ;; etc.; all your mail related modes
             ;;    ))
+            ("shikken" (filename . "shikken/"))
             ("GenomicFeaturesX"
 	     (filename . "GenomicFeaturesX/"))
             ;; ("GenomeAnnoations"
