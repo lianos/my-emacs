@@ -10,23 +10,16 @@
             ;;    (mode . mail-mode)
             ;;    ;; etc.; all your mail related modes
             ;;    ))
+            ("TagSeqAnalysis" (filename . "TagSeqAnalysis/"))
+            ("TagSeq" (filename . "TagSeq/"))
+            ("SeqStore" (filename . "SeqStore/"))
+            ("SeqTools" (filename . "seqtools/"))
+            ("biosignals" (filename . "biosignals/"))
+            ("GenomicCache" (filename . "GenomicCache/"))
+            ("ARE.utils" (filename . "ARE.utils/"))
+            ("data.table" (filename . "data.table/"))
             ("shikken" (filename . "shikken/"))
-            ("GenomicFeaturesX"
-	     (filename . "GenomicFeaturesX/"))
-            ;; ("GenomeAnnoations"
-	    ;;  (filename . "GenomeAnnotations/"))
-            ("SeqTools"
-             (filename . "seqtools/"))
-	    ("SeqStore"
-	     (filename . "SeqStore/"))
-	    ("TagSeq"
-	     (filename . "TagSeq/"))
-	    ;; ("DGEseq"
-	    ;;  (filename . "DGEseq/"))
-	    ;; ("TailSeq"
-	    ;;  (filename . "TailSeq/"))
-	    ;; ("mayr"
-	    ;;  (filename . "mayr.project"))
+            ("buckshot" (filename . "buckshot/"))
 	    ("Programming/R"
 	     (mode . ess-mode))
             ("ESS-help"
