@@ -110,6 +110,9 @@
 
 (require 'ess-compat)
 
+(if (featurep 'emacs)
+    (require 'ido nil t))
+
 (eval-and-compile
   (require 'ess-custom))
 
@@ -163,20 +166,73 @@
 ;;;  --> is done in ess-mode.el, ess-inf.el, etc
 
 
-;;; Completion and Database code
+ ; ESS Completion
+(defun ess-completing-read (prompt collection &optional predicate
+                                   require-match initial-input hist def)
+  "Read a string in the minibuffer, with completion.
+Use `ido-completing-read' if IDO interface is present, or fall
+back on classical `completing-read' otherwise. Meaning of
+arguments is as in `completing-read'. If HIST is null use
+`ess--completing-hist' as history.
 
-(defun ess-load-object-name-db-file ()
-  "Load object database file if present, mention if not."
-  (if (string= ess-language "S")
-      (progn
-	(make-local-variable 'ess-object-name-db)
-	(condition-case ()
-	    (load ess-object-name-db-file)
-	  (error
-	   ;;(message "%s does not exist.  Consider running ess-create-object-name-db."
-		;;    ess-object-name-db-file)
-;;	      (ding)
-	      (sit-for 1))))))
+By default ESS uses enables IDO flex matching. See
+`ido-enable-flex-matching' for details on flex matching and
+`ess-ido-flex-matching' on how to disable it for ESS, if you
+don't want it.
+
+Some useful keys for IDO completion:
+
+ - C-s (next) or C-r (previous) to move through the list.
+ - C-SPC   to restrict the list to currently matched items.
+ - TAB     to display possible completion in a buffer
+ - C-t     `ido-toggle-regexp'
+"
+  (let ((use-ido (and ess-use-ido-p (featurep 'ido))))
+    (setq hist (or hist 'ess--completing-hist))
+    (when (and def (not use-ido)) ;; ido places in front and highlights the default
+      (setq prompt (format "%s(default %s) " prompt def)))
+    (if use-ido
+        (let ((reset-ido (and use-ido (not ido-mode))) ;people not using ido but having it)
+              (ido-current-directory nil)
+              (ido-directory-nonreadable nil)
+              (ido-directory-too-big nil)
+              (ido-context-switch-command 'ignore)
+              (ido-enable-flex-matching ess-ido-flex-matching) ;it's fast and useful, may be get into options
+              (ido-choice-list (copy-sequence collection)) ;ido removes the match (reported)
+              sel)
+          (unwind-protect
+              (progn
+                (ido-init-completion-maps)
+                (add-hook 'minibuffer-setup-hook 'ido-minibuffer-setup)
+                (add-hook 'choose-completion-string-functions 'ido-choose-completion-string)
+                (setq sel (ido-read-internal 'list prompt hist def require-match initial-input))
+                (when hist  ;; ido does not push into hist the whole match if C-SPC or RET is used (reported)
+                  (unless (string= sel (car (symbol-value hist)))
+                    (set hist (cons sel  (symbol-value hist))))))
+            (when reset-ido
+              (remove-hook 'minibuffer-setup-hook 'ido-minibuffer-setup)
+              (remove-hook 'choose-completion-string-functions 'ido-choose-completion-string)))
+          sel)
+      ;; else usual completion
+      (when (and (featurep 'xemacs) ;; xemacs workaround
+                 (not (listp (car collection))))
+        (setq collection (mapcar 'list collection)))
+      (completing-read prompt collection predicate require-match initial-input hist def)
+      )))
+
+;; not in use since 2004
+;; (defun ess-load-object-name-db-file ()
+;;   "Load object database file if present, mention if not."
+;;   (if (string= ess-language "S")
+;;       (progn
+;;      (make-local-variable 'ess-object-name-db)
+;;      (condition-case ()
+;;          (load ess-object-name-db-file)
+;;        (error
+;;         ;;(message "%s does not exist.  Consider running ess-create-object-name-db."
+;;              ;;    ess-object-name-db-file)
+;; ;;         (ding)
+;;            (sit-for 1))))))
 
 
 

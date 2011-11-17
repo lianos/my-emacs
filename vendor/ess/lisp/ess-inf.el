@@ -258,9 +258,12 @@ Alternatively, it can appear in its own frame if
 
       ;; Start from the "right" directory
       (if startdir (setq default-directory startdir))
-      ;; Set up history
-      (setq-default ess-history-file
-		    (concat "." ess-dialect "history"))
+      (if ess-history-file ;; Set up history
+	  (if (eq t ess-history-file)
+	      (setq ess-history-file (concat "." ess-dialect "history"))
+	    ;; otherwise must be a string "..."
+	    (unless (stringp ess-history-file)
+	      (error "`ess-history-file' must be nil, t, or a string"))))
       ;; initialize.
       (let ((ess-directory (if startdir default-directory ess-directory)))
 	(ess-multi procname buf inferior-ess-start-args)))))
@@ -332,9 +335,11 @@ there is no process NAME)."
 	(setq ess-local-process-name proc-name)
 	(goto-char (point-max))
 	;; load past history
-	(setq comint-input-ring-file-name
-	      (expand-file-name ess-history-file ess-directory))
-	(comint-read-input-ring)
+	(when ess-history-file
+	  (setq comint-input-ring-file-name
+		(expand-file-name ess-history-file
+				  (or ess-history-directory ess-directory)))
+	  (comint-read-input-ring))
 	;; create and run process.
 	(ess-write-to-dribble-buffer
 	 (format "(ess-multi 1):  start-args=%s \n"
@@ -825,23 +830,17 @@ ordinary inferior process.  Alway nil on Unix machines."
 		     ess-local-process-name 'inferior-ess-ddeclient)
 		    (default-value 'inferior-ess-ddeclient))))))
 
-(defun ess-prompt-wait (proc &optional start-of-output sleep)
+(defun ess-prompt-wait (proc prompt-reg &optional sleep )
   "Wait for a prompt to appear at BOL of current buffer.
-PROC is the ESS process. Does not change point"
+PROC is the ESS process. PROMPT-REG is a regexp of the process
+prompt to look for. Does not change point."
   (if sleep (sleep-for sleep)); we sleep here, *and* wait below
-  (if start-of-output nil (setq start-of-output (point-min)))
   (save-excursion
-    (while (progn
-	     ;; get output if there is some ready
-
-;;	     (if (and ess-microsoft-p ess-ms-slow)
-;;		 (accept-process-output proc 0 1500) ; Microsoft is slow
+      (while (progn
 	       (accept-process-output proc 0 500)
-;;	       )
-	     (goto-char (marker-position (process-mark proc)))
-	     (beginning-of-line)
-	     (if (< (point) start-of-output) (goto-char start-of-output))
-	     (not (looking-at inferior-ess-primary-prompt))))))
+               (goto-char (marker-position (process-mark proc)))
+               (beginning-of-line)
+               (not (looking-at prompt-reg))))))
 
 (defun ordinary-insertion-filter (proc string)
   (let ((old-buffer (current-buffer)))
@@ -880,13 +879,13 @@ will be used in a few places where `a' is proportional to `ess-cmd-delay'."
     ;; else: "normal", non-DDE behavior:
 
     (let* ((sprocess (get-ess-process ess-current-process-name))
-	   sbuffer
+ 	   sbuffer prompt-reg
 	   do-sleep end-of-output
 	   oldpb oldpf oldpm
 	   )
       (if (null sprocess)
-	;; should hardly happen, since (get-ess-process *)  already checked:
-	(error "Process %s is not running!" ess-current-process-name))
+	  ;; should hardly happen, since (get-ess-process *)  already checked:
+	  (error "Process %s is not running!" ess-current-process-name))
       (setq sbuffer (process-buffer sprocess))
       (save-excursion
 	(set-buffer sbuffer)
@@ -895,6 +894,12 @@ will be used in a few places where `a' is proportional to `ess-cmd-delay'."
 		(if sleep (if (numberp sleep) nil (setq sleep 1))) ; t means 1
 		(and ess-cmd-delay sleep)))
 	(if do-sleep (setq sleep (* sleep ess-cmd-delay)))
+	(setq prompt-reg
+	      ;; The default for inferior-ess-command-prompt should be nil, but
+	      ;; it is messed up by ess-setq-vars-default in inferior-ess-mode.
+	      ;; Thus, need to check here for local value :(
+	      (concat (or (cdr (assoc 'inferior-ess-command-prompt (buffer-local-variables)))
+			  inferior-ess-primary-prompt) "\\'")) ;anchor to eob
 	(ess-if-verbose-write (format "(ess-command %s ..)" com))
 	(save-excursion
 	  (goto-char (marker-position (process-mark sprocess)))
@@ -921,20 +926,16 @@ will be used in a few places where `a' is proportional to `ess-cmd-delay'."
 		;; need time for ess-create-object-name-db on PC
 		(if no-prompt-check
 		    (sleep-for 0.020); 0.1 is noticable!
-		    ;; else: default
-		  (ess-prompt-wait sprocess nil
+		  ;; else: default
+		  (ess-prompt-wait sprocess prompt-reg
 				   (and do-sleep (* 0.4 sleep))));MS: 4
-		;;(if do-sleep (sleep-for (* 0.0 sleep))); microsoft: 0.5
-
-		;; goto end, making sure final prompt is deleted
-		;; FIXME? do this with much less code
+		;; delete the prompt
 		(goto-char (point-max))
-		(save-excursion
-		  (beginning-of-line)
-		  (setq end-of-output (point)))
-		(delete-region end-of-output (point-max))
-		))
-	  (ess-if-verbose-write " .. ok{ess-command}\n")
+		(delete-region (point-at-bol) (point-max))
+		)
+	      (ess-if-verbose-write " .. ok{ess-command}")
+	      )
+	  (ess-if-verbose-write " .. exiting{ess-command}\n")
 	  ;; Restore old values for process filter
 	  (set-process-buffer sprocess oldpb)
 	  (set-process-filter sprocess oldpf)
@@ -1139,7 +1140,7 @@ this does not apply when using the S-plus GUI, see `ess-eval-region-ddeclient'."
 	    (process-send-region sprocess start end)
 	    (process-send-string sprocess "\n"))))))
 
-  (message "Finished evaluation")
+  (message (or message "Finished evaluation"))
   (if (and (fboundp 'deactivate-mark) ess-eval-deactivate-mark)
       (deactivate-mark))
   ;; return value
@@ -1170,12 +1171,18 @@ Arg has same meaning as for `ess-eval-region'."
     (let* ((beg-end (ess-end-of-function))
 	   (beg (nth 0 beg-end))
 	   (end (nth 1 beg-end))
-	   name)
+	   name assigned-in-ns)
       (goto-char beg)
       (setq name (ess-read-object-name-default))
-      (princ (concat "Loading: " name) t)
-      (ess-eval-region beg end vis
-		       (concat "Eval function " name)))))
+      (when (and (string-match "^R" ess-dialect) ;; how about S?
+                 (ess-get-process-variable ess-local-process-name 'ess--developer-p))
+          (setq assigned-in-ns (ess-developer-assign-function name (buffer-substring-no-properties beg end))))
+      (unless assigned-in-ns
+        (princ (concat "Loading: " name) t)
+        (ess-eval-region beg end vis
+                         (concat "Eval function " (or name "???"))))))
+  )
+
 
 ;; This is from	 Mary Lindstrom <lindstro@Biostat.Wisc.Edu>
 ;; 31 Aug 1995 14:11:43		To: S-mode@stat.math.ethz.ch
@@ -1581,7 +1588,7 @@ to continue it."
   (setq major-mode 'inferior-ess-mode)
   (setq mode-name "iESS")		;(concat "iESS:" ess-dialect))
   (setq mode-line-process
-	'(" [" ess-local-process-name "]: %s"))
+	'(" [" ess-mode-line-indicator "]: %s"))
   (use-local-map inferior-ess-mode-map)
   (if ess-mode-syntax-table
       (set-syntax-table ess-mode-syntax-table)
@@ -2191,32 +2198,39 @@ using `ess-object-list' if that is non-nil."
 (defun ess-get-words-from-vector (command &optional no-prompt-check)
   "Evaluate the S command COMMAND, which returns a character vector.
 Return the elements of the result of COMMAND as an alist of strings.
-COMMAND should have a terminating newline."
+COMMAND should have a terminating newline.
+
+To avoid max.print to truncate your vector, wrap your
+command (%s) in local call:
+
+local({oo<-options(max.print=100000);
+out<-try({%s});print(out);options(oo)\n}))
+"
   (let ((tbuffer (get-buffer-create
 		  " *ess-get-words*")); initial space: disable-undo
 	words)
     (save-excursion
       (set-buffer tbuffer)
       (ess-if-verbose-write (format "ess-get-words*(%s).. " command))
+      ;; VS: wrap automatically?
+      ;; (ess-command (format "local({oo<-options(max.print=100000);\nout<-try({%s});print(out);options(oo)\n})\n" command)
+      ;;              tbuffer 'sleep no-prompt-check)
       (ess-command command tbuffer 'sleep no-prompt-check)
       (ess-if-verbose-write " [ok] ..")
       (goto-char (point-min))
-      (if (not (looking-at "\\s-*\\[1\\]"))
+      (if (not (looking-at "[+ \t>\n]*\\[1\\]"))
 	  (progn (ess-if-verbose-write "not seeing \"[1]\".. ")
 		 (setq words nil)
-	  )
-	(goto-char (point-max))
-	(while (re-search-backward "\"\\([^\"]*\\)\"" nil t)
+                 )
+	(while (re-search-forward "\"\\(\\(\\\\\\\"\\|[^\"]\\)*\\)\"" nil t);match \"
 	  (setq words (cons (buffer-substring (match-beginning 1)
 					      (match-end 1)) words))))
-      ;;DBG, do *not* (i.e., comment):
-      (kill-buffer tbuffer)
       )
     (ess-if-verbose-write
-	 (if (> (length words) 5)
-	     (format " |-> (length words)= %d\n" (length words))
-	   (format " |-> words= '%s'\n" words)))
-    words))
+     (if (> (length words) 5)
+         (format " |-> (length words)= %d\n" (length words))
+       (format " |-> words= '%s'\n" words)))
+    (reverse words)))
 
 (defun ess-compiled-dir (dir)
   "Return non-nil if DIR is an S object directory with special files.

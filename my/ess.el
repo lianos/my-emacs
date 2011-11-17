@@ -13,11 +13,11 @@
 (add-hook 'ess-mode-hook
           (lambda ()
             (setq tab-width 2)
-            (setq yas/buffer-local-condition t)
+            (setq yas/buffer-local-condition t)))
             ;; I can't define these "inline"
             ;; emacs throws an "ess-help-mode-map" symbol is void
-            (define-key ess-help-mode-map "w" 'ess-display-help-in-browser)
-            (define-key ess-help-mode-map "i" 'ess-display-R-index)))
+            ;; (define-key ess-help-mode-map "w" 'ess-display-help-in-browser)
+            ;; (define-key ess-help-mode-map "i" 'ess-display-R-index)))
 
 ;; Tweak font locking
 (add-hook 'ess-mode-hook
@@ -38,102 +38,6 @@
 (setq comint-scroll-to-bottom-on-input t)
 (setq comint-scroll-to-bottom-on-output t)
 (setq comint-move-point-for-output t)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Enhance ESS-help mojo
-;; Courtesy of Vitale Spinu
-;;
-;; Open current help page in ESS buffer in a browser
-(defun ess-display-help-in-browser ()
-  (interactive)
-  (if (not (equal ess-dialect "R"))
-      (message "Sorry, not available for the dialect %s " ess-dialect)
-    (let ((object (buffer-name)))
-      (string-match ".*(\\(.*\\))[^)]*\\'" object)
-      (setq object (match-string 1 object))
-      (if (not object)
-          (message "Cannot infer the help object from buffer name")
-        (ess-command (format "help('%s', help_type='html')\n" object))
-        (message "Help for '%s' opened in the web-browser" object))
-      )))
-;; (define-key ess-help-mode-map "w" 'ess-display-help-in-browser)
-
-;; Open a help index for a given package
-;; * Press `i` in ess-help-buffer to jump to help for another (named) package
-;; * Browse which function/object you want help on then punch <RET>
-(defun ess--help-on-object-at-bol ()
- "Provide help on object at the beginning of line.
-Intended to be used in R-index help pages. Load the package if necessary.
-It is bound to RET and C-m in R-index pages."
- (interactive)
- (save-excursion
-   (let ((package (buffer-name))
-         obj)
-     (string-match ".*(package:\\(.*\\))[^)]*\\'" package)
-     (setq package (match-string 1 package))
-     (if (not (re-search-backward "^\\(\\S-+\\)\\( \\{2\\}\\|\t\\)" nil t))
-         (message "No help topics at this line")
-       (setq obj (match-string 1))
-       (when package
-         (ess-command (format "require('%s')\n" package)) ;;might not be loaded
-         (ess-display-help-on-object obj)
-         ))
-     )))
-
-(defun ess-display-R-index ()
- "Prompt for package name and display its index.
-Bound to 'i' by default in ess-help-mode-map."
- (interactive)
- (let ((object (buffer-name))
-       (curr-win-mode major-mode)
-       pack buff all-packs prompt)
-   (if (not (equal ess-dialect "R"))
-       (message "Sorry, not available for the dialect %s " ess-dialect)
-     (string-match ".*(\\(.*\\))[^)]*\\'" object)
-     (setq object (match-string 1 object))
-     (if  (not object)
-         (message "Cannot infer the help object from buffer name")
-       (setq pack (car (ess-get-words-from-vector (format "find('%s')\n" object))))
-       (when pack
-         (string-match "package:\\(.*\\)\\'" pack)
-         (setq pack (match-string 1 pack)))
-       )
-     (setq all-packs (ess-get-words-from-vector ".packages(all.available = TRUE)\n"))
-     (setq prompt (if pack
-                      (format "Index of (default '%s'): " pack)
-                    "Index of: "))
-     (setq pack (completing-read prompt all-packs nil nil nil nil pack))
-     (setq buff  (get-buffer-create (format "*help[%s](package:%s)*" ess-dialect pack)))
-     (with-current-buffer buff
-       (if buffer-read-only (setq buffer-read-only nil))
-       (delete-region (point-min) (point-max))
-       (ess-help-mode)
-       (setq ess-local-process-name ess-current-process-name)
-       (ess-command (format "help(package='%s')\n" pack) buff)
-       (ess-help-underline)
-       (set-buffer-modified-p 'nil)
-       (goto-char (point-min))
-       (re-search-forward "^Index:" nil t)
-       (save-excursion
-         (while (re-search-forward "^\\(\\S-+\\)\\( \\{2\\}\\|\t\\)" nil t)
-           (put-text-property (match-beginning 1) (match-end 1) 'face 'underline)))
-       (local-set-key [return] 'ess--help-on-object-at-bol)
-       (local-set-key [(control ?m)] 'ess--help-on-object-at-bol)
-       (toggle-read-only t))
-     (let ((special-display-regexps
-            (if ess-help-own-frame '(".") nil))
-           (special-display-frame-alist ess-help-frame-alist)
-           (special-display-function
-            (if (eq ess-help-own-frame 'one)
-                'ess-help-own-frame
-              special-display-function)))
-       (if (eq curr-win-mode 'ess-help-mode)
-           (if ess-help-own-frame
-               (pop-to-buffer buff)
-             (switch-to-buffer buff))
-         (ess-display-temp-buffer buff)))
-     )))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Setting comint-prompt-read-only to true is supposed to be a bad idea?
 ;; See: http://stackoverflow.com/questions/2710442

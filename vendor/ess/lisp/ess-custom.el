@@ -124,7 +124,7 @@
 
 ;; Variables (not user-changeable)
 
-(defvar ess-version "5.14"
+(defvar ess-version "5.15"
   "Version of ESS currently loaded.")
 
 (defvar no-doc
@@ -254,11 +254,16 @@ If this is nil, the history file is relative to `ess-directory'."
   :group 'ess
   :type '(choice (const nil) directory))
 
-(defcustom ess-history-file nil
-  "File to pick up history from.
-If this is a relative file name, it is relative to `ess-history-directory'."
+(defcustom ess-history-file t
+  "File to pick up history from.  nil means *no* history is read or written.
+t means something like \".Rhistory\".
+If this is a relative file name, it is relative to `ess-history-directory'.
+Consequently, if that is set explicitly, you will have one history file
+for all projects."
   :group 'ess
-  :type '(choice (const nil) file))
+  :type '(choice (const :tag "Off" nil)
+                 (const :tag "On" t)
+		 file))
 
 (defcustom ess-plain-first-buffername t
   "No fancy process buffname for the first process of each type (novice mode)."
@@ -271,6 +276,24 @@ If this is a relative file name, it is relative to `ess-history-directory'."
 Avoids the plain dialect name."
   :group 'ess
   :type 'boolean)
+
+(defcustom  ess-use-ido-p t
+  "If t ess will try to use ido completion whenever possible."
+  :group 'ess
+  :type 'boolean)
+
+(defcustom  ess-ido-flex-matching t
+  "If t ido for ESS completion uses flex matching.
+See `ido-enable-flex-matching' for details.
+If you have an old computer, or you load lot of packages, you
+might want to set this to nil.
+"
+  :group 'ess
+  :type 'boolean)
+
+(defvar ess--completing-hist nil
+  "Variable to store completion history.
+Used by `ess-completion-read' command.")
 
 
 (defcustom ess-S-assign " <- "
@@ -716,7 +739,9 @@ to sweave the current noweb file and latex the result."
 ;; SJE -- this should not be defcustom - user does not set it.
 (defvar ess-local-process-name nil
   "The name of the ESS process associated with the current buffer.")
+(put 'ess-local-process-name 'risky-local-variable t)
 (make-variable-buffer-local 'ess-local-process-name)
+
 
 (defcustom ess-kermit-command "gkermit -T"
   "Kermit command invoked by `ess-kermit-get' and `ess-kermit-send'."
@@ -1257,6 +1282,15 @@ anchor to bol with `^'."
 (make-variable-buffer-local 'inferior-ess-secondary-prompt)
 (setq-default inferior-ess-secondary-prompt "+ ?")
 
+(defcustom inferior-ess-command-prompt nil
+  "Regular expression used by `ess-command' to detect the primary prompt.
+If nil `ess-command' will use `inferior-ess-primary-prompt'."
+  :group 'ess-proc
+  :type 'string)
+
+(make-variable-buffer-local 'inferior-ess-command-prompt)
+(setq-default inferior-ess-command-prompt nil)
+
 ;;*;; Variables controlling interaction with the ESS process
 
 (defcustom ess-execute-in-process-buffer nil
@@ -1323,6 +1357,24 @@ of Emacs until the code has been successfully evaluated."
 ;; SJE -- this shouldn't be customixed by user.
 (defvar ess-current-process-name nil
   "Name of the current S process.")
+
+(defvar ess-mode-line-indicator '("" ess-local-process-name)
+  "List of ESS mode-line indicators.
+Local in process buffers. Changes of this variable are
+automatically reflected in mode-lines of the process and all
+associated buffer in ess-mode.
+
+First element must be a string. Add a symbol and then remove with
+`delq'. Note that the symbols which are part of this list should
+better have 'risky-local-variable property set to t. Otherwise the text
+properties are not displayed.
+
+External utilities such as `ess-tracebug' and `ess-developer'
+customize this variable to indicate the changes of the process
+status or user interaction.
+")
+(put 'ess-mode-line-indicator 'risky-local-variable t)
+(make-variable-buffer-local 'ess-mode-line-indicator)
 
 (defvar ess-process-name-list nil
   "Alist of active ESS processes.")
@@ -1719,6 +1771,14 @@ If nil, input is in the `font-lock-variable-name-face'."
 ;; modules, but they can all call it so we may as well put it here.
 
 ;;*;; Variables relating to ess-help-mode
+
+
+(defcustom ess-help-pop-to-buffer nil
+  "If non-nil ess-help buffers are given focus during the display.
+For consistency with emacs help system, the default is nil.
+"
+  :group 'ess-help
+  :type 'boolean)
 
 (defcustom ess-help-own-frame nil
   "Controls whether ESS help buffers should start in a different frame.

@@ -421,6 +421,7 @@ sending `inferior-ess-language-start' to S-Plus.")
 ;; ALWAYS:
 (ess-message "[ess-site:] require 'ess   *ITSELF* ...")
 (require 'ess); -> loads ess-custom.el and more
+(ess-message "[ess-site:] .. after requiring 'ess ...")
 
 (ess-write-to-dribble-buffer
    (format "[ess-site.el _2_]: ess-customize-alist=%s \n"
@@ -428,6 +429,7 @@ sending `inferior-ess-language-start' to S-Plus.")
 
 ;; (1.8) Speedbar and mouse
 
+(ess-message "[ess-site:] require 'ess-menu ...")
 (require 'ess-menu)
 (require 'ess-mouse)
 
@@ -435,6 +437,7 @@ sending `inferior-ess-language-start' to S-Plus.")
 
 ;; To remove toolbar support under ESS, add "(setq ess-use-toolbar nil)"
 ;; to your ~/.emacs or ~/.xemacs/init.el before (require 'ess-site)
+(ess-message "[ess-site:] require 'ess-toolbar ...")
 (require 'ess-toolbar)
 
 ;;; 2. Site Specific setup
@@ -521,6 +524,7 @@ sending `inferior-ess-language-start' to S-Plus.")
 ;; -----  *and* update the "Start Process" menu (below)
 ;;    -> To this: wrap the following in functions that can be re-called
 
+(ess-message "[ess-site:] before creating ess-versions-* ...")
 ;; Create  ess-versions-created,
 ;;         ess-r-versions-created,
 ;; and on Windows, ess-rterm-version-paths -----------------------------------------
@@ -530,6 +534,7 @@ sending `inferior-ess-language-start' to S-Plus.")
 				   (ess-sqpe-versions-create ess-SHOME-versions)               ;; 32-bit
 				   (ess-sqpe-versions-create ess-SHOME-versions-64 "-64-bit")) ;; 64-bit
 				(ess-s-versions-create)))) ;; use ess-s-versions
+  (ess-message "[ess-site:] (let ... after (ess-s-versions-create) ...")
   (if ess-microsoft-p
       (setq ess-rterm-version-paths ;; (ess-find-rterm))
 	    (ess-flatten-list
@@ -557,6 +562,7 @@ sending `inferior-ess-language-start' to S-Plus.")
 		   (ess-find-rterm (concat PF "/R/") "bin/x64/Rterm.exe")
 		   ))
 		)))))
+  (ess-message "[ess-site:] (let ... before (ess-r-versions-create) ...")
 
   (setq ess-r-versions-created ;;  for Unix *and* Windows, using either
 	(ess-r-versions-create));; ess-r-versions or ess-rterm-version-paths (above!)
@@ -580,9 +586,12 @@ sending `inferior-ess-language-start' to S-Plus.")
     (easy-menu-add-item ess-mode-menu '("Start Process")
 			(cons "Other" new-menu))))
 
+(ess-message "[ess-site:] after ess-versions-created ...")
+
 ;; Check to see that inferior-R-program-name points to a working version
 ;; of R; if not, try to find the newest version:
 (ess-check-R-program-name) ;; -> (ess-find-newest-R) if needed, in ./ess-r-d.el
+(ess-message "[ess-site:] after ess-check-R-prog... ...")
 
 ;;; 3. Customization (and examples) for your site
 ;;;; ===============================================
@@ -733,6 +742,7 @@ sending `inferior-ess-language-start' to S-Plus.")
 ;;;(defvar sas-indent-width 4 "*Amount to indent sas statements")
 
  ; Local variables section
+(ess-message "[ess-site:] *very* end ...")
 
 ;;; This file is automatically placed in Outline minor mode.
 ;;; The file is structured as follows:

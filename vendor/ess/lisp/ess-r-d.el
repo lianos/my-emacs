@@ -35,7 +35,7 @@
 (require 'ess-s-l)
 
 (require 'ess-r-args); for now --- should the default rather become ess-eldoc?
-
+(require 'ess-developer)
 ;; modify S Syntax table:
 (setq R-syntax-table S-syntax-table)
 
@@ -83,6 +83,7 @@
      (inferior-ess-exit-prompt		. "Save workspace image? [y/n/c]: ")
      (inferior-ess-primary-prompt	. "\\([A-Z][][A-Za-z0-9.]*\\)?> ")
      (inferior-ess-secondary-prompt	. "+ ?")
+     (inferior-ess-command-prompt	. "\\([A-Z][][A-Za-z0-9.]*\\)?\\(+ \\)*> ")
      ;;harmful for shell-mode's C-a: -- but "necessary" for ESS-help?
      (inferior-ess-start-file		. nil) ;; "~/.ess-R"
      (inferior-ess-start-args		. "")
@@ -93,7 +94,9 @@
    S-common-cust-alist)
   "Variables to customize for R -- set up later than emacs initialization.")
 
-(defvar ess-r-versions '("R-1" "R-2" "R-devel" "R-patched")
+(defvar ess-r-versions (if (eq system-type 'darwin)
+			   '("R-1" "R-2" "R-devel" "R-patched" "R32" "R64")
+			 '("R-1" "R-2" "R-devel" "R-patched"))
   "List of partial strings for versions of R to access within ESS.
 Each string specifies the start of a filename.  If a filename
 beginning with one of these strings is found on `exec-path', a M-x
@@ -163,7 +166,10 @@ to R, put them in the variable `inferior-R-args'."
 		   "function(..., help_type) help(..., htmlhelp= (help_type==\"html\"))")))
 
 	    (ess-eval-linewise
-	     (concat ".help.ESS <- " my-R-help-cmd) nil nil nil 'wait-prompt)
+	     ;; not just into .GlobalEnv where it's too easily removed..
+	     (concat "assignInNamespace(\".help.ESS\","
+		     my-R-help-cmd ", ns = asNamespace(\"base\"))")
+	     nil nil nil 'wait-prompt)
 	  ))
 
       ;; else R version <= 2.4.1
@@ -621,6 +627,26 @@ Completion is available for supplying options."
       (browse-url (concat site okstring "&max=20&result=normal&sort=score"
 			  "&idxname=Rhelp02a&idxname=functions&idxname=docs")))))
 
+(defvar ess--packages-cache nil
+  "Cache var to store package names. Used by
+  `ess-install.packages'.")
+
+(defun ess-install.packages (&optional update)
+  "Prompt and install R package. With argument, update cached packages list."
+  (interactive "P")
+  (if (not (string-match "^R" ess-dialect))
+      (message "Sorry, not available for %s" ess-dialect)
+    (when (or update
+              (not ess--packages-cache))
+      (setq ess--packages-cache
+            (ess-get-words-from-vector "local({oo<-options(max.print=100000);print(rownames(available.packages()));options(oo)})\n")))
+    (let ((ess-eval-visibly-p t)
+          pack)
+      (setq pack (ess-completing-read "Package to install: " ess--packages-cache))
+      (process-send-string (get-process ess-current-process-name)
+                           (format "install.packages('%s')\n" pack))
+      (display-buffer (buffer-name (process-buffer (get-process ess-current-process-name))))
+      )))
 
 (defun ess-dirs ()
   "Set Emacs' current directory to be the same as the *R* process.

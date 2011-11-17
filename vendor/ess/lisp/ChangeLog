@@ -1,3 +1,179 @@
+2011-11-14  Vitalie Spinu  <spinuvit@gmail.com>
+
+	* ess-help.el (ess-read-helpobj-name-default): defined alias for
+		  ess-helpobj-at-point.
+
+2011-11-13  Vitalie Spinu  <spinuvit@gmail.com>
+
+	* ess-help.el (ess-helpobj-at-point): modified the name of
+	ess-read-helpobj-name-default to a more intuitive one and
+	consistent with emacs conventions.
+
+	* ess-custom.el (ess-help-pop-to-buffer): If non-nil ess-help
+	buffers are given focus during the display.
+	(ess-ido-flex-matching): if you don't use ido flex matching but
+	still want it for ESS, here it is.
+
+	* ess-help.el (ess-display-help-on-object): put cache update on
+	universal argument, it also regenerates the help buffer as
+	before. Removed curr-* kludge which was not necessary. Removed the
+	handling of help buffer into separate function.
+	(ess-help-type): local variable in help files holding the help
+	type symbol. So far, 'help, 'index, 'vignette.
+	(ess-help-object): local in help files holding the name of the
+	help object, i.e. name of the package for index and help topic for
+	ordinary help.
+	(ess-help-mode-map): new keys - i for index, v for vignette, w for
+	help in web-browser. "q" key is not burring the buffer instead of
+	jumping to the end of ESS. C-c C-z is standard combination for
+	that action.
+	(ess-help-mode-menu): new menu entries for index vignette and
+	browse in web-browser.
+	(ess-find-help-file): This one does not do the prompt processing
+	anymore. Everything is done in ess-completing-read now.
+	(ess-get-help-topics-list): topics are now list of strings instead
+	of alist. IDO and emacs handles them better. A workaround is
+	implemented for Xemacs to use alist in ess-completing-read.
+	-------------
+	New functions:
+	(ess-display-index): linked index with ido request.
+	(ess-R-display-vignettes, ess-display-vignettes): display
+	vignettes in nicely formatted, linked help buffer. In xemacs emits
+	the call to browseVignettes() instead.
+	(ess-display-help-in-browser): pop the current help page in
+	browser.
+	(ess--switch-to-help-buffer): display help buffers, consistently
+	with `ess-help-pop-to-buffer' and `ess-help-own-frame'.
+
+	* ess.el (ess-completing-read): moved code around.
+
+	* ess-inf.el (ess-eval-function): integrated ess-developer in ess-eval-function
+	Works only for R, useful for S as well?
+
+	* ess-mode.el (ess-mode): integrated mode-line-indicator.
+
+	* ess-inf.el (inferior-ess-mode): integrated mode-line-indicator.
+
+	* ess-custom.el (ess-mode-line-indicator): added dynamic mode-line
+	indicator. Mode line of ess-mode is now in sync with the
+	associated process. This feature is used by ess-developer and
+	ess-tracebug.  Xemacs does not have the necessary support for it.
+
+2011-11-12  Vitalie Spinu  <spinuvit@gmail.com>
+
+
+	* ess.el (ess-completing-read): new function to use for completion
+	in ESS. It uses ido completion mechanism whenever available, and
+	falls back on classical completing-read  otherwise.
+
+	* ess-r-d.el (ess-install.packages): fast way to instal packages
+	with ido interface.
+
+	* ess-custom.el (ess-use-ido-p): users can disable ido if they
+	don't want it.
+	(ess--completing-hist): new internal variable to store completion
+	history.
+
+	* ess-inf.el (ess-get-words-from-vector): addapted regular
+	expression to match "\"", this was breaking the command
+	before. See etc/R-ESS-bugs.el (bug 1).
+
+	Added comment on max.print truncating the vector in the
+	doc string (bug 2 in etc/R-ESS-bugs.el). Sill not sure if
+	should wrap the code automatically or leave it to the user.
+
+2011-11-11  Vitalie Spinu  <spinuvit@gmail.com>
+
+	* ess-r-d.el (R-customize-alist): added
+	`inferior-ess-command-prompt' to R-customize-alist. Solves bug 3
+	in etc/R-ESS-bugs.el.
+
+	* ess-custom.el (inferior-ess-command-prompt): new prompt regexp
+	to be used specifically in ess-command. If nil (the default)
+	ess-command uses `inferior-ess-primary-prompt' as it was before.
+
+	* ess-inf.el (ess-command): Anchoring the prompt to the end of
+	buffer in order to avoid premature prompt detection (see
+	etc/R-ESS-bugs.el bug 4). Moved ..ok{ess-command} inside
+	unwind-protect. Before it was ..ok even when ess-command failed.
+	(ess-prompt-wait): Added new required parameter PROMPT-REG for the
+	local prompt regexp to be passed explicitly. Before, it was using
+	global value of the prompt regexp.
+	Dropped start-of-output argument. It's never used in ess-code and
+	had confusing meaning wich was not even documented.
+
+2011-11-03  Rodney Sparapani  <rsparapa@mcw.edu>
+
+	* ess-sas-l.el (sas-fix-life-tables): if read-only,
+	then toggle to read-write first
+	(SAS-listing-mode): name ESS[LST] for emacs functionality
+	that cares about names like tabbar
+
+2011-09-30  Rodney Sparapani  <rsparapa@mcw.edu>
+
+	* ess-sas-a.el (ess-sas-graph-view): search for GSASFILE more
+	robust to handle recent versions of SAS and embedded dots in
+	filename
+
+2011-09-17  Henning Redestig  <henning@psc.riken.jp>
+
+	* ess-roxy.el (ess-roxy-fill-field): Filling text inside roxygen
+	entries now operate on individual paragraphs instead of the whole
+	field.
+
+2011-09-16  Sebastian P. Luque  <spluque@gmail.com>
+
+	* ess-swv.el (ess-swv-remove-TeX-commands): Simplify removal of
+	commands from TeX-command-list (AUCTeX users).  Thanks to Stephen.
+	(ess-swv-toggle-plug-into-AUCTeX): Fixed doc string.
+
+2011-09-11  Henning Redestig  <henning@psc.riken.jp>
+
+	* ess-roxy.el (ess-roxy-update-entry): fixes problem with roxy
+	entries in the beginning of a file
+
+2011-09-03  Henning Redestig  <henning@psc.riken.jp>
+
+	* ess-roxy.el (ess-roxy-in-header-p): fix introduced bug in update-entry
+
+2011-09-01  Henning Redestig  <henning@psc.riken.jp>
+
+	* ess-roxy.el (ess-roxy-get-args-list-from-entry): couldnt really
+	handle the ... argument param description before. can now.
+
+2011-09-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* ess-custom.el (ess-history-file): now three-valued;
+	(nil, t, <string>). If nil, *no* history is read or written.
+
+	* ess-inf.el (inferior-ess, ess-multi): ess-history-file changes;
+	finally *use* the ess-history-directory.
+
+2011-08-31  Henning Redestig  <henning@psc.riken.jp>
+
+	* ess-roxy.el (ess-roxy-end-of-field): attempt to handle mutiple
+	paragraphs inside @param fields etc.
+
+2011-08-31  Sebastian P. Luque  <spluque@gmail.com>
+
+	* ess-help.el (ess-get-help-aliases-list): Choose whether to use
+	.readRDS() or readRDS() based on R version.
+
+2011-08-30  Sebastian P. Luque  <spluque@gmail.com>
+
+	* ess-swv.el (ess-swv-plug-into-AUCTeX): Evaluate this function
+	after loading tex.
+
+2011-08-18  Rodney Sparapani  <rsparapa@mcw.edu>
+
+	* ess-bugs-d.el (ess-bugs-switch-to-suffix): let's not
+	magnify burn-in (via the thinning multiple)
+
+2011-08-17  Stephen Eglen  <stephen@gnu.org>
+
+	* ess-r-d.el (ess-r-versions): Add "R32" and "R64" if working on a
+	mac.
+
 2011-07-28  Rodney Sparapani  <rsparapa@mcw.edu>
 
 	* ess-bugs-d.el (ess-bugs-switch-to-suffix): complete

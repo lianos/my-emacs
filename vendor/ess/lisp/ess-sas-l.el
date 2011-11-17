@@ -106,6 +106,7 @@ the mode line."
   "Fundamental mode with `ess-listing-minor-mode' and read-only."
   (interactive)
   (fundamental-mode)
+  (setq mode-name "ESS[LST]")
   (ess-listing-minor-mode 1)
   (use-local-map sas-mode-local-map)
   (toggle-read-only t)) ;; to protect the buffer.
@@ -981,6 +982,7 @@ opening /* appears.  returns 0 otherwise."
 Proc Lifetest.  Operates on current region.  A major space saver if there is
 heavy censoring."
   (interactive)
+  (if buffer-read-only (toggle-read-only))
     (goto-char (point-min))
 (while (re-search-forward "^.*[ ]+[.][ ]+[.][ ]+[.][ ]+.*$" nil t)
      (replace-match "" nil nil)))
