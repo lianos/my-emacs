@@ -9,7 +9,7 @@
               (width . 145) (height . 70)))
     
       (color-theme-zenburn)
-    
+      (global-hl-line-mode t)
       ;; Change the drag/drop behavior
       ;; http://stackoverflow.com/questions/1850292
       (define-key global-map [ns-drag-file]
