@@ -1,5 +1,5 @@
 ;; Defines custom functions and binds them to keyboard shortcuts.
-;; 
+;;
 ;; These functions were primarily found in random places on the internet,
 ;; or ones I made myself.
 
@@ -24,6 +24,13 @@
     (when (file-exists-p (concat personal ".el"))
       (load personal))))
 
+
+;; Delete to start of line
+(defun kill-start-of-line ()
+  "kill from point to start of line"
+  (interactive)
+  (kill-line 0))
+(global-set-key (kbd "C-;") 'kill-start-of-line)
 
 ;; Change \M-; to a better comment-dwim. This will comment the current
 ;; line if the mark isn't active, not add a comment to the end of the line
@@ -125,7 +132,7 @@ the matching brace"
 (defun gcm-scroll-up ()
   (interactive)
   (scroll-down 1))
-  
+
 (global-set-key [M-down] 'gcm-scroll-down)
 (global-set-key [M-up]   'gcm-scroll-up)
 
