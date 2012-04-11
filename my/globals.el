@@ -16,7 +16,6 @@
 (setq show-paren-style 'mixed)  ;; dunno, but supposed to be a good idea
 (setq backup-inhibited t)       ;; disable backup
 (setq auto-save-default nil)    ;; disable auto save
-(tool-bar-mode 0)               ;; removes the toolbar from the top
 (global-font-lock-mode t)       ;; turn on syntax highlight for all major modes
 (fset 'yes-or-no-p 'y-or-n-p)   ;; type just "y/n" instead of "yes/no"
 (setq next-line-add-newlines nil) ;; don't add new lines when scrolling past end

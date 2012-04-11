@@ -7,7 +7,10 @@
 ;;      '( ("R-something" "/usr/local/bin/R-something")
 ;;         ("R-other" "/opt/local/bin/R-other" "-j")))
 
-(load (expand-file-name "~/.emacs.d/vendor/ess/lisp/ess-site"))
+(setq ess-s-versions-list
+     '( ("Rr" "~/sw/bin/Rr") ))
+
+(load (expand-file-name "~/.emacs.d/vendor/ESS/lisp/ess-site"))
 (require 'ess-site)
 
 (add-hook 'ess-mode-hook

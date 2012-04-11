@@ -3,6 +3,7 @@
     (progn
       ;; Emacs.app needs this for delete/backspace to work as expected when
       ;; launched as an *.app instead of through the terminal
+      (tool-bar-mode 0)               ;; removes the toolbar from the top
       (normal-erase-is-backspace-mode 1)
       (setq initial-frame-alist               ;; Set initial window position
             '((top . 40) (left . 50)          ;; works well for 19200 x 1200
