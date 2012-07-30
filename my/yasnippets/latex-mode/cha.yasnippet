@@ -1,9 +1,8 @@
 # -*- mode: snippet -*-
-# contributor : Mads D. Kristensen <madsdk@gmail.com>
+# contributor : Steve Lianoglou <slianoglouk@gmail.com>
 # key : cha
 # group: sections
 # name : \chapter
 # --
 \chapter{${1:name}}
-\label{${2:"waiting for reftex-label call..."$(unless yas/modified-p (reftex-label nil 'dont-insert))}}
-$0
+\label{cha:${2:${1:$(replace-regexp-in-string "[^[:alnum:]]" "_" yas/text)}}}
