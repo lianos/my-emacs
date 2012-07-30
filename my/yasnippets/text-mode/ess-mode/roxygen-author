@@ -1,4 +1,0 @@
-#name : @author ...
-#key : author
-# --
-@author Steve Lianoglou \email{${1:slianoglou@@gmail.com}}
