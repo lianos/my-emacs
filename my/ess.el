@@ -22,6 +22,12 @@
             ;; (define-key ess-help-mode-map "w" 'ess-display-help-in-browser)
             ;; (define-key ess-help-mode-map "i" 'ess-display-R-index)))
 
+;; To get tab yasnippet expansion to work on LaTeX/Rnw files
+(add-hook 'latex-mode-hook
+'(lambda()
+(local-set-key [tab] 'yas/expand)))
+
+
 ;; Tweak font locking
 (add-hook 'ess-mode-hook
  '(lambda()
@@ -41,6 +47,11 @@
 (setq comint-scroll-to-bottom-on-input t)
 (setq comint-scroll-to-bottom-on-output t)
 (setq comint-move-point-for-output t)
+
+;; The input commands won't appear in R buffer, but blocks of code
+;; evaluated by C-c C-r shouldn't hang ESS no more, cf:
+;; https://stat.ethz.ch/pipermail/ess-help/2012-April/007745.html
+(setq ess-eval-visibly-p nil)
 
 ;; Setting comint-prompt-read-only to true is supposed to be a bad idea?
 ;; See: http://stackoverflow.com/questions/2710442
