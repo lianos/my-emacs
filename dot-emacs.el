@@ -26,6 +26,7 @@
 (vendor 'ibuffer)
 (vendor 'ssh)
 (vendor 'yasnippet)
+(vendor 'magit)
 ;; (vendor 'things-cmds)
 
 (load "my/globals")

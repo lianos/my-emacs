@@ -136,4 +136,26 @@ the matching brace"
 (global-set-key [M-down] 'gcm-scroll-down)
 (global-set-key [M-up]   'gcm-scroll-up)
 
-;; (provide 'my-functions)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Search directory w/ regexp then inline search the files w/ regexp
+;; http://stackoverflow.com/questions/4969373
+;;
+;; 1. Run `find-grep-dired` as usual
+;; 2. Press `t` (dired-toggle-marks) to mark all files.
+;; 3. Press `A` to start dired-do-search. When prompted for regexp, simply press 
+;;    `M-p`, this will bring up your find-grep regexp since both functions 
+;;    use the same prompting history list
+;; 4. You will be taken to the first match in the first file. Press `M-` to go
+;;    to the next match spanning all of your matched files.
+(defun find-grep-dired-do-search (dir regexp)
+  "First perform `find-grep-dired', and wait for it to finish.
+Then, using the same REGEXP as provided to `find-grep-dired',
+perform `dired-do-search' on all files in the *Find* buffer."
+  (interactive "DFind-grep (directory): \nsFind-grep (grep regexp): ")
+  (find-grep-dired dir regexp)
+  (while (get-buffer-process (get-buffer "*Find*"))
+    (sit-for 1))
+  (with-current-buffer "*Find*"
+    (dired-toggle-marks)
+    (dired-do-search regexp)))
+(global-set-key [C-x s] 'find-grep-dired-do-search)

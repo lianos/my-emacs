@@ -13,6 +13,8 @@
 (load (expand-file-name "~/.emacs.d/vendor/ESS/lisp/ess-site"))
 (require 'ess-site)
 
+(load "my/ess-knitr")
+
 (add-hook 'ess-mode-hook
           (lambda ()
             (setq tab-width 2)
@@ -47,6 +49,50 @@
 (setq comint-scroll-to-bottom-on-input t)
 (setq comint-scroll-to-bottom-on-output t)
 (setq comint-move-point-for-output t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Sweave with cacheSweave, taken from:
+;; http://blog.nguyenvq.com/2009/05/14/editingadding-on-to-sweave-features-in-ess/
+(defun ess-swv-run-in-R2 (cmd &optional choose-process)
+  "Run \\[cmd] on the current .Rnw file.  Utility function not called by user."
+  (let* ((rnw-buf (current-buffer)))
+    (if choose-process ;; previous behavior
+  (ess-force-buffer-current "R process to load into: ")
+      ;; else
+      (update-ess-process-name-list)
+      (cond ((= 0 (length ess-process-name-list))
+       (message "no ESS processes running; starting R")
+       (sit-for 1); so the user notices before the next msgs/prompt
+       (R)
+       (set-buffer rnw-buf)
+       )
+      ((not (string= "R" (ess-make-buffer-current))); e.g. Splus, need R
+       (ess-force-buffer-current "R process to load into: "))
+       ))
+
+    (save-excursion
+      (ess-execute (format "require(tools)")) ;; Make sure tools is loaded.
+      (basic-save-buffer); do not Sweave/Stangle old version of file !
+      (let* ((sprocess (get-ess-process ess-current-process-name))
+       (sbuffer (process-buffer sprocess))
+       (rnw-file (buffer-file-name))
+       (Rnw-dir (file-name-directory rnw-file))
+       (Sw-cmd
+        (format
+         "local({..od <- getwd(); setwd(%S); library(cacheSweave); %s(%S, cacheSweaveDriver()); setwd(..od) })"
+         Rnw-dir cmd rnw-file))
+       )
+  (message "%s()ing %S" cmd rnw-file)
+  (ess-execute Sw-cmd 'buffer nil nil)
+  (switch-to-buffer rnw-buf)
+  (ess-show-buffer (buffer-name sbuffer) nil)))))
+
+(defun ess-swv-weave2 ()
+ "Run Sweave on the current .Rnw file."
+ (interactive)
+ (ess-swv-run-in-R2 "Sweave"))
+(define-key noweb-minor-mode-map "\M-nw" 'ess-swv-weave2)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; The input commands won't appear in R buffer, but blocks of code
 ;; evaluated by C-c C-r shouldn't hang ESS no more, cf:
