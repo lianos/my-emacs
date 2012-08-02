@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
-# contributor : Mads D. Kristensen <madsdk@gmail.com>
+# contributor : Steve Lianoglou <slianoglou@gmail.com>
 # key : fig
 # group: environments
 # name : \begin{figure} ... \end{figure}
@@ -7,6 +7,6 @@
 \begin{figure}[${1:htbp}]
   \centering
   \includegraphics[${2:scale=${3:1}}]{${4:file}}
-  \caption{${5:caption}}
-  \label{fig:${6:label}}
+  \caption${5:[${6:short caption}]}{${7:caption}}
+  \label{fig:${8:${5:$(replace-regexp-in-string "[^[:alnum:]]" "_" yas/text)}}}
 \end{figure}

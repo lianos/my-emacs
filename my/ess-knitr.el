@@ -5,7 +5,9 @@
 ;; Define key-bindings for calling 'knit' and 'purl;
 ;; 'M-n r' - knit the current buffer
 ;; 'M-n u' - purl the current buffer
-(define-key noweb-minor-mode-map "\M-nk" 'ess-swv-knit)
+
+(define-key noweb-minor-mode-map "\M-nK" 'ess-swv-knit)
+(define-key noweb-minor-mode-map "\M-nk" 'ess-knit)
 (define-key noweb-minor-mode-map "\M-nu" 'ess-swv-purl)
 (define-key noweb-minor-mode-map "\M-np" 'ess-swv-PDF)
 
@@ -20,6 +22,12 @@
   "Run knit on the current .Rnw file."
   (interactive)
   (ess-swv-run-in-R "require(knitr) ; knit"))
+
+(defun ess-knit ()
+  "Ghetto run knit on current .Rnw file and have objects loaded into global space"
+  (interactive)
+  (message "knit()ing %S" (buffer-file-name))
+  (ess-execute (format "require(%S); knit(%S)" "knitr" (buffer-file-name))))
 
 (defun ess-swv-purl ()
   "Run purl on the current .Rnw file."
