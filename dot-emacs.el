@@ -27,12 +27,16 @@
 (vendor 'ssh)
 (vendor 'yasnippet)
 (vendor 'magit)
+(vendor 'minimap)
+(vendor 'expand-region)
 ;; (vendor 'things-cmds)
 
 (load "my/globals")
 (load "my/bindings")
 (load "my/cua")
 (load "my/tabs")
+(load "my/spelling")
+(load "my/expand-region")
 
 ;; Setup Programming Environments
 (load "my/ess")

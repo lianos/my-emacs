@@ -25,3 +25,19 @@
   (flyspell-goto-next-error)
   (ispell-word))
 (global-set-key (kbd "M-<f8>") 'flyspell-check-next-highlighted-word)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Get spelling to work correctly with Sweave/noweb docs
+;; http://stackoverflow.com/questions/8287330
+
+(add-to-list 'ispell-skip-region-alist '("^<<.*>>=" . "^@"))
+
+(defun flyspell-eligible ()
+  (let ((p (point)))
+    (save-excursion
+      (cond ((re-search-backward (ispell-begin-skip-region-regexp) nil t)
+             (ispell-skip-region (match-string-no-properties 0))
+             (< (point) p))
+            (t)))))
+
+(put 'latex-mode 'flyspell-mode-predicate 'flyspell-eligible)
