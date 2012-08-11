@@ -10,7 +10,7 @@
 (setq ess-s-versions-list
      '( ("Rr" "~/sw/bin/Rr") ))
 
-(load (expand-file-name "~/.emacs.d/vendor/ESS/lisp/ess-site"))
+(load (expand-file-name "~/.emacs.d/vendor/ess/lisp/ess-site"))
 (require 'ess-site)
 
 (load "my/ess-knitr")
@@ -304,45 +304,3 @@
     (kill-buffer tmpbuf)))
 (define-key ess-mode-map "\C-c\C-g" 'ess-R-object-tooltip)
 
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Bind lots of stuff to shift-RET
-;; http://www.kieranhealy.org/blog/archives/2009/10/12/make-shift-enter-do-a-lot-in-ess/
-;; ESS: Emacs Speaks Statistics
-;; Use shift-enter to split window & launch R (if not running), execute highlighted
-;; region (if R running & area highlighted), or execute current line
-;; (and move to next line, skipping comments). Nice.
-;; See http://www.emacswiki.org/emacs/EmacsSpeaksStatistics,
-;; FelipeCsaszar. Adapted to spilit vertically instead of
-;; horizontally.
-;; (defun my-ess-start-R ()
-;;   (interactive)
-;;   (if (not (member "*R*" (mapcar (function buffer-name) (buffer-list))))
-;;       (progn
-;;   (delete-other-windows)
-;;   (setq w1 (selected-window))
-;;   (setq w1name (buffer-name))
-;;   (setq w2 (split-window w1 nil t))
-;;   (R)
-;;   (set-window-buffer w2 "*R*")
-;;   (set-window-buffer w1 w1name))))
-;;
-;; (defun my-ess-eval ()
-;;   (interactive)
-;;   (my-ess-start-R)
-;;   (if (and transient-mark-mode mark-active)
-;;       (call-interactively 'ess-eval-region)
-;;     (call-interactively 'ess-eval-line-and-step)))
-;;
-;; (add-hook 'ess-mode-hook
-;;     '(lambda()
-;;        (local-set-key [(shift return)] 'my-ess-eval)))
-;;
-;; (add-hook 'inferior-ess-mode-hook
-;;     '(lambda()
-;;        (local-set-key [C-up] 'comint-previous-input)
-;;        (local-set-key [C-down] 'comint-next-input)))
-
-
-;; (provide 'my-programming-r)
