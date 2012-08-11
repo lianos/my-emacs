@@ -29,7 +29,6 @@
 (vendor 'magit)
 (vendor 'minimap)
 (vendor 'expand-region)
-;; (vendor 'things-cmds)
 
 (load "my/globals")
 (load "my/bindings")
