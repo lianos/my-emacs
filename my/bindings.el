@@ -10,9 +10,9 @@
 ;; Set C-z to be another keymap (it minimizes window otherwise)
 (global-set-key "\C-z" nil)
 
-;; CUA mode stomps on ctl-x r *
-(global-set-key "\C-zr" 'point-to-register)
-(global-set-key "\C-zj" 'jump-to-register)
+;; Activate CUA rectancgles over xterm
+(global-set-key "\C-zr" 'cua-set-rectangle-mark)
+
 ;; ============================================================================
 ;; Key bindings
 ;; ============================================================================
