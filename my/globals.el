@@ -31,6 +31,11 @@
 ;; Trailing whitespace is unnecessary
 (add-hook 'before-save-hook (lambda () (delete-trailing-whitespace)))
 
+;; paragarph fill settings, see
+;; http://www.emacswiki.org/emacs/FillParagraph
+(setq-default fill-column 80)
+;; use * to begin paragraphs -- for when you are enumerated lists
+(setq paragraph-start "\\*\\|$" paragraph-separate "$")
 
 ;; Scrolling
 ;; http://zhangda.wordpress.com/2009/05/21

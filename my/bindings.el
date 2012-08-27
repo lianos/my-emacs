@@ -7,6 +7,12 @@
 (global-set-key (kbd "C-l") ctl-x-map)
 (global-set-key (kbd "C-x") 'recenter)
 
+;; Set C-z to be another keymap (it minimizes window otherwise)
+(global-set-key "\C-z" nil)
+
+;; CUA mode stomps on ctl-x r *
+(global-set-key "\C-zr" 'point-to-register)
+(global-set-key "\C-zj" 'jump-to-register)
 ;; ============================================================================
 ;; Key bindings
 ;; ============================================================================
