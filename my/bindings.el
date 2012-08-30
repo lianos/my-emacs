@@ -7,11 +7,9 @@
 (global-set-key (kbd "C-l") ctl-x-map)
 (global-set-key (kbd "C-x") 'recenter)
 
+;; ============================================================================
 ;; Set C-z to be another keymap (it minimizes window otherwise)
 (global-set-key "\C-z" nil)
-
-;; Activate CUA rectancgles over xterm
-(global-set-key "\C-zr" 'cua-set-rectangle-mark)
 
 ;; ============================================================================
 ;; Key bindings
@@ -46,3 +44,8 @@
 ;; Clears Meta-g from any binding, we are effectively setting it up as another
 ;; prefix key
 ;;(global-unset-key "\M-g")
+
+(global-set-key "\C-zr" 'cua-set-rectangle-mark) ;; CUA rectancgles over xterm
+(global-set-key (kbd "C-=") 'er/expand-region)
+(global-set-key "\C-z=" 'er/expand-region) ;; to enablue use over xterm
+(global-set-key (kbd "C--") 'er/contract-region)

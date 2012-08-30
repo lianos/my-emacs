@@ -31,7 +31,6 @@
 (vendor 'expand-region)
 
 (load "my/globals")
-(load "my/bindings")
 (load "my/cua")
 (load "my/tabs")
 (load "my/spelling")
@@ -41,6 +40,8 @@
 (load "my/ess")
 
 (load "my/platform-specific-settings")
+
+(load "my/bindings")
 
 ;; ============================================================================
 ;; Auto-generated custom settings (from M-x customize ...)
