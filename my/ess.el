@@ -7,11 +7,7 @@
 ;;      '( ("R-something" "/usr/local/bin/R-something")
 ;;         ("R-other" "/opt/local/bin/R-other" "-j")))
 
-;; (setq ess-s-versions-list
-;;      '( ("Rr" "~/sw/bin/Rr") ))
-
 (load (expand-file-name "~/.emacs.d/vendor/ess-release/lisp/ess-site"))
-; (load (expand-file-name "~/libs/emacs/ess/lisp/ess-site"))
 (require 'ess-site)
 
 ;; (load "my/ess-knitr")
