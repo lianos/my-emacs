@@ -4,8 +4,8 @@
 ;                 (expand-file-name "~/libs/emacs/polymode/modes"))
 ;               load-path))
 
-(add-to-list 'load-path (expand-file-name "~/libs/emacs/polymode"))
-(add-to-list 'load-path (expand-file-name "~/libs/emacs/polymode/modes"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/vendor/polymode"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/vendor/polymode/modes"))
 
 
 (require 'poly-R)
