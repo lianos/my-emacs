@@ -7,13 +7,14 @@
 ;;      '( ("R-something" "/usr/local/bin/R-something")
 ;;         ("R-other" "/opt/local/bin/R-other" "-j")))
 
-(setq ess-s-versions-list
-     '( ("Rr" "~/sw/bin/Rr") ))
+;; (setq ess-s-versions-list
+;;      '( ("Rr" "~/sw/bin/Rr") ))
 
-(load (expand-file-name "~/.emacs.d/vendor/ess/lisp/ess-site"))
+; (load (expand-file-name "~/.emacs.d/vendor/ess/lisp/ess-site"))
+(load (expand-file-name "~/libs/emacs/ess/lisp/ess-site"))
 (require 'ess-site)
 
-(load "my/ess-knitr")
+;; (load "my/ess-knitr")
 
 (add-hook 'ess-mode-hook
           (lambda ()
@@ -87,11 +88,11 @@
   (switch-to-buffer rnw-buf)
   (ess-show-buffer (buffer-name sbuffer) nil)))))
 
-(defun ess-swv-weave2 ()
- "Run Sweave on the current .Rnw file."
- (interactive)
- (ess-swv-run-in-R2 "Sweave"))
-(define-key noweb-minor-mode-map "\M-nw" 'ess-swv-weave2)
+;; (defun ess-swv-weave2 ()
+;;  "Run Sweave on the current .Rnw file."
+;;  (interactive)
+;;  (ess-swv-run-in-R2 "Sweave"))
+;; (define-key noweb-minor-mode-map "\M-nw" 'ess-swv-weave2)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; The input commands won't appear in R buffer, but blocks of code

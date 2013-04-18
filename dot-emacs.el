@@ -17,17 +17,20 @@
 (vendor 'autopair)
 (vendor 'browse-kill-ring)
 (vendor 'color-theme)
-(vendor 'cedet)
-(vendor 'ecb)
+; (vendor 'cedet)
+; (vendor 'ecb)
 (vendor 'fixme)
-(vendor 'goto-last-change)
+
+;; Not loading this in emacs24 due to the following warning message:
+;; Warning (mule): `unibyte: t' is obsolete; use "coding: 'raw-text" instead.
+;; (vendor 'goto-last-change)
 (vendor 'hl-line+)
 (vendor 'ido)
 (vendor 'ibuffer)
 (vendor 'ssh)
 (vendor 'yasnippet)
-(vendor 'magit)
-(vendor 'minimap)
+; (vendor 'magit)
+; (vendor 'minimap)
 (vendor 'expand-region)
 
 (load "my/globals")
@@ -38,6 +41,7 @@
 
 ;; Setup Programming Environments
 (load "my/ess")
+(load "my/polymode")
 
 (load "my/platform-specific-settings")
 

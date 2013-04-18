@@ -10,7 +10,7 @@
 (setenv "PATH" (concat "/usr/local/texlive/2010/bin/x86_64-darwin:" (getenv "PATH")))
 
 ;; Ensure R starts in 64bit mode
-(setenv "R_ARCH" "/x86_64")
+;; (setenv "R_ARCH" "/x86_64")
 
 ;; (setq exec-path (cons "/usr/texbin" exec-path))
 ;; (setenv "PATH" (concat "/usr/texbin:" (getenv "PATH")))
