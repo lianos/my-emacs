@@ -10,6 +10,10 @@
            ;;    (mode . mail-mode)
            ;;    ;; etc.; all your mail related modes
            ;;    ))
+           ;; ======================================================== Genentech
+           ("ngs340" (filename . "ngs340/"))
+           ("c3po" (filename . "c3po"))
+           ;; ===================================================== cBio @ MSKCC
            ("ApAcalypse" (filename . "ApAcalypse/"))
            ("TagSeqAnalysis" (filename . "TagSeqAnalysis/"))
            ("TagSeq" (filename . "TagSeq/"))
@@ -22,7 +26,7 @@
            ("shikken" (filename . "shikken/"))
            ("buckshot" (filename . "buckshot/"))
            ("Programming/R" (mode . ess-mode))
-           ("ESS-help" (name . "help[R]"))
+           ;; ("ESS-help" (buffer-name . "help[R]"))
            ("Programming" ;; prog stuff not already in MyProjectX
             (or
              (mode . c-mode)

@@ -3,28 +3,6 @@
 ;; These functions were primarily found in random places on the internet,
 ;; or ones I made myself.
 
-;; For loading libraries from the vendor directory and then loading my
-;; customizations for that library. Taken from:
-;; https://github.com/rmm5t/dotfiles/blob/master/emacs.d/rmm5t/defuns.el
-(defun vendor (library &rest autoload-functions)
-  (let* ((file (symbol-name library))
-         (normal (concat "~/.emacs.d/vendor/" file))
-         (suffix (concat normal ".el"))
-         (personal (concat "~/.emacs.d/my/" file))
-	 (found nil))
-    (cond
-     ((file-directory-p normal) (add-to-list 'load-path normal) (set 'found t))
-     ((file-directory-p suffix) (add-to-list 'load-path suffix) (set 'found t))
-     ((file-exists-p suffix)  (set 'found t)))
-    (when found
-      (if autoload-functions
-          (dolist (autoload-function autoload-functions)
-            (autoload autoload-function (symbol-name library) nil t))
-        (require library)))
-    (when (file-exists-p (concat personal ".el"))
-      (load personal))))
-
-
 ;; Delete to start of line
 (defun kill-start-of-line ()
   "kill from point to start of line"
@@ -46,54 +24,74 @@
 (global-set-key "\M-;" 'comment-dwim-line)
 
 
-(defun goto-match-paren (arg)
-  "Go to the matching parenthesis if on parenthesis AND last command is a
-movement command, otherwise insert %. This is vi-esque style of jumping to
-the matching brace"
+;; http://www.emacswiki.org/emacs/NavigatingParentheses
+(defun goto-embedded-match-paren (arg)
+  "Go to the matching parenthesis if on parenthesis. Else go to the
+   opening parenthesis one level up."
   (interactive "p")
-  (message "%s" last-command)
-  (if (not (memq last-command '(set-mark
-                                set-mark-command
-                                cua-set-mark
-                                goto-match-paren
-                                down-list
-                                up-list
-                                end-of-defun
-                                beginning-of-defun
-                                backward-sexp
-                                forward-sexp
-                                backward-up-list
-                                forward-paragraph
-                                backward-paragraph
-                                end-of-buffer
-                                beginning-of-buffer
-                                backward-word
-                                forward-word
-                                mwheel-scroll
-                                backward-word
-                                forward-word
-                                mouse-start-secondary
-                                mouse-yank-secondary
-                                mouse-secondary-save-then-kill
-                                move-end-of-line
-                                move-beginning-of-line
-                                backward-char
-                                forward-char
-                                scroll-up
-                                scroll-down
-                                scroll-left
-                                scroll-right
-                                mouse-set-point
-                                next-buffer
-                                previous-buffer
-                                previous-line
-                                next-line)))
-      (self-insert-command (or arg 1))
-    (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
-          ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
-          (t (self-insert-command (or arg 1))))))
+  (cond ((looking-at "\\s\(") (forward-list 1))
+        (t
+         (backward-char 1)
+         (cond ((looking-at "\\s\)")
+                (forward-char 1) (backward-list 1))
+               (t
+                (while (not (looking-at "\\s("))
+                  (backward-char 1)
+                  (cond ((looking-at "\\s\)")
+                         (message "->> )")
+                         (forward-char 1)
+                         (backward-list 1)
+                         (backward-char 1)))
+                  ))))))
+(global-set-key "\C-p" 'goto-embedded-match-paren)
 
-(global-set-key (kbd "%") 'goto-match-paren)
+;;(defun goto-match-paren (arg)
+;;  "Go to the matching parenthesis if on parenthesis AND last command is a
+;;movement command, otherwise insert %. This is vi-esque style of jumping to
+;;the matching brace"
+;;  (interactive "p")
+;;  (message "%s" last-command)
+;;  (if (not (memq last-command '(set-mark
+;;                                set-mark-command
+;;                                cua-set-mark
+;;                                goto-match-paren
+;;                                down-list
+;;                                up-list
+;;                                end-of-defun
+;;                                beginning-of-defun
+;;                                backward-sexp
+;;                                forward-sexp
+;;                                backward-up-list
+;;                                forward-paragraph
+;;                                backward-paragraph
+;;                                end-of-buffer
+;;                                beginning-of-buffer
+;;                                backward-word
+;;                                forward-word
+;;                                mwheel-scroll
+;;                                backward-word
+;;                                forward-word
+;;                                mouse-start-secondary
+;;                                mouse-yank-secondary
+;;                                mouse-secondary-save-then-kill
+;;                                move-end-of-line
+;;                                move-beginning-of-line
+;;                                backward-char
+;;                                forward-char
+;;                                scroll-up
+;;                                scroll-down
+;;                                scroll-left
+;;                                scroll-right
+;;                                mouse-set-point
+;;                                next-buffer
+;;                                previous-buffer
+;;                                previous-line
+;;                                next-line)))
+;;      (self-insert-command (or arg 1))
+;;    (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
+;;          ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
+;;          (t (self-insert-command (or arg 1))))))
+;;(global-set-key (kbd "%") 'goto-match-paren)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Clipboard functions
@@ -142,8 +140,8 @@ the matching brace"
 ;;
 ;; 1. Run `find-grep-dired` as usual
 ;; 2. Press `t` (dired-toggle-marks) to mark all files.
-;; 3. Press `A` to start dired-do-search. When prompted for regexp, simply press 
-;;    `M-p`, this will bring up your find-grep regexp since both functions 
+;; 3. Press `A` to start dired-do-search. When prompted for regexp, simply press
+;;    `M-p`, this will bring up your find-grep regexp since both functions
 ;;    use the same prompting history list
 ;; 4. You will be taken to the first match in the first file. Press `M-` to go
 ;;    to the next match spanning all of your matched files.

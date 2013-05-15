@@ -1,3 +1,8 @@
+;; Some hints on setting up the right codes for different key combinations can
+;; be found here:
+;;    http://offbytwo.com/2012/01/15/emacs-plus-paredit-under-terminal.html
+;;    http://unix.stackexchange.com/questions/47312
+
 ;; ============================================================================
 ;; Swap ctrl-x to be ctrl-l : Banish emacs claw!
 ;; I've found this is necessary to be loaded after provided libraries because
@@ -28,8 +33,8 @@
 (global-set-key [M-delete]    'kill-word)
 (global-set-key [M-backspace] 'backward-kill-word)
 
-(global-set-key [M-left] 'backward-word)
-(global-set-key [M-right] 'forward-word)
+;;(global-set-key [M-left] 'backward-word)
+;;(global-set-key [M-right] 'forward-word)
 
 ;; HOME and END to send you to start/end of the buffer
 (global-set-key (kbd "<home>") 'beginning-of-buffer)
@@ -46,6 +51,11 @@
 ;;(global-unset-key "\M-g")
 
 (global-set-key "\C-zr" 'cua-set-rectangle-mark) ;; CUA rectancgles over xterm
-(global-set-key (kbd "C-=") 'er/expand-region)
-(global-set-key "\C-z=" 'er/expand-region) ;; to enablue use over xterm
-(global-set-key (kbd "C--") 'er/contract-region)
+(global-set-key [C-S-down] 'cua-set-rectangle-mark) ;; CUA rectancgles over xterm
+
+;; (global-set-key (kbd "C-x") 'er/expand-region) ;; use DEL for forward delete!
+;; (global-set-key (kbd "C--") 'er/contract-region)
+;; (global-set-key (kbd "C-=") 'er/expand-region)
+;; (global-set-key "\C-z=" 'er/expand-region) ;; to enablue use over xterm
+(global-set-key [M-right] 'er/expand-region)
+(global-set-key [M-left] 'er/contract-region)
