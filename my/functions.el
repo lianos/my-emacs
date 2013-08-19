@@ -108,6 +108,13 @@
    (buffer-substring-no-properties beg end))
   (setq deactivate-mark t))
 
+;; http://stackoverflow.com/questions/3669511
+(defun show-file-name ()
+  "Show the full path file name in the minibuffer."
+  (interactive)
+  (message (buffer-file-name)))
+(global-set-key (kbd "<f1>") 'show-file-name)
+
 (defun send-buffer-path-to-clipboard ()
   "Send buffer path to clipboard"
   (interactive)
@@ -118,8 +125,8 @@
   (interactive)
   (set-clipboard-contents-from-string (file-name-directory (buffer-file-name))))
 
-(define-key ctl-x-map "c" 'send-buffer-path-to-clipboard)
-(define-key ctl-x-map "p" 'send-buffer-dirpath-to-clipboard)
+;; (define-key ctl-x-map "c" 'send-buffer-path-to-clipboard)
+;; (define-key ctl-x-map "p" 'send-buffer-dirpath-to-clipboard)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scrolling

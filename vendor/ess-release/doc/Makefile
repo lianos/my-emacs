@@ -64,13 +64,13 @@ distclean : clean
 #	-@rm -f $(PDFs)
 
 ../README: $(TEXISRC)
-	$(MAKETXT) readme.texi \
+	-$(MAKETXT) readme.texi \
 	| perl -pe 'last if /^Concept Index/;' \
 	> ../README
 #	| perl -pe 'last if /^Concept Index/; print "For INSTALLATION, see way below.\n\n" if /^\s*ESS grew out of/' \
 
 ../ANNOUNCE: $(TEXISRC)
-	$(MAKETXT) announc.texi \
+	-$(MAKETXT) announc.texi \
 	| perl -pe 'last if /^Concept Index/;' > ../ANNOUNCE
 
 README.Microsoft : README.Microsoft.texi
@@ -78,16 +78,16 @@ README.Microsoft : README.Microsoft.texi
 	| perl -pe 'last if /^Concept Index/;' > README.Microsoft
 
 ../NEWS: Makefile ess-defs.texi newfeat.texi news.texi
-	$(MAKETXT) news.texi > ../NEWS
+	-$(MAKETXT) news.texi > ../NEWS
 
 ../ONEWS: Makefile ess-defs.texi onewfeat.texi onews.texi
-	$(MAKETXT) onews.texi > ../ONEWS
+	-$(MAKETXT) onews.texi > ../ONEWS
 
 ### File Dependencies
 
 info/ess.info: $(TEXISRC) ../VERSION
 	@echo "making Info documentation..."
-	$(MAKEINFO) ess.texi
+	-$(MAKEINFO) ess.texi
 	mv -f ess.info info/
 
 install: install-info install-other-docs
@@ -109,21 +109,21 @@ install-other-docs: pdf html
 
 uninstall :
 	-cd $(DOCDIR) && $(UNINSTALL) ess.dvi ess.pdf readme.dvi readme.pdf README ANNOUNCE
-	-cd $(DOCDIR) && $(UNINSTALL) ess.html readme.html 
-	-cd $(DOCDIR) && $(UNINSTALL) refcard.pdf 
+	-cd $(DOCDIR) && $(UNINSTALL) ess.html readme.html
+	-cd $(DOCDIR) && $(UNINSTALL) refcard.pdf
 
 ##  TO DO:  ess_toc.html & readme_toc.html should be merged into index.html
 html/ess.html: $(TEXISRC)
 	@echo "making HTML documentation..."
 	mkdir -p html
-	$(MAKEHTML) ess.texi > html/ess.html
+	-$(MAKEHTML) html/ess.html ess.texi
 #MM	$(TEXI2HTML) $(SPLITCHAP) ess.texi
 #MM	test -d ess && cp -p ess/ess_toc.html html/index.html || cp -p ess_toc.html html/index.html
 #MM	test -d ess && mv -f ess/*.html html || mv -f *.html html
 
 html/readme.html: $(TEXISRC)
-	$(MAKEHTML)  --no-validate readme.texi > html/readme.html
-##                   ^^^^^^^^^^^^^ (design bug: "FIXME" in ess.texi)
+	-$(MAKEHTML) html/readme.html --no-validate readme.texi
+		 ##                   ^^^^^^^^^^^^^ (design bug: "FIXME" in ess.texi)
 #MM	$(TEXI2HTML) readme.texi
 #	mv -f readme.html html
 

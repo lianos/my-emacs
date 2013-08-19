@@ -152,7 +152,8 @@
     (define-key map "\M-?"       'ess-list-object-completions)
     ;; wrong here (define-key map "\C-c\C-k" 'ess-request-a-process)
     (define-key map "\C-c\C-k"   'ess-force-buffer-current)
-    (define-key map "\C-c`"      'ess-parse-errors) ; \C-x reserved!
+    (define-key map "\C-c`"      'ess-show-traceback)
+    (define-key map [(control ?c) ?~] 'ess-show-call-stack)
     (define-key map "\C-c."      'ess-set-style); analogous to binding in C-mode
     (define-key map "{"          'ess-electric-brace)
     (define-key map "}"          'ess-electric-brace)
@@ -887,6 +888,8 @@ With prefix argument, only shows the errors ESS reported."
             (self-insert-command (prefix-numeric-value arg)))
         (self-insert-command (prefix-numeric-value arg))))))
 
+;; fixeme: move into ess-indent-or-complete, indentation functions are overly
+;; scattered around
 (defun ess-indent-command (&optional whole-exp)
   "Indent current line as ESS code, or in some cases insert a tab character.
 If `ess-tab-always-indent' is non-nil (the default), always indent
@@ -919,7 +922,8 @@ of the expression are preserved."
                (skip-chars-backward " \t")
                (not (bolp))))
         (insert-tab)
-      (ess-indent-line))))
+      ;; call ess-indent-line
+      (funcall indent-line-function))))
 
 
 (defun ess-indent-or-complete ()
@@ -1090,6 +1094,7 @@ See also `ess-first-tab-never-complete'."
 (defun ess-indent-line ()
   "Indent current line as ESS code.
 Return the amount the indentation changed by."
+  ;; fixme: make this work with standard indent-line-function
   (if (fboundp ess-indent-line-function)
       (funcall ess-indent-line-function)
     ;; else S and R default behavior

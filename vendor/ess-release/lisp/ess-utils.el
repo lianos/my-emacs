@@ -128,7 +128,7 @@
 
 (defun ess--generate-eval-visibly-submenu (menu)
   '(["yes" (lambda () (interactive) (setq ess-eval-visibly t))
-     :style radio :enable t :selected (eq ess-eval-visibly t) ]
+     :style radio :enable t :selected (eq ess-eval-visibly t)]
     ["nowait" (lambda () (interactive) (setq ess-eval-visibly 'nowait))
      :style radio :enable t :selected (eq ess-eval-visibly 'nowait) ]
     ["no" (lambda () (interactive) (setq ess-eval-visibly nil))
@@ -829,7 +829,7 @@ process to avoid excessive requests.
 
 
 
-(defmacro ess--execute-singlekey-command (map &optional prompt wait exit-form &rest args)
+(defmacro ess--execute-electric-command (map &optional prompt wait exit-form &rest args)
   "Execute single-key comands defined in MAP till a key is pressed which is not part of map.
 
 Return the value of the lastly executed command.
@@ -1045,11 +1045,11 @@ If package_name is R_GlobalEnv or \"\", and time_stamp is less
 recent than the time of the last user interaction to the process,
 then update the entry.
 
-Package_name is \"\" if funname was not found or is a special name,n
-i.e. contains :,$ or @.
+Package_name is \"\" if funname was not found or is a special
+name i.e. contains :,$ or @.
 "
   (when (and funname ;; usually returned by ess--funname.start (might be nil)
-             (and ess-local-process-name (get-process ess-local-process-name)))
+             (ess-process-live-p))
     (let* ((proc (get-process ess-local-process-name))
            (args (gethash funname (process-get proc 'funargs-cache)))
            (pack (caar args))
@@ -1058,13 +1058,13 @@ i.e. contains :,$ or @.
                  (and (time-less-p ts (process-get proc 'last-eval))
                       (or (null pack)
                           (equal pack "")
-                          (equal pack "R_GlobalEnv"))
-                      ))
+                          (equal pack "R_GlobalEnv"))))
         ;; reset cache
         (setq args nil))
       (or args
           (cadr (assoc funname (process-get proc 'funargs-pre-cache)))
-          (with-current-buffer (ess-command (format ess-funargs-command funname))
+          (with-current-buffer (ess-command (format ess-funargs-command
+                                                    (ess-quote-special-chars funname)))
             (goto-char (point-min))
             (when (re-search-forward "(list" nil t)
               (goto-char (match-beginning 0))
@@ -1114,6 +1114,11 @@ later."
                       ))
                 (error nil)))))))
 
+(defun ess--inject-code-from-file (file)
+  ;; this is different from ess-load-file
+  (ess-command (with-temp-buffer
+                 (insert-file-contents file)
+                 (buffer-string))))
 
 (provide 'ess-utils)
 

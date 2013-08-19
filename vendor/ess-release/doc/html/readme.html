@@ -268,11 +268,11 @@ acronym[title]::after { content: "This acronym means" attr(title); speak:normal;
 <p><a name="index-README-1"></a>
 This is the README file for the distribution of ESS version
 
-   <p>12.09-2
+   <p>13.05
 
    <p>ESS is a GNU Emacs and XEmacs mode for interactive statistical
 programming and data analysis.  Languages supported: the S family (S,
-S-PLUS and R), SAS, BUGS/JAGS, Stata and XLispStat.  ESS grew out of the
+S-PLUS and R), SAS, BUGS/JAGS and Stata.  ESS grew out of the
 desire for bug fixes and extensions to S-mode and SAS-mode as well as a
 consistent union of their features in one package.
 
@@ -842,13 +842,13 @@ from the emacs buffer containing your S program (for example,
    <p>If you wish to run R, you can start it with:
 <pre class="example">     M-x R
 </pre>
-   <p>XLispStat can not currently be run with
-<pre class="example">     M-x XLS
-</pre>
-   <p>Hopefully, this will change.  However, you can still edit with
-emacs, and cut and paste the results into the XLispStat
-*Listener* Window under Microsoft Windows.
-
+   <!-- XLispStat can not currently be run with -->
+<!-- @example -->
+<!-- M-x XLS -->
+<!-- @end example -->
+<!-- Hopefully, this will change.  However, you can still edit with -->
+<!-- emacs, and cut and paste the results into the XLispStat -->
+<!-- *Listener* Window under Microsoft Windows. -->
 <div class="node">
 <a name="Starting-up"></a>
 <p><hr>
@@ -882,11 +882,11 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#General-Information">General Informati
      <ul>
 <li>Languages Supported:
           <ul>
-  <li>S family (i.e., R and S+ (aka S-PLUS), nowadays)
+  <li>S family (R and S+ AKA S-PLUS)
   <li>SAS
   <li>OpenBUGS/JAGS
   <li>Stata
-  <li>XLispStat including Arc and ViSta
+<!-- @item XLispStat including Arc and ViSta -->
   <li>Julia
   </ul>
      <li>Editing source code (S family, SAS, OpenBUGS/JAGS, Stata, Julia)
@@ -939,9 +939,61 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#General-Information">General Informati
 <!-- node-name,  next,  previous,  up -->
 <h3 class="section">1.10 New Features</h3>
 
+<!-- @itemize @w{} -->
+<!-- @item -->
+<p>Changes/New Features in 13.05:
      <ul>
-Changes/Bug Fixes in 12.09-2:
-          <ul>
+<li><acronym>ESS[gretl]</acronym>: Support for <code>gretl</code> (both editing and
+sub-process interaction). A contribution of Ahmadou Dicko. 
+<li><acronym>ESS</acronym>: process output display is 4-10 times faster due to new caching
+and only occasional emacs re-display (for the moment this functionality
+is available only when <code>ess-tracebug</code> is active). 
+<li><acronym>ESS</acronym>: <kbd>C-c `</kbd> is now bound to <code>ess-show-traceback</code> and
+<kbd>C-c ~</kbd> is bound to <code>ess-show-call-stack</code>. 
+<li><acronym>ESS[R]</acronym>: ESS stores function in 'ESSR' environment to
+avoid kludging users' global environment and accidental deletion. 
+<li><acronym>ESS[R]</acronym>: new variable <code>ess-swv-processing-command</code> to control
+weaving and tangling. 
+<li><acronym>ESS[R]</acronym>: <code>ess-default-style</code> has been changed
+ (from <code>DEFAULT</code>) to <code>RRR</code>.  Use something like
+ <code>(setq ess-default-style 'DEFAULT)</code> or
+ <code>(setq ess-indent-level 2)</code> in your <samp><span class="file">~/.emacs</span></samp> equivalent
+ <em>before</em> loading ESS, if you do not like this new &ldquo;incompatible&rdquo;
+ default style. 
+<li><acronym>ESS[julia]</acronym>: ESS stores its functions in 'ESS' module. 
+<li><acronym>ESS[julia]</acronym>: Eldoc is now supported in julia modes
+<li><acronym>ESS[julia]</acronym>: Adjusted error reference detection and interactive help
+to julia internal changes
+<li><acronym>ESS[R]</acronym>: <code>ess-use-tracebug</code>'s default has been changed to
+ <code>t</code>. Set it to nil if you want to keep the previous behavior. 
+<li><acronym>ESS[tracebug]</acronym>: Electric debug keys have been removed [breaking change]
+The functionality was replaced with <code>ess-debug-minor-mode</code> and
+<code>ess-debug-minor-mode-map</code>. 
+<li><acronym>ESS[tracebug]</acronym>: <code>ess-tracebug-map</code> is an alias to
+ <code>ess-dev-map</code> <kbd>C-c C-t</kbd>. 
+<li><acronym>ESS[tracebug]</acronym>: <code>ess-bp-toggle-state</code> (<kbd>C-c C-t o</kbd>)
+ can now be used during the debug session to toggle breakpoints on the fly
+ (suggestion by Ross Boylan). 
+<li><acronym>ESS[tracebug]</acronym>: <code>ess-debug-flag-for-debugging</code> and
+<code>ess-debug-unflag-for-debugging</code> work correctly from the debugging
+ contexts. These commands also recognize non-exported functions for the
+ packages listed in <code>ess-developer-packages</code> (<kbd>C-c C-t C-a</kbd>).
+
+     <li><acronym>ESS[R]</acronym>: Eldoc (activated by <code>ess-use-eldoc</code>) has
+ become more sophisticated, and hence also more intruding in the interface
+ between the Statistics softare, e.g., R, and the user.
+
+     <p>Note that you can turn off ElDoc, by placing <code>(setq ess-use-eldoc nil)</code>
+ in your <samp><span class="file">~/.emacs</span></samp> file, prior to loading ESS,
+
+     <li><acronym>ESS[SAS]</acronym>: long over-looked <code>SAS-mode-hook</code> appears! 
+<li><acronym>ESS[SAS]</acronym>: <code>ess-sas-edit-keys-toggle</code> now defaults to <code>t</code>
+since <code>sas-indent-line</code> is still broken, i.e. <kbd>TAB</kbd> is now
+bound to <code>ess-sas-tab-to-tab-stop</code> by default
+</ul>
+
+   <p>Changes/Bug Fixes in 12.09-2:
+     <ul>
 <li><acronym>ESS</acronym>: new <code>ess-switch-to-end-of-proc-buffer</code> variable that controls
  whether <kbd>C-c C-z</kbd> switches to the end of process buffer. The
  default is <code>t</code>. You can use prefix argument to <kbd>C-c C-z</kbd> to
@@ -965,11 +1017,11 @@ knitr).
 line at eob, instead of staying at the last line. 
 </ul>
 
-     <p>Changes/New Features in 12.09-1:
-          <ul>
+   <p>Changes/New Features in 12.09-1:
+     <ul>
 <li><acronym>ESS</acronym> <em>Breaking Changes in Keys</em>:
 
-               <ul>
+          <ul>
 <li>New keymaps:
 <code>ess-doc-map</code> bound to <kbd>C-c C-d</kbd>; <code>ess-extra-map</code> bound
 to <kbd>C-c C-e</kbd>; <code>ess-dump-object-into-edit-buffer</code> was moved on
@@ -981,7 +1033,7 @@ to <kbd>C-c C-e</kbd>; <code>ess-dump-object-into-edit-buffer</code> was moved o
 moved on <kbd>C-c C-t</kbd>
 <li><code>C-c C-y</code> is deprecated in favor of <code>C-c C-z C-z</code>
 </ul>
-          <li><acronym>ESS[R]</acronym> new command <code>ess-describe-object-at-point</code>
+     <li><acronym>ESS[R]</acronym> new command <code>ess-describe-object-at-point</code>
 bound to <kbd>C-c C-d C-e</kbd> (repeat <kbd>C-e</kbd> or <kbd>e</kbd> to cycle). It
 was inspired by Erik Iverson's <code>ess-R-object-tooltip</code>. Customize
 <code>ess-describe-at-point-method</code> to use tooltip instead of an
@@ -1045,8 +1097,8 @@ commands in C-c map.
 <li><acronym>ESS</acronym> help: More evaluation commands were added to ess-help mode (<kbd>C-c C-c</kbd>, <kbd>C-M-x</kbd> etc)
 </ul>
 
-     <p>Bug Fixes in 12.09-1:
-          <ul>
+   <p>Bug Fixes in 12.09-1:
+     <ul>
 <li>i<acronym>ESShelp</acronym><!-- /@w -->: Multiple help pages with the same name are properly handled on <kbd>C-c C-v</kbd>
 <li>i<acronym>ESSremote</acronym><!-- /@w -->: Evaluation with ESS remote no longer freezes emacs. 
 <li>i<acronym>ESS</acronym><!-- /@w -->: <code>comint-previous-prompt</code> <kbd>C-c C-p</kbd> no longer stops on secondary prompt &ldquo;+&rdquo;. 
@@ -1067,14 +1119,14 @@ It now happens only once at the start of the session.
 <li><acronym>ESS[Julia]</acronym>: Help system works again. 
 </ul>
 
-     <p>Changes/New Features in 12.09:
+   <p>Changes/New Features in 12.09:
 
-          <ul>
+     <ul>
 <li><b>Due to XEmacs lacking some features that ESS requires, ESS support of XEmacs
 ends with ESS 12.04-4.  This decision will be re-visited in the future as
 XEmacs continues to sync with GNU Emacs.</b>
 
-          <li><acronym>ESS[R]</acronym>: On Windows, there is now a new customizable variable
+     <li><acronym>ESS[R]</acronym>: On Windows, there is now a new customizable variable
 (currently called <code>ess-directory-containing-R</code>) to tell ESS where
 to look for the <samp><span class="file">Rterm.exe</span></samp> executables.  The name of the variable
 and the values it can take are both in beta and subject to change.  Prior
@@ -1082,61 +1134,61 @@ to this variable, ESS searched only in the default installation
 directory.  Setting this variable now tells ESS how to find
 <samp><span class="file">Rterm.exe</span></samp> executables when they are installed somewhere else.
 
-          <li><acronym>ESS[julia]</acronym>: <em>new</em> mode
+     <li><acronym>ESS[julia]</acronym>: <em>new</em> mode
 for editing julia code (<samp><span class="file">*.jl</span></samp>). Start with <kbd>M-x julia</kbd>.
 
-          <p>Full interaction interface, imenu and basic error referencing are available.
+     <p>Full interaction interface, imenu and basic error referencing are available.
 
-          <li><acronym>ESS[R]</acronym> noweb: <code>noweb-mode</code> and <code>noweb-font-lock-mode</code> have
+     <li><acronym>ESS[R]</acronym> noweb: <code>noweb-mode</code> and <code>noweb-font-lock-mode</code> have
 been renamed to <code>ess-noweb-mode</code> and
 <code>ess-noweb-font-lock-mode</code> to avoid conflicts with the &ldquo;real&rdquo; <code>noweb-mode</code>.
 
-          <li><acronym>ESS[R]</acronym> noweb: The long standing font-lock bug has been solved
+     <li><acronym>ESS[R]</acronym> noweb: The long standing font-lock bug has been solved
 in <code>ess-noweb</code> interface.
 
-          <li><acronym>ESS</acronym>: Basic evaluation keys are now bound to <code>ess-eval-region-*-</code> functions:
+     <li><acronym>ESS</acronym>: Basic evaluation keys are now bound to <code>ess-eval-region-*-</code> functions:
 
-               <ul>
+          <ul>
 <li><kbd>C-M-x</kbd> is bound to <code>ess-eval-region-or-function-or-paragraph</code>
 <li><kbd>C-c C-c</kbd> is bound to <code>ess-eval-region-or-function-or-paragraph-and-step</code>
 <li><kbd>C-RET</kbd> is bound to <code>ess-eval-region-or-line-and-step</code>
 </ul>
 
-          <p>Each of these functions first evaluates the region whenever the region
+     <p>Each of these functions first evaluates the region whenever the region
 is active.
 
-          <li><acronym>ESS</acronym>: <kbd>C-M-a</kbd>/<kbd>C-M-e</kbd> now step to beginning/end of
+     <li><acronym>ESS</acronym>: <kbd>C-M-a</kbd>/<kbd>C-M-e</kbd> now step to beginning/end of
 paragraph if no function has been detected.
 
-          <li><acronym>ESS</acronym>: <code>ess-eval-*-and-step</code> family of functions are now smarter,
+     <li><acronym>ESS</acronym>: <code>ess-eval-*-and-step</code> family of functions are now smarter,
 and don't step to end of buffer or end of chunk code (<code>@</code>) when at
 the end of the code.
 
-          <li><acronym>ESS</acronym>: <code>ess-handy-commands</code> function is bound to <kbd>C-c h</kbd>
+     <li><acronym>ESS</acronym>: <code>ess-handy-commands</code> function is bound to <kbd>C-c h</kbd>
 
-          <li><acronym>ESS</acronym>: ESS is now <em>blinking</em>  the evaluated region. 
+     <li><acronym>ESS</acronym>: ESS is now <em>blinking</em>  the evaluated region. 
 Set <code>ess-blink-region</code> to nil to deactivate; <code>ess-blink-delay</code>
 gives the duration of the blink. Evaluated region is &ldquo;blinked&rdquo; in
 <code>highlight</code> face.
 
-          <li><acronym>ESS[R-help]</acronym>  New key <kbd>a</kbd> for &ldquo;apropos()&rdquo; in help buffers. Also available
+     <li><acronym>ESS[R-help]</acronym>  New key <kbd>a</kbd> for &ldquo;apropos()&rdquo; in help buffers. Also available
 through <kbd>C-c h</kbd>.
 
-          <li><acronym>ESS[R-help]</acronym>  All R commands of type foo?bar and foo??bar are recognized
+     <li><acronym>ESS[R-help]</acronym>  All R commands of type foo?bar and foo??bar are recognized
 and redirected into appropriate *ESS-help* buffers.
 
-          <li><acronym>ESS[R]</acronym>: New customization interface for <em>font-lock</em>.
+     <li><acronym>ESS[R]</acronym>: New customization interface for <em>font-lock</em>.
 
-          <p>ESS font-lock operates with predefined keywords. Default keywords are
+     <p>ESS font-lock operates with predefined keywords. Default keywords are
 listed in <code>ess-R-font-lock-keywords</code> and
 <code>inferior-R-font-lock-keywords</code>, which see. The user can easily
 customize those by adding new keywords. These variables can also be
 interactively accessed and saved through <kbd>ESS/Font-lock</kbd> submenu.
 
-          <p>Several new fontification keywords have been added. Most notably the
+     <p>Several new fontification keywords have been added. Most notably the
 keywords for highlighting of function calls, numbers and operators.
 
-          <li><acronym>ESS[R]</acronym>: auto-complete is now activated by default whenever
+     <li><acronym>ESS[R]</acronym>: auto-complete is now activated by default whenever
 auto-complete package is detected. Set <code>ess-use-auto-complete</code> to
 nil to deactivate. 
 <li><acronym>ESS[R]</acronym>: R AC sources are no longer auto-starting at 0 characters
@@ -1145,51 +1197,51 @@ but at the default <code>ac-auto-start</code> characters.
 but only appends <code>ac-source-filename</code> to it. 
 <li><acronym>ESS</acronym>: <code>ac-source-R</code> now concatenates &ldquo; = &ldquo; to function arguments.
 
-          <li><acronym>ESS</acronym>: Menus for ESS and iESS have been reorganized and enriched with
+     <li><acronym>ESS</acronym>: Menus for ESS and iESS have been reorganized and enriched with
 <em>Tracebug</em> and <em>Developer</em> submenus.
 
-          <li><acronym>ESS[R]</acronym>: <code>ess-developer</code> and <code>ess-tracebug</code> commands are available by default
+     <li><acronym>ESS[R]</acronym>: <code>ess-developer</code> and <code>ess-tracebug</code> commands are available by default
 in <code>ess-dev-map</code> which is bound to <kbd>C-c d</kbd> in ESS and iESS maps.
 
-          <li><acronym>ESS[R]</acronym>: <code>eldoc</code> truncates long lines whenever <code>eldoc-echo-area-use-multiline-p</code>
+     <li><acronym>ESS[R]</acronym>: <code>eldoc</code> truncates long lines whenever <code>eldoc-echo-area-use-multiline-p</code>
 is non-nil (the default). Set this variable to t if you insist on multiline eldoc. 
 See also <code>ess-eldoc-abbreviation-style</code>.
 
-          <li><acronym>ESS[R]</acronym>: completion code pre-caches arguments
+     <li><acronym>ESS[R]</acronym>: completion code pre-caches arguments
 of heavy generics such as <code>plot</code> and <code>print</code> to eliminated the
 undesirable delay on first request.
 
-          <li>i<acronym>ESS</acronym><!-- /@w -->: Prompts in inferior buffers are now highlighted uniformly with
+     <li>i<acronym>ESS</acronym><!-- /@w -->: Prompts in inferior buffers are now highlighted uniformly with
 <code>comint-highlight-prompt</code> face.
 
-          <li><acronym>ESS[R]</acronym>: R process no longer wait for the completion of input in inferior buffer. 
+     <li><acronym>ESS[R]</acronym>: R process no longer wait for the completion of input in inferior buffer. 
 Thus, long running commands like <code>Sys.sleep(5)</code> no longer stall emacs.
 
-          <li><acronym>ESS</acronym>: [R, S, Stata, Julia] have specialized <code>ess-X-post-run-hook</code>s, which
+     <li><acronym>ESS</acronym>: [R, S, Stata, Julia] have specialized <code>ess-X-post-run-hook</code>s, which
 are run at the end of subprocess initialization.
 
-          <li><acronym>ESS[Stata]</acronym>: All interactive evaluation commands work as expected. 
+     <li><acronym>ESS[Stata]</acronym>: All interactive evaluation commands work as expected. 
 On-line comments are removed before the evaluation and multiline
 comments are skipped on <kbd>C-c C-c</kbd> and other interactive commands.
 
-          <li><acronym>ESS</acronym> no longer auto-connects to a subprocess with a different dialect than
+     <li><acronym>ESS</acronym> no longer auto-connects to a subprocess with a different dialect than
 the current buffer's one.
 
-          <li><acronym>ESS</acronym>: <code>ess-arg-function-offset-new-line</code> is now a list for all
+     <li><acronym>ESS</acronym>: <code>ess-arg-function-offset-new-line</code> is now a list for all
 the ESS indentation styles, which results in the following indentation
 after an open &ldquo;(&rdquo;:
 
-          <pre class="verbatim">            a &lt;- some.function(other.function(
-               arg1,
-               arg2)
-     </pre>
+     <pre class="verbatim">       a &lt;- some.function(other.function(
+          arg1,
+          arg2)
+</pre>
 
-          <li><acronym>ESS[SAS]</acronym>: Improved MS RTF support for GNU Emacs; try
+     <li><acronym>ESS[SAS]</acronym>: Improved MS RTF support for GNU Emacs; try
   <code>ess-sas-rtf-portrait</code> and <code>ess-sas-rtf-landscape</code>. 
 </ul>
 
-     <p>Changes/Bug Fixes in 12.04-3:
-          <ul>
+   <p>Changes/Bug Fixes in 12.04-3:
+     <ul>
 <li><acronym>ESS</acronym>: basic support for package.el compatibility
 <li><acronym>ESS[R]</acronym>: correct indentation of &amp; and | continuation lines
 <li><code>M-x ess-version</code> shows the svn revision even after <code>make install</code>
@@ -1201,8 +1253,8 @@ after an open &ldquo;(&rdquo;:
 <li>New <code>make</code> target  <code>lisp</code>, to build the lisp-only part, i.e., not building the docs. 
 </ul>
 
-     <p>Changes/New Features in 12.04-1:
-          <ul>
+   <p>Changes/New Features in 12.04-1:
+     <ul>
 <li>i<acronym>ESS[Stata]</acronym><!-- /@w -->: New interactive help invocation. 
 <li>i<acronym>ESS[Stata]</acronym><!-- /@w -->: New custom variable <code>inferior-STA-start-file</code>. 
 <li>i<acronym>ESS[Stata]</acronym><!-- /@w -->: <code>inferior-STA-program-name</code> is now &ldquo;stata&rdquo;
@@ -1211,8 +1263,8 @@ and can be  customized.
 Syntax(<kbd>s-S</kbd>), Remarks(<kbd>r</kbd>), Title(<kbd>t</kbd>). 
 </ul>
 
-     <p>Bug Fixes in 12.04-1:
-          <ul>
+   <p>Bug Fixes in 12.04-1:
+     <ul>
 <li><acronym>ESS[R]</acronym>: Better <code>ess-tracebug</code> error handling. 
 <li><acronym>ESS[R]</acronym>: Corrected <code>ess-eldoc</code> help string filtering
 and improved argument caching. 
@@ -1223,8 +1275,8 @@ and improved argument caching.
 <li><acronym>ESS[Rd]</acronym>: R is autostarted also from here, when needed. 
 </ul>
 
-     <p>Changes/New Features in 12.04:
-          <ul>
+   <p>Changes/New Features in 12.04:
+     <ul>
 <li><acronym>ESS</acronym>: Reverting new behavior of 12.03, <kbd>TAB</kbd> in <code>ess-mode</code>
 no longer completes by default.  If you want smart <kbd>TAB</kbd> completion
 in R and S scripts, similarly to i<acronym>ESS</acronym><!-- /@w --> behavior, set the variable
@@ -1238,39 +1290,39 @@ introduced in <acronym>ESS(12.03)</acronym> now accepts a list with the first el
 number to indicate that the offset should be computed from the indent of
 the previous line. For example setting it to '(2) results in:
 
-          <pre class="verbatim">            a &lt;- some.function(
-              arg1,
-              arg2)
-     </pre>
+     <pre class="verbatim">       a &lt;- some.function(
+         arg1,
+         arg2)
+</pre>
 
-     </ul>
+   </ul>
 
-     <p>Changes/New Features in 12.03:
-          <ul>
+   <p>Changes/New Features in 12.03:
+     <ul>
 <li><acronym>ESS</acronym> indentation: new offset variable <code>ess-arg-function-offset-new-line</code>
 controlling for the indentation of lines immediately following open
 '('. This is useful to shift backwards function arguments after a long
 function call expression:
 
-          <pre class="verbatim">            a &lt;- some.function(
-                   arg1,
-                   arg2)
-     </pre>
+     <pre class="verbatim">       a &lt;- some.function(
+              arg1,
+              arg2)
+</pre>
 
-          <p>instead of the old
+     <p>instead of the old
 
-          <pre class="verbatim">            a &lt;- some.function(
-                               arg1,
-                               arg2)
-     </pre>
+     <pre class="verbatim">       a &lt;- some.function(
+                          arg1,
+                          arg2)
+</pre>
 
-          <p>If '(' is not followed by new line the behavior is unchanged:
+     <p>If '(' is not followed by new line the behavior is unchanged:
 
-          <pre class="verbatim">            a &lt;- some.function(arg1,
-                               arg2)
-     </pre>
+     <pre class="verbatim">       a &lt;- some.function(arg1,
+                          arg2)
+</pre>
 
-          <p>This variable should be set as part of indentation style lists, or in
+     <p>This variable should be set as part of indentation style lists, or in
 ess-mode hook. 
 <li><acronym>ESS[R]</acronym>: <kbd>C-c .</kbd> sets (indentation) style. 
 <li><acronym>ESS</acronym>: In ESS buffers <code>yank</code>(<kbd>C-y</kbd>) command accepts
@@ -1303,7 +1355,7 @@ the emacs 24 completion scheme, i.e. all the completion is done by
 ESS doesn't bind <kbd>M-TAB</kbd> for emacs 24 or higher. <kbd>M-TAB</kbd> calls the
 default <code>complete-symbol</code>.
 
-          <li><acronym>ESS[R]</acronym>: Out of the box integration with <code>Auto
+     <li><acronym>ESS[R]</acronym>: Out of the box integration with <code>Auto
 Completion</code> mode (http://cx4a.org/software/auto-complete/). Three AC
 sources <code>ac-source-R-args</code>, <code>ac-source-R-objects</code> and
 <code>ac-source-R</code> are provided. The last one combines the previous two
@@ -1322,9 +1374,9 @@ documentation. Bound to <kbd>C-c C-e t</kbd>.
 <li><acronym>ESS[R]</acronym>: Solved the &ldquo;nil filename&rdquo; bug in roxygen support. 
 <li><acronym>ESS[R]</acronym>: <code>ess-tracebug</code> is now part of <acronym>ESS</acronym>:
 
-          <p>New Features:
+     <p>New Features:
 
-               <ul>
+          <ul>
 <li>Source injection: Tracebug now can inject source references on the
 fly during code evaluation, i.e. you don't have to source your file, but
 just evaluate your code in normal fashion. Variable
@@ -1332,7 +1384,7 @@ just evaluate your code in normal fashion. Variable
 always inject source reference, if <code>'function</code>, inject only for
 functions (this is the default), if <code>nil</code>, never inject.
 
-               <p>During the source injection the value of <code>ess-eval-visibly</code> is
+          <p>During the source injection the value of <code>ess-eval-visibly</code> is
 ignored. 
 <li>Org-mode support: Visual debugger is now aware of the
 temporary org source editing buffer (<kbd>C-c '</kbd>) and jumps through this
@@ -1341,7 +1393,7 @@ buffers if still alive, or in original org buffer otherwise.
 <li>Two new hooks: ess-tracebug-enter-hook and ess-tracebug-exit-hook
 </ul>
 
-          <li><acronym>ESS[R]</acronym>: New package <code>ess-developer</code> to evaluate <code>R</code>
+     <li><acronym>ESS[R]</acronym>: New package <code>ess-developer</code> to evaluate <code>R</code>
 code directly in the package environment and namespace. It can be
 toggled on and off with <kbd>C-c d t</kbd>. When <code>ess-developer</code> is on
 all ESS evaluation commands are redefined to evaluate code in
@@ -1354,11 +1406,11 @@ function name in the development packages' environment and namespace and
 insert the definition accordingly. See the documentation section
 &ldquo;Developing with ESS/ESS developer&rdquo; for more details.
 
-          <li><acronym>ESS[R]</acronym> help system:
+     <li><acronym>ESS[R]</acronym> help system:
 
-          <p>New Features:
+     <p>New Features:
 
-               <ul>
+          <ul>
 <li><kbd>q</kbd> quits window instead of calling <code>ess-switch-to-end-of-ESS</code>. 
 This is consistent with emacs behavior help and other special buffers (<em>breaking change</em>). 
 <li><kbd>k</kbd> kills window without asking for the name (pointed by Sam Steingold)
@@ -1382,7 +1434,7 @@ such as debugging and/or during R development.  Thanks to Ross Boylan for
 making the suggestion, Sam Steingold for reminding us of this variable and
 Martin Maechler for the warning. 
 </ul>
-          <li><acronym>ESS</acronym> now uses <code>IDO</code> completing read functionality
+     <li><acronym>ESS</acronym> now uses <code>IDO</code> completing read functionality
 for all the interactive requests. It uses ido completion
 mechanism whenever available, and falls back on classical
 completing-read otherwise. You can set <code>ess-use-ido</code> to nil if you
@@ -1390,7 +1442,7 @@ don't want the IDO completion. See the documentation string of
 <code>ess-use-ido</code> for more information about <code>IDO</code> and <acronym>ESS</acronym>
 configuration.
 
-          <li><acronym>ESS[S]</acronym>: &ldquo;<kbd>,</kbd>&ldquo; is bound to ess-smart-comma:
+     <li><acronym>ESS[S]</acronym>: &ldquo;<kbd>,</kbd>&ldquo; is bound to ess-smart-comma:
 If comma is invoked at the process marker of an ESS inferior
 buffer, request and execute a command from <code>`ess-handy-commands'</code>
 list. If <code>ess-R-smart-operators</code> is t <code>`ess-smart-comma</code>
@@ -1399,9 +1451,9 @@ also inserts &ldquo; &ldquo; after comma.
 stores an alist of useful commands which are called by <code>ess-smart-comma</code> in
 the inferior buffer.
 
-          <p>Currently containing:
+     <p>Currently containing:
 
-               <dl>
+          <dl>
 <dt>change-directory<dd>    <code>ess-change-directory</code>
 <br><dt>help-index<dd>          <code>ess-display-index</code>
 <br><dt>help-object<dd>         <code>ess-display-help-on-object</code>
@@ -1415,49 +1467,49 @@ the inferior buffer.
 <br><dt>sos<dd>                 <code>ess-sos</code>
 </dl>
 
-          <p>Handy commands: <code>ess-library</code>, <code>ess-install.packages</code>, etc -
+     <p>Handy commands: <code>ess-library</code>, <code>ess-install.packages</code>, etc -
 ask for item with completion and execute the correspond
 command. <code>ess-sos</code> is a interface to <code>findFn</code> function in
 package <code>sos</code>. If package <code>sos</code> is not found, ask user for
 interactive install.
 
-          <li><acronym>ESS</acronym>: New dynamic mode line indicator: Process status is automatically
+     <li><acronym>ESS</acronym>: New dynamic mode line indicator: Process status is automatically
 reflected in all mode-lines of associated with the process
 buffers. Particularly useful for displaying debug status of
 <code>ess-tracebug</code> and developer status of <code>ess-developer</code> in all
 associated buffers.
 
-          <li><acronym>ESS</acronym>: New <code>ess-completing-read</code> mechanism: <acronym>ESS</acronym> uses
+     <li><acronym>ESS</acronym>: New <code>ess-completing-read</code> mechanism: <acronym>ESS</acronym> uses
 <code>ido</code> completions whenever possible. Variable <code>ess-use-ido</code>
 controls whether to use ido completion or not. Active by default.
 
-          <li><acronym>ESS</acronym> now supports comint fields for output and input
+     <li><acronym>ESS</acronym> now supports comint fields for output and input
 detection. This feature is not used by default, but might be useful in
 the future.
 
-          <li><acronym>ESS[S]</acronym>: New custom variable <code>inferior-ess-S-prompt</code> to
+     <li><acronym>ESS[S]</acronym>: New custom variable <code>inferior-ess-S-prompt</code> to
 customize prompt detection regular expression in the inferior ESS
 buffers. You can customize this variable to enhance comint navigation
 (<code>comint-previous-prompt</code> and <code>comint-next-prompt</code>) the
 inferior buffers.
 
-          <li><acronym>ESS[R]</acronym>: Internal <code>R</code> completion retrieval
+     <li><acronym>ESS[R]</acronym>: Internal <code>R</code> completion retrieval
 (<code>ess-R-complete-object-name</code>)  was rewritten and is faster now.
 
-          <li><acronym>ESS</acronym> is using process plist to store process specific variables,
+     <li><acronym>ESS</acronym> is using process plist to store process specific variables,
 as opposed to buffer local variables as it was using before. The use of
 buffer local variables to store process variables is discouraged.
 
-          <li><acronym>ESS</acronym>: new functions to manipulate process plists:
+     <li><acronym>ESS</acronym>: new functions to manipulate process plists:
 <code>ess-process-get</code> and <code>ess-process-set</code>.
 
-          <li><acronym>ESS</acronym>: Internal process waiting mechanism was completely rewritten. ESS
+     <li><acronym>ESS</acronym>: Internal process waiting mechanism was completely rewritten. ESS
 no more relies on prompt regular expressions for the prompt
 detection. The only requirement on the primary process prompt is to end
 in <code>&gt; </code>. This could be overwritten by setting
 <code>inferor-ess-primary-prompt</code>.
 
-          <li><acronym>ESS[S]</acronym>, notably <code>R</code>: Saved command history:
+     <li><acronym>ESS[S]</acronym>, notably <code>R</code>: Saved command history:
  <var>ess-history-file</var> now accepts <code>t</code> (default), <code>nil</code>, or a
  file name. By setting it to <code>nil</code> no command line history is saved
  anymore.  <var>ess-history-directory</var> now allows to have the history
@@ -1465,14 +1517,14 @@ in <code>&gt; </code>. This could be overwritten by setting
 <li><acronym>ESS[R]</acronym>: more Roxygen improvements. 
 <li><acronym>ESS[R]</acronym>: <kbd>C-c .</kbd> to set (indentation) style.
 
-          <li><acronym>ESS[R]</acronym>: Functions with non-standard names (for example 'aaa-bbb:cc') are
+     <li><acronym>ESS[R]</acronym>: Functions with non-standard names (for example 'aaa-bbb:cc') are
 properly handled by font-lock and evaluation routines. 
 <li><acronym>ESS[R]</acronym>:Several regexp bugs (described in etc/R-ESS-bugs.el) were
 fixed in <code>ess-get-words-from-vector</code> and <code>ess-command</code>. 
 </ul>
 
-     <p>Changes/New Features in 5.14:
-          <ul>
+   <p>Changes/New Features in 5.14:
+     <ul>
 <li><acronym>ESS[BUGS/JAGS]</acronym>:  Batch BUGS is back!  For recent OpenBUGS
 versions, 3.0.8+, a batch BUGS script is once again available,
 but for Linux only.  Therefore, since it seems that BUGS and JAGS must
@@ -1482,21 +1534,21 @@ works like <acronym>ESS[JAGS]</acronym> rather than the original mode <acronym>E
 was difficult to maintain.  Although, <acronym>ESS[BUGS]</acronym> appears to work,
 there still may be some features missing as well as bugs.
 
-          <li><acronym>ESS[R]</acronym>: New customizable variable <code>ess-swv-plug-into-AUCTeX-p</code>
+     <li><acronym>ESS[R]</acronym>: New customizable variable <code>ess-swv-plug-into-AUCTeX-p</code>
 Commands to Sweave current file and LaTeX the result are now available
 to AUCTeX users, if this variable is set to <code>t</code>.
 
-          <li><acronym>ESS[S]</acronym>: <kbd>C-c C-c</kbd>
+     <li><acronym>ESS[S]</acronym>: <kbd>C-c C-c</kbd>
 (<code>ess-eval-function-or-paragraph-and-step</code>) is now skipping over
 comments as the other paragraph functions do. 
 It (and similar functions) should no longer wrongly find
 &lsquo;<samp><span class="samp">function()</span></samp>&rsquo; beginnings inside comments or strings.
 
-          <li><acronym>ESS[SAS]</acronym>: improved by better support for GNU Emacs
+     <li><acronym>ESS[SAS]</acronym>: improved by better support for GNU Emacs
 </ul>
 
-     <p>Changes/New Features in 5.13:
-          <ul>
+   <p>Changes/New Features in 5.13:
+     <ul>
 <li><acronym>ESS[R]</acronym>: On Windows, for R 2.12.0 and later, the Rterm executables
  (in subdirectories i386 / x64) now are found as well as for earlier R versions. 
 <li><acronym>ESS[S+]</acronym>: on Windows, both 32- and 64-bit versions of S+ (&ldquo;S-PLUS&rdquo;)
@@ -1514,8 +1566,8 @@ facilities the same as regular help buffers.
  for evaluating the buffer &ldquo;from beginning till here&rdquo;. 
 </ul>
 
-     <p>Changes/New Features in 5.12:
-          <ul>
+   <p>Changes/New Features in 5.12:
+     <ul>
 <li><acronym>ESS[SAS]</acronym> Font-locking:
  update of PROCs keywords (up to SAS 9.22); error/warnings. 
 <li><acronym>ESS[R]</acronym>: Roxygen improvements: S4 classes;
@@ -1528,13 +1580,13 @@ facilities the same as regular help buffers.
  feature introduced in 5.9. 
 </ul>
 
-     <p>Changes/New Features in 5.11:
-          <ul>
+   <p>Changes/New Features in 5.11:
+     <ul>
 <li>Filename completion within buffers now adds only trailing
 characters to complete the filename, rather than expanding to an
 absolute file path.  This filename completion is bound to the TAB key.
 
-          <li><kbd>M-n P</kbd> in Sweave buffers now prompts for the command to run
+     <li><kbd>M-n P</kbd> in Sweave buffers now prompts for the command to run
 instead of using <samp><span class="command">pdflatex</span></samp> unconditionally, offering completion from
 customizable collection <code>ess-swv-pdflatex-commands</code>, the first of
 which is taken as default and that defaults to <samp><span class="command">texi2pdf</span></samp>. 
@@ -1543,16 +1595,16 @@ to <samp><span class="command">ess-use-this-dir</span></samp>. It sends <code>se
 to set the working directory to the one of the source file. 
 </ul>
 
-     <p>Changes/New Features in 5.10:
-          <ul>
+   <p>Changes/New Features in 5.10:
+     <ul>
 <li><kbd>M-RET</kbd> in *S* buffers is now bound to
 <code>ess-dirs</code>.  This function will set Emacs's current
 directory to be the same as the *S* process.  This is useful if you use
 <code>setwd()</code> within a *S* process. 
 </ul>
 
-     <p>Changes/New Features in 5.9:
-          <ul>
+   <p>Changes/New Features in 5.9:
+     <ul>
 <li>Toolbar:  The toolbar now has an icon for starting Splus. 
 <li>Indentation: New documentation and code has been added to make it
 easier to change how ESS indents code.  In particular, see
@@ -1582,8 +1634,8 @@ subsection &ldquo;Changing indentation styles&rdquo;.
  function. 
 </ul>
 
-     <p>Changes/New Features in 5.8:
-          <ul>
+   <p>Changes/New Features in 5.8:
+     <ul>
 <li><acronym>ESS[R]</acronym>: New <samp><span class="file">ess-rutils.el</span></samp> with utilities for listing, loading,
 installing, and updating packages, as well as object manipulation
 (listing, viewing, and deleting).  It also provides an alternative to
@@ -1597,21 +1649,21 @@ results can be viewed in an Emacs web browser.
 <li>Emacs lisp files have got better names (partly, for now). 
 </ul>
 
-     <p>Changes/New Features in 5.7:
-          <ul>
+   <p>Changes/New Features in 5.7:
+     <ul>
 <li><acronym>ESS[R]</acronym>: loading a source file (<kbd>C-c C-l</kbd>) now works in
  Windows, similarly to other platforms;
  (further; it had accidentally been broken in ESS 5.6 on all platforms)
 </ul>
 
-     <p>Changes/New Features in 5.6:
-          <ul>
+   <p>Changes/New Features in 5.6:
+     <ul>
 <li><acronym>ESS[R]</acronym>: help() calls have to differ from old default, with newer
  versions of R; currently via .help.ESS &lt;- function(...) hack. 
 </ul>
 
-     <p>Changes/New Features in 5.4:
-          <ul>
+   <p>Changes/New Features in 5.4:
+     <ul>
 <li><acronym>ESS[SAS]</acronym>: The long overdue change
 from <code>make-regexp</code> to <code>regexp-opt</code> for font-locking is
 complete.  The new <code>regexp-opt</code> is now the default since
@@ -1631,16 +1683,16 @@ in the old code being used.
  rather than deactivated, thanks to a patch from David Reitter. 
 </ul>
 
-     <p>Changes/New Features in 5.3.11:
-          <ul>
+   <p>Changes/New Features in 5.3.11:
+     <ul>
 <li><acronym>ESS[SAS]</acronym>: work around bug in Emacs 22.2 &amp; 22.3 which fails to
  set case-fold fontification automatically. 
 <li>Rd mode: support new keyword 'Rdversion'
 <li><acronym>ESS[R]</acronym>: now again works with Emacs 21.x
 </ul>
 
-     <p>Changes/New Features in 5.3.10:
-          <ul>
+   <p>Changes/New Features in 5.3.10:
+     <ul>
 <li>Fixed noweb-mode bug accidentally introduced into 5.3.9
 <li>In noweb-mode, e.g., Rnw-mode, electric &ldquo;&lt;&rdquo; also inserts closing &ldquo;@". 
  Further, the code chunk boundaries are better kept up-to-date, such that
@@ -1650,184 +1702,7 @@ in the old code being used.
  behavior which has been found to be buggy. 
 </ul>
 
-     <p>Changes/New Features in 5.3.9:
-          <ul>
-<li><acronym>ESS[SAS]</acronym>: evince PDF viewer now supported as well; search order:
-evince, Xpdf, Adobe/Acrobat Reader
-<li><acronym>ESS[R]</acronym>: added support for Roxygen, potentially to be extended. 
-<li><acronym>ESS[S]</acronym> (and R): inferior (<code>*R*</code>) and transcript modes no longer
-fontify language keywords (such as <code>for</code>, <code>in</code>, etc). 
-<li>i<acronym>ESS[Stata]</acronym><!-- /@w -->: Customize the <code>ess-sta-delimiter-friendly</code> setting
-to <code>t</code> to convert embedded semi-colons to newlines for Stata processing. 
-<li>Sweave fix for embedded blanks in PDF reader and PDF files
-<li>Several fixes for Major Mode Convention violations in <code>ess-mode</code>
-and <code>noweb-mode</code>. 
-<li><acronym>ESS[JAGS]</acronym>: <code>M-x comment-region</code> now available! 
-<li><acronym>ESS[S]</acronym> The <code>ess-swv-*</code> commands (and keybindings) are now in
-a submenu of the &ldquo;Noweb&rdquo; menu, when editing Sweave files. 
-</ul>
-
-     <p>Changes/New Features in 5.3.8:
-          <ul>
-<li><acronym>ESS[JAGS]</acronym>: more separation from <acronym>ESS[BUGS]</acronym> (as much as is currently planned);
-now <kbd>C-c C-c</kbd> on an empty <samp><span class="file">.jmd</span></samp> creates a template as it should;
-symbolic links are created for CODA output so BOA is happy:
-from <samp><span class="file">index.txt</span></samp> to <samp><span class="file">.ind</span></samp> and <samp><span class="file">chain#.txt</span></samp> to <samp><span class="file">#.out</span></samp>
-<li><acronym>ESS[SAS]</acronym>: buffer-local <code>ess-sas-submit-command</code> and
-<code>ess-sas-submit-command-options</code> now recognized by <code>ess-sas-submit-region</code>
-<li><acronym>ESS[S]</acronym>: When trying to evaluate code in an S language buffer and
- there is no associated process, now start R automatically instead of
- signalling an error.  Also, restart R if there is an associated process
- which is not running.  However, do not start R just via the &ldquo;electric&rdquo;
- <kbd>(</kbd> (<code>ess-r-args-auto-show</code>). 
-<li><acronym>ESS[S]</acronym>: For (one-line) functions withOUT '{ .. }' bodys, the end
- of function is now correctly found more often.  This notably improves
- <kbd>C-c C-c</kbd> (<code>ess-eval-function-or-paragraph-and-step</code>). 
-<li><acronym>ESS[JAGS]</acronym>: cleanup/re-organization of elisp code;
-symbolic links for CODA output are now only created by the new
-JAGS <code>system</code> command in version 1.0.3; specify whether
-this command is available via <code>ess-jags-system</code>; if not
-present, then no links are created so that the <code>*shell*</code>
-buffer does not become unresponsive during the batch run
-</ul>
-
-     <p>Changes/New Features in 5.3.7:
-          <ul>
-<li><acronym>ESS</acronym>: <code>ess-default-style</code> now *is* customizable, i.e.,
-  changing its value in <samp><span class="file">~/.emacs</span></samp> now does have the desired effect. 
-<li><acronym>ESS</acronym>: <code>ess-font-lock-mode</code> is a new variable (default: t)
-which controls whether font-locking is enabled in ESS buffers. 
-<li><acronym>ESS[R]</acronym>: for XEmacs on Windows; another tweak to find R versions
-<li><acronym>ESS[SAS]</acronym>: font-locking updated for ODS and SAS Bayesian Procedures;
-a more consistent handling of SAS options by
-<code>ess-sas-submit-command-options</code> which is buffer-local; portable
-snooze for MS Windows via customize-able <code>ess-sleep-for</code> (floats welcome);
-Xpdf now supported as a PDF viewer
-<li><acronym>ESS[Rnw]</acronym>: now also works with &ldquo;emacs -nw&rdquo; and Emacs 22. 
-<li><acronym>ESS[JAGS]</acronym>: now requires JAGS 1.0 (see the new ESS for JAGS help
-section for more information): both need work; suggestions welcome
-<li><acronym>ESS[R]</acronym>: [TAB] completion now uses the R-internal completion
-mechanism (for R &gt;= 2.5.0). 
-<li><acronym title="[S]">ESS[R]</acronym> ([S]): interpretation of &ldquo;_&rdquo; as assignment has
-been removed in <code>ess-continued-statement-p</code> for R and S. 
-<li>several internal code cleanups. 
-<li><acronym title="[S]">ESS[R]</acronym>: An experimental version of a new command <code>Rgui</code>
-on MS Windows to send lines directly from emacs
-to <code>Rgui</code> is available in file <code>lisp/essd-rgui.el</code>. 
-Preliminary documentation is in file <code>doc/rgui-doc.txt</code>. 
-</ul>
-
-     <p>Changes/New Features in 5.3.6:
-          <ul>
-<li><acronym>ESS</acronym>: for XEmacs, using &ldquo;gnuclient&rdquo; (without a &ldquo;-q&rdquo;) works for
- things like fix() after M-x gnuserv-start has been done. 
-<li><acronym title="[S]">ESS[R]</acronym>: M-x R-newest should now work in more situations on MS
- Windows, e.g., when R has been installed in a non-default "ProgramFiles"
- directory tree.  In these cases, there's no need to specify the name (and
- full path) of the R program anymore. 
-<li><acronym title="[S]">ESS[R]</acronym>: For XEmacs, startup (with new tooltip code) works again. 
-</ul>
-
-     <p>Changes/New Features in 5.3.5:
-          <ul>
-<li><acronym title="[S]">ESS[R]</acronym> a new defun is available, <kbd>M-x R-newest</kbd>, which will start
-the newest version of R that it can find on your system. 
-<li><acronym title="[S]">ESS[R]</acronym> add Sven Hartenstein's &ldquo;R function arguments tips&rdquo;
- functionality, via new file <samp><span class="file">../lisp/essd-r-args.el</span></samp>. 
- Note that this includes an &ldquo;electric "("&rdquo; behavior inside <code>R-mode</code>
- which is <em>active by default</em> and can be customized via
- <code>ess-r-args-electric-paren</code>; i.e., use <code>(setq
- ess-r-args-electric-paren nil)</code> to turn it off.  Further,
- <code>ess-r-args-show-as</code> allows to switch to the &ldquo;tooltip&rdquo; mode. 
-<li><acronym>ESS</acronym>: functions <code>ess-get-pdf-viewer</code> and *-ps-viewer; built on new
- customizable variables <code>ess-pdf-viewer-pref</code> and
- <code>ess-ps-viewer-pref</code>; currently used in <code>ess-swv-PDF</code> and
- <code>*-PS</code>. 
-<li><acronym title="[S]">ESS[R]</acronym> Improved <code>ess-swv-PDF</code> to run pdf viewer only if
- pdflatex was ok
-<li><acronym title="[S]">ESS[R]</acronym> Improved <code>ess-swv-weave</code> to start R automatically if
- none is running. 
-<li><acronym>ESS</acronym>: Do no longer ask <em>which</em> ESS process to use if there
- is only one. 
-</ul>
-
-     <p>Changes/New Features in 5.3.4:
-          <ul>
-<li><acronym title="[S]">ESS[R]</acronym> now better work with options(error=recover); and the
-new default of CHM help files on windows. 
-<li><acronym title="[S]">ESS[R]</acronym> some more cleanup in the &ldquo;sweave&rdquo; functions
-<li>miscellaneous fixes
-</ul>
-
-     <p>Changes/New Features in 5.3.3:
-          <ul>
-<li><acronym>ESS[S]</acronym> fix buglet (5.3.2 only) which left command prompt in
-&ldquo;execute buffer&rdquo; and hence help files. 
-<li>new customizable variable <code>ess-display-buffer-reuse-frames</code>
-set to true (which changes default behavior) such that execution or
-help *frames* are reused. 
-</ul>
-
-     <p>Changes/New Features in 5.3.2:
-          <ul>
-<li>Classic BUGS now supported by <code>(require 'essd-bugs)</code> with <acronym>ESS[BUGS]</acronym>
-      and JAGS by <code>(require 'essd-jags)</code> with <acronym>ESS[JAGS]</acronym>.  But, only one
-      of them can be used at a time since they don't play nice together.  Also,
-      <kbd>C-c C-c</kbd> is now bound to the function <code>ess-bugs-next-action</code>
-      (<kbd>F12</kbd> has been retired).  And finally, note that <samp><span class="file">essl-bug.el</span></samp>
-      is deprecated and the replacement is <samp><span class="file">essl-bugs.el</span></samp>. 
-<li><acronym title="[S]">ESS[R]</acronym> Improved some of the &ldquo;Sweave-make&rdquo;
- functions (yet scarcely documented) in <samp><span class="file">ess-swv.el</span></samp>. 
-<li><acronym>ESS[S]</acronym> No longer mess with .Last.value (nor in other &ldquo;languages&rdquo;). 
-</ul>
-
-     <p>Changes/New Features in 5.3.1:
-          <ul>
-<li>See the docs for 2 ways to install <acronym>ESS</acronym> for XEmacs
-               <ol type=1 start=1>
-      <li>by uncommenting the XEmacs part of
-            Section 1 of <samp><span class="file">Makeconf</span></samp> and performing <code>make install</code>
-      <li>by unpacking either
-            <samp><span class="file">ess-5.3.1.tgz</span></samp> or <samp><span class="file">ess-5.3.1.zip</span></samp> into
-            <samp><span class="file">PREFIX/lib/xemacs/site-packages</span></samp> on unix or
-            <samp><span class="file">PREFIX\XEmacs\site-packages</span></samp> on windows
-               </ol>
-<li><acronym title="[S]">ESS[R]</acronym>: fixed bugs so that Rterm.exe can be found by XEmacs
-<li><acronym>ESS[S]</acronym>: <kbd>ess-toggle-S-assign-key</kbd> is slightly changed; in
- particular, the default <code>ess-assign-key</code> is now <kbd>C-x =</kbd>. 
-<li><acronym title="[S]">ESS[R]</acronym>: <kbd>M-x R-site-search</kbd> is a new (slightly experimental)
- utility similar to R's <code>RSiteSearch(..)</code> but with the advantage of
- using Emacs' preferred browser, see <code>browse-url-browser-function</code>
-</ul>
-
-     <p>Changes/New Features in 5.3.0:
-          <ul>
-<li><acronym>ESS[BUGS]</acronym>: sanely re-format statistical output, <samp><span class="file">.bog</span></samp>,
-from scientific notation to numbers rounded with 4 decimal places
-with <kbd>M-x ess-bugs-sci-round-to-4-dp</kbd>. 
-<li>The keys for navigating among section headings in help buffers
-worked, but only for one language per session; they should now work for
-multiple languages.  (They were also broken on Windows machines.) 
-<li><acronym>ESS[S]</acronym> long standing buglets in the internal logic for loading
-lisp code on Windows.  Particularly fixed behavior in help mode with S-plus
-GUI. 
-<li>New variable, <code>ess-use-inferior-program-name-in-buffer-name</code>,
-which enables using the executable name instead of the dialect name for
-R. Feature request. 
-<li><acronym>ESS[S]</acronym> <kbd>ess-execute-screen-options</kbd>
-now also works correctly when there is more than one window *side-by-side*
-in the same frame and runs in the correct buffer also when there is more
-than one S buffer. 
-<li>i<acronym>ESS[S]</acronym><!-- /@w --> new functions <code>ess-eval-paragraph-and-step</code> and
- <code>ess-eval-function-or-paragraph-and-step</code> are bound to keys
- <kbd>C-c C-p</kbd> and <kbd>C-c C-c</kbd> respectively and to the menu in
- <acronym>ESS</acronym>-mode; also bound in the help mode (for evaluating examples). 
-<li><acronym>ESS[S]</acronym> new function <code>ess-toggle-S-assign-key</code> allows to
-assign the &ldquo; &lt;- &rdquo; insertion to an arbitrary key. 
-</ul>
-
-</ul>
-
+<!-- @end itemize -->
 <div class="node">
 <a name="Reporting-Bugs"></a>
 <p><hr>

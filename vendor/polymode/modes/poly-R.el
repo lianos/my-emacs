@@ -20,10 +20,12 @@
 (add-to-list 'auto-mode-alist '("\\.Rnw" . poly-noweb+r-mode))
 
 
+
 ;; MARKDOWN
 (require 'poly-markdown)
 (define-polymode poly-markdown+r-mode pm-config/markdown :lighter " Rmd")
 (add-to-list 'auto-mode-alist '("\\.Rmd" . poly-markdown+r-mode))
+
 
 
 ;; HTML
@@ -44,6 +46,7 @@
 (define-polymode poly-html+r-mode pm-config/html+R)
 (add-to-list 'auto-mode-alist '("\\.Rhtml" . poly-html+r-mode))
 
+
 
 ;;; R-brew
 (defcustom pm-config/brew+R
@@ -62,6 +65,7 @@
 
 (define-polymode poly-brew+r-mode pm-config/brew+R)
 (add-to-list 'auto-mode-alist '("\\.Rbrew" . poly-brew+r-mode))
+
 
 
 ;;; R+C++
@@ -104,6 +108,7 @@
 (define-polymode poly-r+c++-mode pm-config/R+C++)
 (add-to-list 'auto-mode-alist '("\\.Rcpp" . poly-r+c++-mode))
 
+
 
 ;;; C++R
 (defun pm--C++R-head-matcher (ahead)
@@ -125,7 +130,6 @@
 (defcustom  pm-submode/C++R
   (pm-inner-submode "C++R"
                     :mode 'R-mode
-                    :background 1.1
                     :head-reg 'pm--C++R-head-matcher
                     :tail-reg 'pm--C++R-tail-matcher
                     :protect-indent-line-function t)
@@ -152,7 +156,9 @@
   "Ess help R chunk")
 
 (define-polymode poly-ess-help+r-mode pm-config/ess-help+R)
-(add-hook 'ess-help-mode-hook 'poly-ess-help+r-mode)
+(add-hook 'ess-help-mode-hook '(lambda ()
+                                 (when (string= ess-dialect "R")
+                                   (poly-ess-help+r-mode))))
 
 
 (defun pm--Rd-examples-head-matcher (ahead)

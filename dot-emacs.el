@@ -1,5 +1,5 @@
-(add-to-list 'load-path "~/.emacs.d")
-(add-to-list 'load-path "~/.emacs.d/vendor")
+(add-to-list 'load-path (expand-file-name "~/.emacs.d"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/vendor"))
 
 ;; ============================================================================
 ;; For loading libraries from the vendor directory and then loading my
@@ -54,7 +54,7 @@
 ; (vendor 'magit)
 ; (vendor 'minimap)
 (vendor 'expand-region)
-
+(vendor 'multiple-cursors)
 (vendor 'markdown-mode)
 
 (load "my/globals")
@@ -62,8 +62,7 @@
 (load "my/tabs")
 (load "my/spelling")
 (load "my/expand-region")
-
-
+(load "my/auto-complete.el")
 
 ;; Setup Programming Environments
 (load "my/ess")

@@ -3,14 +3,13 @@
 ;; Copyright (C) 2012 Vitalie Spinu.
 ;;
 ;; Filename: ess-julia.el
-;; Author: Vitalie Spinu (based on julia-mode.el form julia-lang project)
+;; Author: Vitalie Spinu (based on julia-mode.el from julia-lang project)
 ;; Maintainer: Vitalie Spinu
 ;; Created: 02-04-2012 (ESS 12.03)
 ;; Keywords: ESS, julia
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-
 ;; This file is *NOT* part of GNU Emacs.
 ;; This file is part of ESS
 ;;
@@ -39,10 +38,7 @@
 ;;
 (require 'compile); for compilation-* below
 
-
 ;;; Code:
-;
-
 
 (defvar julia-mode-hook nil)
 
@@ -63,7 +59,9 @@
     (modify-syntax-entry ?\) ")( " table)
     ;(modify-syntax-entry ?\\ "." table)  ; \ is an operator outside quotes
     (modify-syntax-entry ?'  "." table)  ; character quote or transpose
-    ;(modify-syntax-entry ?\" "." table)
+    (modify-syntax-entry ?\" "\"" table)
+    (modify-syntax-entry ?` "\"" table)
+    ;; (modify-syntax-entry ?\" "." table)
     (modify-syntax-entry ?? "." table)
     (modify-syntax-entry ?$ "." table)
     (modify-syntax-entry ?& "." table)
@@ -90,8 +88,9 @@
     table)
   "Syntax table for julia-mode")
 
-(defconst julia-string-regex
-  "\"[^\"]*?\\(\\(\\\\\\\\\\)*\\\\\"[^\"]*?\\)*\"")
+;; not used
+;; (defconst julia-string-regex
+;;   "\"[^\"]*?\\(\\(\\\\\\\\\\)*\\\\\"[^\"]*?\\)*\"")
 
 (defconst julia-char-regex
   "\\(\\s(\\|\\s-\\|-\\|[,%=<>\\+*/?&|$!\\^~\\\\;:]\\|^\\)\\('\\(\\([^']*?[^\\\\]\\)\\|\\(\\\\\\\\\\)\\)'\\)")
@@ -102,10 +101,8 @@
 (defconst julia-forloop-in-regex
   "for +[^ 	]+ +.*\\(in\\)\\(\\s-\\|$\\)+")
 
-
 (defconst ess-subset-regexp
       "\\[[0-9:, ]*\\]" )
-
 
 (defconst julia-font-lock-defaults
   (list '("\\<\\(\\|Uint\\(8\\|16\\|32\\|64\\)\\|Int\\(8\\|16\\|32\\|64\\)\\|Integer\\|Float\\|Float32\\|Float64\\|Complex128\\|Complex64\\|ComplexNum\\|Bool\\|Char\\|Number\\|Scalar\\|Real\\|Int\\|Uint\\|Array\\|DArray\\|AbstractArray\\|AbstractVector\\|AbstractMatrix\\|SubArray\\|StridedArray\\|StridedVector\\|StridedMatrix\\|VecOrMat\\|StridedVecOrMat\\|Range\\|Range1\\|SparseMatrixCSC\\|Tuple\\|NTuple\\|Buffer\\|Size\\|Index\\|Symbol\\|Function\\|Vector\\|Matrix\\|Union\\|Type\\|Any\\|Complex\\|None\\|String\\|Ptr\\|Void\\|Exception\\|PtrInt\\|Long\\|Ulong\\)\\>" .
@@ -117,7 +114,7 @@
           '("if" "else" "elseif" "while" "for" "begin" "end" "quote"
             "try" "catch" "return" "local" "abstract" "function" "macro" "ccall"
 	    "typealias" "break" "continue" "type" "global" "@\\w+"
-	    "module" "import" "export" "const" "let" "bitstype")
+	    "module" "import" "export" "const" "let" "bitstype" "using")
           "\\|") "\\)\\>")
      'font-lock-keyword-face)
     '("\\<\\(true\\|false\\|C_NULL\\|Inf\\|NaN\\|Inf32\\|NaN32\\)\\>" . font-lock-constant-face)
@@ -195,7 +192,6 @@
               nil)))
       nil)))
 
-
 (defun julia-paren-indent ()
   (let* ((p (parse-partial-sexp (save-excursion
 				  ;; only indent by paren if the last open
@@ -209,14 +205,14 @@
     (if (or (= 0 (car p)) (null pos))
         nil
       (progn (goto-char pos) (+ 1 (current-column))))))
-;  (forward-line -1)
-;  (end-of-line)
-;  (let ((pos (condition-case nil
-;                (scan-lists (point) -1 1)
-;              (error nil))))
-;   (if pos
-;       (progn (goto-char pos) (+ 1 (current-column)))
-;     nil)))
+					;  (forward-line -1)
+					;  (end-of-line)
+					;  (let ((pos (condition-case nil
+					;                (scan-lists (point) -1 1)
+					;              (error nil))))
+					;   (if pos
+					;       (progn (goto-char pos) (+ 1 (current-column)))
+					;     nil)))
 
 (defun julia-indent-line ()
   "Indent current line of julia code"
@@ -247,32 +243,6 @@
     (when (julia-at-keyword julia-block-end-keywords)
       (forward-word 1)))
 
-;; (defun julia-mode ()
-;;   "Major mode for editing julia code"
-;;   (interactive)
-;;   (kill-all-local-variables)
-;;   (set-syntax-table julia-mode-syntax-table)
-;;   (set (make-local-variable 'comment-start) "# ")
-;;   (set (make-local-variable 'comment-start-skip) "#+\\s-*")
-;;   (set (make-local-variable 'font-lock-defaults) '(julia-font-lock-defaults))
-;; ;  (set (make-local-variable 'font-lock-syntactic-keywords)
-;; ;      (list
-;; ;       (list "\\(\\\\\\)\\s-*\".*?\"" 1 julia-mode-char-syntax-table)))
-;;   (set (make-local-variable 'font-lock-syntactic-keywords)
-;;        (list
-;; 	(list julia-char-regex 2
-;; 	      julia-mode-char-syntax-table)
-;; ;        (list julia-string-regex 0
-;; ;              julia-mode-string-syntax-table)
-;; ))
-;;   (set (make-local-variable 'indent-line-function) 'julia-indent-line)
-;;   (set (make-local-variable 'julia-basic-offset) 4)
-;;   (setq indent-tabs-mode nil)
-;;   (setq major-mode 'julia-mode)
-;;   (setq mode-name "julia")
-;;   (run-hooks 'julia-mode-hook))
-
-
 (defvar julia-editing-alist
   '((paragraph-start		  . (concat "\\s-*$\\|" page-delimiter))
     (paragraph-separate		  . (concat "\\s-*$\\|" page-delimiter))
@@ -299,7 +269,7 @@
     (font-lock-defaults		  . '(julia-font-lock-defaults
                                       nil nil ((?\_ . "w"))))
     )
-  "General options for R source files.")
+  "General options for julia source files.")
 
 (autoload 'inferior-ess "ess-inf" "Run an ESS process.")
 (autoload 'ess-mode     "ess-mode" "Edit an ESS process.")
@@ -311,7 +281,7 @@
     (process-send-string process (format inferior-ess-load-command file))))
 
 (defun julia-get-help-topics (&optional proc)
-  (ess-get-words-from-vector "_ess_list_topics()\n"))
+  (ess-get-words-from-vector "ESS.all_help_topics()\n"))
     ;; (ess-command com)))
 
 (defvar julia-help-command "help(\"%s\")\n")
@@ -322,28 +292,30 @@
 (add-to-list 'compilation-error-regexp-alist-alist
              '(julia-in  "^\\s-*in [^ \t\n]* \\(at \\(.*\\):\\([0-9]+\\)\\)" 2 3 nil 2 1))
 (add-to-list 'compilation-error-regexp-alist-alist
-             '(julia-at "^\\s-*\\(at \\(.*\\):\\([0-9]+\\)\\)"  2 3 nil 2 1))
+             '(julia-at "^\\S-+\\s-+\\(at \\(.*\\):\\([0-9]+\\)\\)"  2 3 nil 2 1))
 
 (defvar julia-customize-alist
   '((comint-use-prompt-regexp		. t)
-    (inferior-ess-primary-prompt	. "> ")
-    (inferior-ess-secondary-prompt	. "+ ")
+    (ess-eldoc-function           . 'ess-julia-eldoc-function)
+    (inferior-ess-primary-prompt	. "a> ") ;; from julia>
+    (inferior-ess-secondary-prompt	. nil)
     (inferior-ess-prompt		. "\\w*> ")
     (ess-local-customize-alist		. 'julia-customize-alist)
     (inferior-ess-program		. inferior-julia-program-name)
     (inferior-ess-font-lock-defaults	. julia-font-lock-defaults)
     (ess-get-help-topics-function	. 'julia-get-help-topics)
     (ess-help-web-search-command        . "http://docs.julialang.org/en/latest/search/?q=%s")
-    (inferior-ess-load-command		. "load(\"%s\")\n")
+    (inferior-ess-load-command		. "include(\"%s\")\n")
+    (ess-funargs-command                . "ESS.fun_args(\"%s\")\n")
     (ess-dump-error-re			. "in \\w* at \\(.*\\):[0-9]+")
     (ess-error-regexp			. "\\(^\\s-*at\\s-*\\(?3:.*\\):\\(?2:[0-9]+\\)\\)")
     (ess-error-regexp-alist		. ess-julia-error-regexp-alist)
-    (ess-send-string-function		. 'julia-send-string-function)
+    (ess-send-string-function		. nil);'julia-send-string-function)
     (ess-imenu-generic-expression       . julia-imenu-generic-expression)
     ;; (inferior-ess-objects-command	. inferior-R-objects-command)
     ;; (inferior-ess-search-list-command	. "search()\n")
     (inferior-ess-help-command		. julia-help-command)
-    ;; (inferior-ess-help-command		. "help(\"%s\")\n")
+    ;; (inferior-ess-help-command	. "help(\"%s\")\n")
     (ess-language			. "julia")
     (ess-dialect			. "julia")
     (ess-suffix				. "jl")
@@ -380,15 +352,15 @@ beginning with one of these strings is found on `exec-path', a M-x
 command for that version of Julia is made available.  ")
 
 (defcustom inferior-julia-args ""
-  "String of arguments (see 'R --help') used when starting R.
-These arguments are currently not passed to other versions of R that have
-been created using the variable `ess-r-versions'."
+  "String of arguments (see 'julia --help') used when starting julia."
+;; These arguments are currently not passed to other versions of julia that have
+;; been created using the variable `ess-r-versions'."
   :group 'ess-julia
   :type 'string)
 
 ;;;###autoload
 (defun julia-mode  (&optional proc-name)
-  "Major mode for editing R source.  See `ess-mode' for more help."
+  "Major mode for editing julia source.  See `ess-mode' for more help."
   (interactive "P")
   ;; (setq ess-customize-alist julia-customize-alist)
   (ess-mode julia-customize-alist proc-name)
@@ -416,11 +388,11 @@ been created using the variable `ess-r-versions'."
 (defun julia (&optional start-args)
   "Call 'julia',
 Optional prefix (C-u) allows to set command line arguments, such as
---vsize.  This should be OS agnostic.
+--load=<file>.  This should be OS agnostic.
 If you have certain command line arguments that should always be passed
-to R, put them in the variable `inferior-julia-args'."
+to julia, put them in the variable `inferior-julia-args'."
   (interactive "P")
-  ;; get settings, notably inferior-R-program-name :
+  ;; get settings, notably inferior-julia-program-name :
   (if (null inferior-julia-program-name)
       (error "'inferior-julia-program-name' does not point to 'julia-release-basic' executable")
     (setq ess-customize-alist julia-customize-alist)
@@ -438,26 +410,55 @@ to R, put them in the variable `inferior-julia-args'."
                                  " ? "))
 		      nil))))
       (inferior-ess jl-start-args) ;; -> .. (ess-multi ...) -> .. (inferior-ess-mode) ..
-      (ess-tb-start)
+      (ess--tb-start)
       (set (make-local-variable 'julia-basic-offset) 4)
-      ;; (setq indent-tabs-mode nil)
-      ;; (if inferior-ess-language-start
-      ;; 	(ess-eval-linewise inferior-ess-language-start
-      ;; 			   nil nil nil 'wait-prompt)))
-      (ess-eval-linewise (format "load(\"%sess-julia.jl\")\n" ess-etc-directory))
+      ;; remove ` from julia's logo
+      (goto-char (point-min))
+      (while (re-search-forward "`" nil t)
+        (replace-match "'"))
+      (goto-char (point-max))
+      (ess--inject-code-from-file (format "%sess-julia.jl" ess-etc-directory))
       (with-ess-process-buffer nil
         (run-mode-hooks 'ess-julia-post-run-hook))
       )))
 
+;;; ELDOC
 
-;;;; IMENU
+(defun ess-julia-eldoc-function ()
+  "Return the doc string, or nil.
+If an ESS process is not associated with the buffer, do not try
+to look up any doc strings."
+  (interactive)
+  (when (and (ess-process-live-p)
+             (not (ess-process-get 'busy)))
+    (let ((funname (or (and ess-eldoc-show-on-symbol ;; aggressive completion
+                            (symbol-at-point))
+                       (car (ess--funname.start)))))
+      (when funname
+        (let* ((args (copy-sequence (nth 2 (ess-function-arguments funname))))
+               (W (- (window-width (minibuffer-window)) (+ 4 (length funname))))
+               (doc (concat (propertize funname 'face font-lock-function-name-face) ": ")))
+          (when args
+            (setq args (sort args (lambda (s1 s2)
+                                    (< (length s1) (length s2)))))
+            (setq doc (concat doc (pop args)))
+            (while (and args (< (length doc) W))
+              (setq doc (concat doc "  "
+                                (pop args))))
+            (when (and args (< (length doc) W))
+              (setq doc (concat doc " {--}"))))
+          doc)))))
+
+
+;;; IMENU
 (defvar julia-imenu-generic-expression
   ;; don't use syntax classes, screws egrep
   '(("Function (_)" "[ \t]*function[ \t]+\\(_[^ \t\n]*\\)" 1)
-    ("Function" "[ \t]*function[ \t]+\\([^_][^ \t\n]*\\)" 1)
+    ("Function" "[ \t]*function[ \t]+\\([^_][^\t\n]*\\)" 1)
     ("Const" "[ \t]*const \\([^ \t\n]*\\)" 1)
     ("Type"  "^[ \t]*[a-zA-Z0-9_]*type[a-zA-Z0-9_]* \\([^ \t\n]*\\)" 1)
-    ("Load"      " *\\(load\\)(\\([^ \t\n)]*\\)" 2)
+    ("Require"      " *\\(\\brequire\\)(\\([^ \t\n)]*\\)" 2)
+    ("Include"      " *\\(\\binclude\\)(\\([^ \t\n)]*\\)" 2)
     ;; ("Classes" "^.*setClass(\\(.*\\)," 1)
     ;; ("Coercions" "^.*setAs(\\([^,]+,[^,]*\\)," 1) ; show from and to
     ;; ("Generics" "^.*setGeneric(\\([^,]*\\)," 1)
@@ -468,7 +469,5 @@ to R, put them in the variable `inferior-julia-args'."
     ;; ("Package" "^.*\\(library\\|require\\)(\\(.*\\)," 2)
     ;; ("Data" "^\\(.+\\)\\s-*<-[ \t\n]*\\(read\\|.*data\.frame\\).*(" 1)))
     ))
-
-
 
 (provide 'ess-julia)

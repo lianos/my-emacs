@@ -1,4 +1,6 @@
 ;; http://emacs-fu.blogspot.com/2010/02/dealing-with-many-buffers-ibuffer.html
+;; http://martinowen.net/blog/2010/02/tips-for-emacs-ibuffer.html
+;;
 ;; Look into using eproject: http://github.com/jrockway/eproject
 (setq ibuffer-saved-filter-groups
   (quote (("default"
@@ -38,6 +40,7 @@
 
 (add-hook 'ibuffer-mode-hook
   (lambda ()
+    (ibuffer-auto-mode 1)
     (ibuffer-switch-to-saved-filter-groups "default")))
 
 ;; Ensure ibuffer opens with point at the current buffer's entry.

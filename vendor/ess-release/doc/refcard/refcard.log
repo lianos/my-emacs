@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.11.13)  12 JAN 2013 22:26
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2013.1.26)  15 MAY 2013 09:03
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -181,19 +181,24 @@ Underfull \hbox (badness 10000) in paragraph at lines 227--246
  []
 
 
-Underfull \hbox (badness 6961) in paragraph at lines 292--294
+Overfull \hbox (14.11595pt too wide) in paragraph at lines 251--265
+[][] 
+ []
+
+
+Underfull \hbox (badness 6961) in paragraph at lines 291--293
 []\OT1/cmr/m/n/10 Evaluate your code into the pack-age (in
  []
 
 [2] (./refcard.aux) ) 
 Here is how much of TeX's memory you used:
  432 strings out of 493488
- 5797 string characters out of 3138790
+ 5797 string characters out of 3138791
  91606 words of memory out of 3000000
  3794 multiletter control sequences out of 15000+200000
  6660 words of font info for 25 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
- 23i,12n,17p,170b,660s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 23i,12n,17p,170b,738s stack positions out of 5000i,500n,10000p,200000b,50000s
 </hg/s/linux/9/app/teTeX/07.12/texmf-dist/fonts/type1/publ
 ic/amsfonts/cm/cmbx10.pfb></hg/s/linux/9/app/teTeX/07.12/texmf-dist/fonts/type1
 /public/amsfonts/cm/cmbx12.pfb></hg/s/linux/9/app/teTeX/07.12/texmf-dist/fonts/
@@ -211,7 +216,7 @@ hg/s/linux/9/app/teTeX/07.12/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.p
 fb></hg/s/linux/9/app/teTeX/07.12/texmf-dist/fonts/type1/public/amsfonts/cm/cmt
 t8.pfb></hg/s/linux/9/app/teTeX/07.12/texmf-dist/fonts/type1/public/amsfonts/cm
 /cmtt9.pfb>
-Output written on refcard.pdf (2 pages, 163504 bytes).
+Output written on refcard.pdf (2 pages, 164161 bytes).
 PDF statistics:
  71 PDF objects out of 1000 (max. 8388607)
  51 compressed objects within 1 object stream

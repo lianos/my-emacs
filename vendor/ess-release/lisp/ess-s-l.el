@@ -137,10 +137,9 @@
     (ess-get-help-topics-function  . 'ess-get-S-help-topics-function)
     (ess-getwd-command          . "getwd()\n")
     (ess-setwd-command          . "setwd('%s')\n")
-    (ess-funargs-command        . ".ess.funargs(%s)\n")
+    (ess-funargs-command        . ".ess_funargs(\"%s\")\n")
     )
-  "S-language common settings for all <dialect>-customize-alist s"
-  )
+  "S-language common settings for all <dialect>-customize-alist s")
 
 (defconst S+common-cust-alist
   (append
@@ -157,7 +156,7 @@
      (ess-dump-filename-template . (ess-replace-regexp-in-string
                                     "S$" ess-suffix ; in the one from custom:
                                     ess-dump-filename-template-proto))
-
+     (ess-traceback-command     . "traceback()\n")
      (ess-mode-editing-alist    . S-editing-alist)
 
      (ess-dumped-missing-re
@@ -501,8 +500,10 @@ unless prefix argument NO-FORCE-CURRENT is non-nil."
 ;;*;; S/R  Pretty-Editing
 
 (defun ess-fix-comments (&optional dont-query verbose)
-  "Fix ess-mode buffer so that single-line comments start with at least `##'."
+  "Fix ess-mode buffer so that single-line comments start with at least '##',
+and ensure space before subsequent text."
   (interactive "P")
+  (ess-replace-regexp-dump-to-src "#\\([A-Za-z0-9]\\)" "# \\1" nil verbose)
   (ess-replace-regexp-dump-to-src "^\\([ \t]*#\\)\\([^#]\\)"
                                   "\\1#\\2" dont-query verbose))
 
@@ -639,6 +640,9 @@ and one that is well formatted in emacs ess-mode."
     (ess-rep-regexp "\\([A-Za-z0-9()]\\)}" "\\1 }" 'fix nil verbose)
     (ess-space-around "else" from verbose)
 
+    (goto-char from) ;; add a space inside "){"
+    (ess-rep-regexp "){" ") {" 'fix nil verbose)
+
     ;; add a newline and indent before a "}"
     ;; --- IFF there's NO "{" or "#" AND some NON-white text on the same line:
     ;;D (if verbose (message "\t R-fix-misc..: Hard.. '}'"))
@@ -677,12 +681,13 @@ toggle between the new and the previous assignment."
         (if (not (and force current-is-S-assign))
             (setq ess-S-assign-key-last current-action))))))
 
-(defun ess-smart-underscore ()
-  "Smart \"_\" key: insert `ess-S-assign', unless in string/comment.
+(defvar polymode-mode)
+(defun ess-smart-S-assign ()
+  "Smart \\[ess-smart-S-assign] key: insert `ess-S-assign', unless in string/comment.
 If the underscore key is pressed a second time, the assignment
 operator is removed and replaced by the underscore.  `ess-S-assign',
 typically \" <- \", can be customized.  In ESS modes other than R/S,
-an underscore is always inserted. "
+the  underscore is always inserted. "
   (interactive)
   ;;(insert (if (ess-inside-string-or-comment-p (point)) "_" ess-S-assign))
   (save-restriction
@@ -692,18 +697,22 @@ an underscore is always inserted. "
         (narrow-to-region (process-mark (get-ess-process)) (point-max)))
       (and ess-noweb-mode
            (ess-noweb-in-code-chunk)
-           (ess-noweb-narrow-to-chunk)))
+           (ess-noweb-narrow-to-chunk))
+      (and (fboundp 'pm/narrow-to-span)
+           polymode-mode
+           (pm/narrow-to-span)))
     (if (or
          (ess-inside-string-or-comment-p (point))
          (not (equal ess-language "S")))
-        (insert "_")
+        (insert ess-smart-S-assign-key)
       ;; else:
       (ess-insert-S-assign))))
-
+(defalias 'ess-smart-underscore 'ess-smart-S-assign)
 
 (defun ess-insert-S-assign ()
   "Insert the assignment operator `ess-S-assign', unless it is already there.
-In that case, the it is removed and replaced by the underscore.
+In that case, the it is removed and replaced by
+  `ess-smart-S-assign-key', \\[ess-smart-S-assign-key].
   `ess-S-assign', typically \" <- \", can be customized."
   (interactive)
   ;; one keypress produces ess-S-assign; a second keypress will delete
@@ -719,31 +728,42 @@ In that case, the it is removed and replaced by the underscore.
         ;; If we are currently looking at ess-S-assign, replace it with _
         (progn
           (delete-char (- assign-len))
-          (insert "_"))
-      (delete-horizontal-space)
+          (insert ess-smart-S-assign-key))
+      (if (string= ess-smart-S-assign-key "_")
+          (delete-horizontal-space))
       (insert ess-S-assign))))
 
-(defun ess-toggle-underscore (force)
-  "Set the \"_\" (underscore) key to \\[ess-smart-underscore] or back to \"_\".
- Toggle the current definition, unless FORCE is non-nil, where
- \\[ess-smart-underscore] is set unconditionally.
+(defun ess-toggle-S-assign (force)
+  "Set the `ess-smart-S-assign-key' (by default \"_\"
+[underscore]) key to \\[ess-smart-S-assign] or back to
+`ess-smart-S-assign-key'.  Toggle the current definition, unless
+FORCE is non-nil, where \\[ess-smart-S-assign] is set
+unconditionally.
 
- Using \"C-q _\" will always just insert the underscore character."
+  If you as per default have `ess-smart-S-assign-key' set to
+  underscore, note that using \"C-q _\" will always just insert the
+  underscore character."
   (interactive "P")
-  (let ((current-key (lookup-key ess-mode-map "_")))
-    (if (and current-key
+  (let ((current-key (lookup-key ess-mode-map ess-smart-S-assign-key))
+        (default-key (lookup-key ess-mode-map "_"))
+        )
+    (if (and (or default-key current-key)
              ;; (stringp current-key) (string= current-key ess-S-assign)
              (not force))
         (progn
-          (define-key ess-mode-map          "_" nil); 'self-insert-command
-          (define-key inferior-ess-mode-map "_" nil))
+          (define-key ess-mode-map          "_" nil)
+          (define-key inferior-ess-mode-map "_" nil)
+          (define-key ess-mode-map          ess-smart-S-assign-key nil); 'self-insert-command
+          (define-key inferior-ess-mode-map ess-smart-S-assign-key nil))
       ;; else : "force" or current-key is "nil", i.e. default
-      (define-key ess-mode-map          "_" 'ess-smart-underscore)
-      (define-key inferior-ess-mode-map "_" 'ess-smart-underscore))))
-
+      (define-key ess-mode-map          ess-smart-S-assign-key
+        'ess-smart-S-assign)
+      (define-key inferior-ess-mode-map ess-smart-S-assign-key
+        'ess-smart-S-assign))))
+(defalias 'ess-toggle-underscore 'ess-toggle-S-assign)
 ;; NOTA BENE: "_" is smart *by default* :
 ;; -----  The user can always customize `ess-S-assign' ...
-(ess-toggle-underscore 'force-to-S-assign)
+(ess-toggle-S-assign 'force-to-S-assign)
 
 (defun ess-add-MM-keys ()
   "Define MM's user keys, currently \\<ess-mode-map>\\[ess-insert-function-outline], and
@@ -803,7 +823,7 @@ and I need to relearn emacs lisp (but I had to, anyway."
     ("Classes" "^.*setClass(\\(.*\\)," 1)
     ("Coercions" "^.*setAs(\\([^,]+,[^,]*\\)," 1) ; show from and to
     ("Generics" "^.*setGeneric(\\([^,]*\\)," 1)
-    ("Methods" "^.*set\\(Group\\|Replace\\)?Method(\"\\(.+\\)\"," 2)
+    ("Methods" "^.*set\\(Group\\|Replace\\)?Method(\\([^,]+,[^,]*\\)" 2)
     ;;[ ]*\\(signature=\\)?(\\(.*,?\\)*\\)," 1)
     ;;
     ;;("Other" "^\\(.+\\)\\s-*<-[ \t\n]*[^\\(function\\|read\\|.*data\.frame\\)]" 1)

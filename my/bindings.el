@@ -44,7 +44,7 @@
 (define-key ctl-x-map "e" 'end-of-buffer)
 
 (global-set-key (kbd "<f6>") 'bookmark-jump)
-(global-set-key (kbd "<f7>") 'bookmark-set	)
+(global-set-key (kbd "<f7>") 'bookmark-set)
 
 ;; Clears Meta-g from any binding, we are effectively setting it up as another
 ;; prefix key

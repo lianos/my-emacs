@@ -52,7 +52,7 @@
 ;;
 ;; with Emacs (and in general):
 ;;
-;;      (setq load-path (cons "/path/to/ess/lisp-directory" load-path)
+;;      (setq load-path (cons "/path/to/ess/lisp-directory" load-path))
 
 ;;; Code:
 
@@ -230,7 +230,10 @@ between .s or .S files and assembly mode.
           (remassoc "\\.[qsS]\\'" auto-mode-alist))
     ;; put .q extention back
     ;; (add-to-list is in xemacs and GNU emacs)
-    (add-to-list 'auto-mode-alist '("\\.q\\'" . S-mode))))
+    ;; R-mode when in a R/ subdirectory, otherwise S-mode:
+    (add-to-list 'auto-mode-alist '("/R/.*\\.q\\'" . R-mode))
+    (add-to-list 'auto-mode-alist '("\\.q\\'" . S-mode))
+    ))
 
 ;; Be careful when editing the following. MISTAKES WILL RESULT IN
 ;; *.sty BEING TREATED AS ESS[S], rather than LaTeX-mode!
@@ -239,7 +242,8 @@ between .s or .S files and assembly mode.
   (setq auto-mode-alist
         (append
          '(("\\.sp\\'"          . S-mode) ;; re: Don MacQueen <macq@llnl.gov>
-           ("\\.[qsS]\\'"       . S-mode) ;; q,s,S [see ess-restore-asm-extns above!]
+           ("/R/.*\\.q\\'"      . R-mode) ;; R/*.q is R code (e.g., in package)
+           ("\\.[qsS]\\'"       . S-mode) ;; s,S [see ess-restore-asm-extns above!]
            ("\\.ssc\\'"         . S-mode) ;; Splus (>= 4.x) script files.
            ("\\.SSC\\'"         . S-mode) ;; ditto for windoze
            ("\\.[rR]\\'"        . R-mode)
@@ -517,6 +521,11 @@ sending `inferior-ess-language-start' to S-Plus.")
 ;; -----  *and* update the "Start Process" menu (below)
 ;;    -> To this: wrap the following in functions that can be re-called
 
+(defun ess-r-s-versions-creation ()
+  "(Re)Create ESS  R-<..> commands FILENAME sans final \"extension\".
+The extension, in a file name, is the part that follows the last `.'."
+
+  (interactive)
 (ess-message "[ess-site:] before creating ess-versions-* ...")
 ;; Create  ess-versions-created,
 ;;         ess-r-versions-created,
@@ -527,8 +536,6 @@ sending `inferior-ess-language-start' to S-Plus.")
                                    (ess-sqpe-versions-create ess-SHOME-versions)               ;; 32-bit
                                    (ess-sqpe-versions-create ess-SHOME-versions-64 "-64-bit")) ;; 64-bit
                                 (ess-s-versions-create)))) ;; use ess-s-versions
-  (ess-message "[ess-site:] (let ... after (ess-s-versions-create) ...")
-
   (if ess-microsoft-p
       (setq ess-rterm-version-paths ;; (ess-find-rterm))
             (ess-flatten-list
@@ -578,7 +585,10 @@ sending `inferior-ess-language-start' to S-Plus.")
                  '(R-newest-list
                    ess-r-versions-created
                    ess-s-versions-created)))))
+)
 
+(ess-message "[ess-site:] before (ess-r-s-versions-creation) ...")
+(ess-r-s-versions-creation)
 
 (when ess-versions-created
   ;; new-menu will be a list of 3-vectors, of the form:

@@ -1,42 +1,57 @@
+module ESS
 
-function _ess_list_categories()
-    Base._jl_init_help()
-    show("*ALL*"); print(" ")
-    for cat = Base._jl_help_category_list
-        show(cat)
-        print(" ")
-    end
-end
-
-function _ess_print_index(cat::ASCIIString)
-    Base._jl_init_help()
-    if cat == "*ALL*"
-        println("   All help items:\n\n")
-        for cat = Base._jl_help_category_list
-            print("\n", cat, ":\n")
-            for func =  Base._jl_help_category_dict[cat]
-                print(func, " ")
-            end
+function all_help_topics()
+    Base.Help.init_help()
+    ## show all categories 
+    for cat = Base.Help.CATEGORY_LIST
+        if !isempty(Base.Help.CATEGORY_DICT[cat])
             println()
-        end
-    elseif has(Base._jl_help_category_dict, cat)
-        println("  Help is available for the following items:\n\n")
-        for func = Base._jl_help_category_dict[cat]
-            print(func, ":\n")
-        end
-    else 
-        error("Category $(cat) not found ")
-    end 
-end
-
-function _ess_list_topics()
-    Base._jl_init_help()
-    for cat = Base._jl_help_category_list
-        show(cat); println()
-        for el = Base._jl_help_category_dict[cat]
-            show(el); print(" ")
+            show(cat); println();
+            for func = Base.Help.CATEGORY_DICT[cat]
+                print("  ")
+                show(func)
+            end
         end
     end
 end
 
+## modified version of function show(io::IO, m::Method)
+function fun_args(m::Method)
+    tv = m.tvars
+    io = OUTPUT_STREAM::IO
+    if !isa(tv,Tuple)
+        tv = (tv,)
+    end
+    if !isempty(tv)
+        Base.show_delim_array(io, tv, '{', ',', '}', false)
+    end
+    li = m.func.code
+    e = Base.uncompressed_ast(li)
+    argnames = e.args[1]
+    decls = map(Base.argtype_decl_string, argnames, {m.sig...})
+    print(io, "(")
+    print_joined(io, decls, ",", ",")
+    print(io, ")")
+end
 
+## modified versionof show(io::IO, mt::MethodTable)
+function fun_args(f::Function)
+    mt = f.env
+    print("(list nil nil '(")
+    d = mt.defs
+    while !is(d,())
+        print("\"")
+        fun_args(d)
+        print("\" ")
+        d = d.next
+        if is(d,())
+            print("))")
+        end
+    end
+end
+
+function fun_args(s::String)
+    fun_args(eval(parse(s)))
+end
+
+end 

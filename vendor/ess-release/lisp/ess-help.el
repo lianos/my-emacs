@@ -157,58 +157,50 @@ If COMMAND is suplied, it is used instead of `inferior-ess-help-command'.
     ;; else: "normal", non-DDE behavior:
     (let* ((hb-name (concat "*help["
                             ess-current-process-name
-                            "](" object ")*"))
+                            "](" (replace-regexp-in-string "^\\?\\|`" "" object) ")*"))
            (old-hb-p    (get-buffer hb-name))
-           (tbuffer     (get-buffer-create hb-name))
-           (lproc-name  ess-local-process-name)
-           (alist       ess-local-customize-alist))
-
+           (tbuffer     (get-buffer-create hb-name)))
       (when (or (not old-hb-p)
                 current-prefix-arg
                 (ess--help-get-bogus-buffer-substring old-hb-p))
-
-        (with-current-buffer tbuffer
-          (ess-write-to-dribble-buffer
-           (format "(ess-help '%s' start  ..\n" hb-name))
-          (ess-setq-vars-local (eval alist))
+        (ess-with-current-buffer tbuffer
           (setq ess-help-object object
-                ess-help-type 'help
-                ess-local-process-name lproc-name)
-
-          ;; Ask the corresponding ESS process for the help file:
-          (if buffer-read-only (setq buffer-read-only nil))
-          (delete-region (point-min) (point-max))
-          (ess-help-mode)
-          (setq ess-local-process-name ess-current-process-name)
-          (when (and (null command)
-                   (string-match "^R" ess-dialect))
-            ;;VS[16-12-2012]: ugly hack to avoid tcl/tk dialogs (should go away soon)
-            (let ((packs (ess-get-words-from-vector
-                          (format "as.character(help('%s'))\n" object))))
-              (when (> (length packs) 1)
-                (setq
-                 command (format ;; crippled S3 :(
-                          "do.call(structure, c('%s', attributes(help('%s'))))\n"
-                          (ess-completing-read "Choose location" packs nil t)
-                          object)))))
-          (ess-command (format (or command inferior-ess-help-command)
-                               object) tbuffer)
-          (ess-help-underline)
-          ;;VS[03-09-2012]: todo this should not be here:
-          ;; Stata is clean, so we get a big BARF from this.
-          (unless (string= ess-language "STA")
-            (ess-nuke-help-bs))
-          (goto-char (point-min))
-          (set-buffer-modified-p 'nil)
-          (setq buffer-read-only t)
-          (setq truncate-lines nil)
-          (ess-write-to-dribble-buffer
-           (format "(ess-help '%s' done  ..\n" hb-name))
-           ))
-
+                ess-help-type 'help)
+          (ess--flush-help-into-current-buffer object command)))
       (unless (ess--help-kill-bogus-buffer-maybe tbuffer)
-        (ess--switch-to-help-buffer tbuffer))
-      )))
+        (ess--switch-to-help-buffer tbuffer)))))
+
+(defun ess--flush-help-into-current-buffer (object &optional command)
+  (ess-write-to-dribble-buffer
+   (format "(ess-help '%s' start  ..\n" (buffer-name (current-buffer))))
+
+  ;; Ask the corresponding ESS process for the help file:
+  (if buffer-read-only (setq buffer-read-only nil))
+  (delete-region (point-min) (point-max))
+  (ess-help-mode)
+  (when (and (null command)
+             (string-match "^R" ess-dialect))
+    ;;VS[16-12-2012]: ugly hack to avoid tcl/tk dialogs (should go away soon)
+    (let ((packs (ess-get-words-from-vector
+                  (format "as.character(help('%s'))\n" object))))
+      (when (> (length packs) 1)
+        (setq
+         command (format ;; crippled S3 :(
+                  "do.call(structure, c('%s', attributes(help('%s'))))\n"
+                  (ess-completing-read "Choose location" packs nil t)
+                  object)))))
+  (ess-command (format (or command inferior-ess-help-command)
+                       object) (current-buffer))
+  (ess-help-underline)
+  ;;VS[03-09-2012]: todo: this should not be here:
+  ;; Stata is clean, so we get a big BARF from this.
+  (unless (string= ess-language "STA")
+    (ess-nuke-help-bs))
+  (goto-char (point-min))
+  (set-buffer-modified-p 'nil)
+  (setq buffer-read-only t)
+  (setq truncate-lines nil))
+
 
 (defun ess--help-kill-bogus-buffer-maybe (buffer)
   "Internal, try to kill bogus buffer with message. Return t if killed."
@@ -323,7 +315,6 @@ if necessary.  It is bound to RET and C-m in R-index pages."
      reg-keyword
      (format "*help[%s](index:%s)*"  ess-dialect pack)
      'index nil nil reg-start pack)
-    
     ))
 
 
@@ -371,6 +362,11 @@ if necessary.  It is bound to RET and C-m in R-index pages."
                               'follow-link t
                               'help-echo (or help-echo "help on object")))
           ))
+      
+      ;; (save-excursion ;; why R places all these spaces?
+      ;;   (goto-char (point-min))
+      ;;   (while (re-search-forward " \\{10,\\} *" nil t)
+      ;;     (replace-match "\t\t\t")))
       (setq buffer-read-only t)
       (setq ess-help-type help-type)
       (setq truncate-lines nil)
@@ -430,8 +426,7 @@ if necessary.  It is bound to RET and C-m in R-index pages."
   (interactive)
   (cond
    ((string-match "^R" ess-dialect) (ess-R-display-vignettes))
-   (t (message "Sorry, not implemented for %s" ess-dialect))
-   ))
+   (t (message "Sorry, not implemented for %s" ess-dialect))))
 
 (defun ess-R-display-vignettes ()
   "Display R vignettes in ess-help-like buffer."
@@ -457,7 +452,7 @@ if necessary.  It is bound to RET and C-m in R-index pages."
               (setq details nil)))
           ))
       (setq buff  (get-buffer-create (format "*[%s]vignettes*"  ess-dialect)))
-      (with-current-buffer buff
+      (ess-with-current-buffer buff
         (setq buffer-read-only nil)
         (delete-region (point-min) (point-max))
         (ess-setq-vars-local (eval alist))
@@ -820,8 +815,8 @@ Keystroke    Section
           obj fun)))
 
 ;; defunct old name:
-(defun ess-read-helpobj-name-default (slist)
-  (car (delq nil (ess-helpobjs-at-point slist))))
+;; (defun ess-read-helpobj-name-default (slist)
+;;   (car (delq nil (ess-helpobjs-at-point slist))))
 
 (defun ess-find-help-file (p-string)
   "Find help, prompting for P-STRING.  Note that we can't search SAS,
@@ -833,8 +828,7 @@ Stata or XLispStat for additional information."
         (ess-completing-read p-string (append (delq nil hlpobjs) help-files-list)
                              nil nil nil nil (car hlpobjs)))
     ;; (string-match "\\(XLS\\)\\|\\(STA\\)\\|\\(SAS\\)" ess-language)
-    (read-string (format "%s: " p-string))
-    ))
+    (read-string (format "%s: " p-string))))
 
 ;;*;; Utility functions
 
@@ -937,7 +931,7 @@ specific.")
 
 (defun ess-describe-object-at-point ()
   "Get info for object at point, and display it in an electric buffer or tooltip.
-This is a single key command (see `ess--execute-singlekey-command').
+This is an electric command (see `ess--execute-electric-command').
 
 If region is active (`region-active-p') use it instead of the
 object at point.
@@ -966,7 +960,7 @@ option for other dialects).
       (define-key map (vector last-command-event) 'ess--describe-object-at-point)
       ;; todo: put digits into the map
       (let* ((inhibit-quit t) ;; C-g removes the buffer
-             (buf (ess--execute-singlekey-command
+             (buf (ess--execute-electric-command
                    map (format "Press %c to cycle" (event-basic-type last-command-event))
                    nil nil objname))
              ;; read full command
