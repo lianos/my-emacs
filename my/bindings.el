@@ -3,6 +3,9 @@
 ;;    http://offbytwo.com/2012/01/15/emacs-plus-paredit-under-terminal.html
 ;;    http://unix.stackexchange.com/questions/47312
 
+;; Somehow C-p is set to go to first line of screen
+(global-set-key (kbd "C-p") 'previous-line)
+
 ;; ============================================================================
 ;; Swap ctrl-x to be ctrl-l : Banish emacs claw!
 ;; I've found this is necessary to be loaded after provided libraries because
