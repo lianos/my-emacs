@@ -1,29 +1,9 @@
 (add-to-list 'load-path (expand-file-name "~/.emacs.d"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/vendor"))
 
-;; ============================================================================
-;; For loading libraries from the vendor directory and then loading my
-;; customizations for that library. Taken from:
-;; https://github.com/rmm5t/dotfiles/blob/master/emacs.d/rmm5t/defuns.el
-(defun vendor (library &rest autoload-functions)
-  (let* ((file (symbol-name library))
-         (normal (concat "~/.emacs.d/vendor/" file))
-         (suffix (concat normal ".el"))
-         (personal (concat "~/.emacs.d/my/" file))
-   (found nil))
-    (cond
-     ((file-directory-p normal) (add-to-list 'load-path normal) (set 'found t))
-     ((file-directory-p suffix) (add-to-list 'load-path suffix) (set 'found t))
-     ((file-exists-p suffix)  (set 'found t)))
-    (when found
-      (if autoload-functions
-          (dolist (autoload-function autoload-functions)
-            (autoload autoload-function (symbol-name library) nil t))
-        (require library)))
-    (when (file-exists-p (concat personal ".el"))
-      (load personal))))
+(load "my/functions")
 
-;; ============================================================================
+;; =============================================================================
 ;; Set up OS-vars to enable os-specific tweaking of emacs, eg.
 ;;   (if macosx-p
 ;;       (progn ...))
@@ -31,16 +11,12 @@
 (defvar macosx-p (string-match "darwin" (symbol-name system-type)))
 (defvar linux-p (string-match "linux" (symbol-name system-type)))
 
-
 (load "my/env")
 
 (require 'uniquify)
 
-;; (vendor 'autopair)
 (vendor 'browse-kill-ring)
 (vendor 'color-theme)
-; (vendor 'cedet)
-; (vendor 'ecb)
 (vendor 'fixme)
 
 ;; Not loading this in emacs24 due to the following warning message:
@@ -72,7 +48,6 @@
 (load "my/platform-specific-settings")
 
 (load "my/bindings")
-(load "my/functions")
 
 ;; ============================================================================
 ;; Auto-generated custom settings (from M-x customize ...)

@@ -22,11 +22,8 @@
           (lambda ()
             (setq tab-width 2)
             (setq yas/buffer-local-condition t)))
-            ;; I can't define these "inline"
-            ;; emacs throws an "ess-help-mode-map" symbol is void
-            ;; (define-key ess-help-mode-map "w" 'ess-display-help-in-browser)
-            ;; (define-key ess-help-mode-map "i" 'ess-display-R-index)))
 
+;; Get smartparens to work in the interactive ESS (iESS) buffer
 (add-hook 'ess-R-post-run-hook 'smartparens-mode)
 
 ; (setq ess-ask-for-ess-directory t)
