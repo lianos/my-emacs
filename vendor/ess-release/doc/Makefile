@@ -22,9 +22,9 @@ TEXI2PDF = LANG=C texi2dvi --pdf
 TEXISRC = announc.texi authors.texi bugrept.texi bugs.texi bugs-ms.texi     \
 	credits.texi currfeat.texi ess.texi ess-defs.texi getting.texi \
 	help-s.texi help-sas.texi inst_svn.texi unixlike.texi windows.texi \
-	license.texi mailing.texi onewfeat.texi \
+	license.texi mailing.texi onewfeat.texi news.texi onews.texi \
 	newfeat.texi readme.texi requires.texi stabilty.texi help-bugs.texi \
-        help-jags.texi Makefile ../Makeconf
+        help-jags.texi allnews.texi Makefile ../Makeconf ../VERSION
 
 ESSINFONODE1='* ESS: (ess).'
 ESSINFONODE2='	        Emacs Speaks Statistics'
@@ -39,7 +39,7 @@ all  : info text html dvi pdf
 docs : info text html
 info : info/ess.info
 text : $(TXTs)
-html : html/ess.html html/readme.html
+html : html/ess.html html/readme.html html/news.html
 dvi  : $(DVIs)
 pdf  : $(PDFs)
 ps   : ess.ps  readme.ps
@@ -65,23 +65,22 @@ distclean : clean
 
 ../README: $(TEXISRC)
 	-$(MAKETXT) readme.texi \
-	| perl -pe 'last if /^Concept Index/;' \
-	> ../README
+	| perl -pe 'last if /^Concept Index/;' > $@
 #	| perl -pe 'last if /^Concept Index/; print "For INSTALLATION, see way below.\n\n" if /^\s*ESS grew out of/' \
 
 ../ANNOUNCE: $(TEXISRC)
 	-$(MAKETXT) announc.texi \
-	| perl -pe 'last if /^Concept Index/;' > ../ANNOUNCE
+	| perl -pe 'last if /^Concept Index/;' > $@
 
 README.Microsoft : README.Microsoft.texi
 	$(MAKETXT) README.Microsoft.texi \
-	| perl -pe 'last if /^Concept Index/;' > README.Microsoft
+	| perl -pe 'last if /^Concept Index/;' > $@
 
 ../NEWS: Makefile ess-defs.texi newfeat.texi news.texi
-	-$(MAKETXT) news.texi > ../NEWS
+	-$(MAKETXT) news.texi > $@
 
 ../ONEWS: Makefile ess-defs.texi onewfeat.texi onews.texi
-	-$(MAKETXT) onews.texi > ../ONEWS
+	-$(MAKETXT) onews.texi > $@
 
 ### File Dependencies
 
@@ -104,12 +103,12 @@ install-info : info/ess.info
 install-other-docs: pdf html
 	-$(INSTALLDIR) $(DOCDIR)
 	$(INSTALL) ess.dvi ess.pdf readme.dvi readme.pdf ../README ../ANNOUNCE $(DOCDIR)
-	$(INSTALL) html/ess.html html/readme.html $(DOCDIR)
+	$(INSTALL) html/ess.html html/readme.html html/news.html $(DOCDIR)
 	$(INSTALL) refcard/refcard.pdf $(DOCDIR)
 
 uninstall :
 	-cd $(DOCDIR) && $(UNINSTALL) ess.dvi ess.pdf readme.dvi readme.pdf README ANNOUNCE
-	-cd $(DOCDIR) && $(UNINSTALL) ess.html readme.html
+	-cd $(DOCDIR) && $(UNINSTALL) ess.html readme.html news.html
 	-cd $(DOCDIR) && $(UNINSTALL) refcard.pdf
 
 ##  TO DO:  ess_toc.html & readme_toc.html should be merged into index.html
@@ -126,6 +125,10 @@ html/readme.html: $(TEXISRC)
 		 ##                   ^^^^^^^^^^^^^ (design bug: "FIXME" in ess.texi)
 #MM	$(TEXI2HTML) readme.texi
 #	mv -f readme.html html
+
+html/news.html: $(TEXISRC)
+	mkdir -p html
+	-$(MAKEHTML) html/news.html allnews.texi
 
 refcard/refcard.pdf: refcard/refcard.tex
 	(cd refcard ; pdflatex refcard)

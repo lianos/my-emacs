@@ -296,8 +296,8 @@ number."
              font-lock-comment-face)
        (cons "For further information on ANNOTATE macros, enter,"
              font-lock-comment-face)
-       (cons "^SAS/STAT 9.3_M1, SAS/ETS 9.3_M1, SAS/OR 9.3_M1"
-             font-lock-comment-face)
+       ;; (cons "^SAS/STAT 9.3_M1, SAS/ETS 9.3_M1, SAS/OR 9.3_M1"
+       ;;       font-lock-comment-face)
        (cons "\\(or \\)?%HELPANO.*$"
              font-lock-comment-face)
        (cons "^Local Variables:$"                  font-lock-comment-face)
@@ -415,7 +415,7 @@ number."
                                    "options"
                                    "plot" "pmenu" "print" "printto"
                                    "rank" "registry" "report"
-                                   "setinit" "sgpanel" "sgplot" "sgscatter" "sort" "sql" "standard" "summary"
+                                   "setinit" "sgdesign" "sgpanel" "sgplot" "sgrender" "sgscatter" "sort" "sql" "standard" "summary"
                                    "tabulate" "template" "timeplot" "transpose" "trantab"
                                    "univariate"
 
@@ -811,7 +811,7 @@ number."
                (back-to-indentation)
                (or (bobp)
                    (looking-at
-                    "data[ ;]\\|proc[ ;]\\|run[ ;]\\|endsas[ ;]\\|g?options[ ;]\\|%macro[ ;]\\|%mend[ ;]")))
+                    "data[ ;]\\|proc[ ;]\\|run[ ;]\\|quit[ ;]\\|endsas[ ;]\\|g?options[ ;]\\|%macro[ ;]\\|%mend[ ;]")))
              ;;  Case where current statement is DATA, PROC, etc...
              (setq prev-end (point))
              (goto-char (point-min))

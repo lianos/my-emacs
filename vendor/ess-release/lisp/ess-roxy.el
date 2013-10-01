@@ -129,7 +129,18 @@
     (unless (featurep 'xemacs)
       (font-lock-remove-keywords nil ess-roxy-font-lock-keywords)))
   (when font-lock-mode
-    (font-lock-fontify-buffer)))
+    (font-lock-fontify-buffer))
+  ;; for auto fill functionality
+  (make-local-variable 'adaptive-fill-regexp)
+  (setq adaptive-fill-regexp (concat ess-roxy-re adaptive-fill-regexp))
+  (make-local-variable 'adaptive-fill-first-line-regexp)
+  (setq adaptive-fill-first-line-regexp (concat ess-roxy-re
+                                                adaptive-fill-first-line-regexp))
+  (make-local-variable 'paragraph-start)
+  (setq paragraph-start (concat "\\(" ess-roxy-re "\\)*" paragraph-start))
+  (make-local-variable 'paragraph-separate)
+  (setq paragraph-separate (concat "\\(" ess-roxy-re "\\)*" paragraph-separate))
+  )
 
 
 ;; (setq hs-c-start-regexp ess-roxy-str)
@@ -454,9 +465,8 @@ point is"
 region, otherwise prefix all lines with the roxy
 string. Convenient for editing example fields."
   (interactive "r")
-  (condition-case nil
-      (if (not (ess-roxy-mark-active))
-          (error "region is not active")))
+  (unless (use-region-p)
+      (error "region is not active"))
   (ess-roxy-roxy-region beg end (ess-roxy-entry-p)))
 
 (defun ess-roxy-roxy-region (beg end &optional on)
@@ -573,12 +583,6 @@ block before the point"
     (if (or not-here (ess-roxy-entry-p))
         (match-string 0)
       ess-roxy-str)))
-
-(defun ess-roxy-mark-active ()
-  "True if region is active and transient mark mode activated"
-  (if (fboundp 'region-active-p)
-      (region-active-p)
-    (and transient-mark-mode mark-active)))
 
 (defun ess-roxy-hide-all ()
   "Hide all Roxygen entries in current buffer. "

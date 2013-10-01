@@ -160,10 +160,6 @@ buffer on the local computer."
                    (list ess-current-process-name)))))
 
 
-;;; ess-remote is constructed by looking at ess-add-process and
-;;; ESS-elsewhere and ess-multi and then simplifying.
-;;;
-
 (defun ess-remote (&optional proc-name)
   "Execute this command from within a buffer running a process.  It
 runs `ess-add-ess-process' to add the process to
@@ -190,26 +186,31 @@ C-n to send lines over.  With SAS, use C-c i
     (ess-setq-vars-local ess-customize-alist)
     (inferior-ess-mode)
     (setq ess-local-process-name (or proc-name ess-current-process-name))
+
+    (ess-process-put 'funargs-cache (make-hash-table :test 'equal))
+    (ess-process-put 'funargs-pre-cache nil)
+    (ess-load-extras)
+
     (goto-char (point-max))
-    (if inferior-ess-language-start
+    (when inferior-ess-language-start
         (ess-eval-linewise inferior-ess-language-start
                            nil nil nil 'wait-prompt))
 
     ;; todo: this is ugly, add to customise alist
-    (if (equal ess-dialect "R")
-        (ess-inject-code-from-file (format "%sESSR.R" ess-etc-directory)))
+    (when (equal ess-dialect "R")
+        (ess--inject-code-from-file (format "%sESSR.R" ess-etc-directory)))
     ;; (ess-load-extras t) ;; not working
 
 
-    (if (equal ess-dialect "S+")
+    (when (equal ess-dialect "S+")
         (ess-command ess-S+--injected-code))
 
-    (if (equal ess-language "SAS")
-        (progn (font-lock-mode 0)
-               (SAS-log-mode)
-               (shell-mode)
-               (setq buffer-read-only nil)
-               (font-lock-mode 1)))))
+    (when (equal ess-language "SAS")
+      (font-lock-mode 0)
+      (SAS-log-mode)
+      (shell-mode)
+      (setq buffer-read-only nil)
+      (font-lock-mode 1))))
 
 
  ; Provide package

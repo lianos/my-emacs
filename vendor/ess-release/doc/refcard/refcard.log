@@ -1,24 +1,14 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2013.1.26)  15 MAY 2013 09:03
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.8.7)  27 SEP 2013 18:52
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **refcard
 (./refcard.tex
 LaTeX2e <2011/06/27>
-Babel <v3.8m> and hyphenation patterns for english, dumylang, nohyphenation, ge
-rman-x-2012-05-30, ngerman-x-2012-05-30, afrikaans, ancientgreek, ibycus, arabi
-c, armenian, basque, bulgarian, catalan, pinyin, coptic, croatian, czech, danis
-h, dutch, ukenglish, usenglishmax, esperanto, estonian, ethiopic, farsi, finnis
-h, french, friulan, galician, german, ngerman, swissgerman, monogreek, greek, h
-ungarian, icelandic, assamese, bengali, gujarati, hindi, kannada, malayalam, ma
-rathi, oriya, panjabi, tamil, telugu, indonesian, interlingua, irish, italian, 
-kurmanji, latin, latvian, lithuanian, mongolian, mongolianlmc, bokmal, nynorsk,
- polish, portuguese, romanian, romansh, russian, sanskrit, serbian, serbianc, s
-lovak, slovenian, spanish, swedish, turkish, turkmen, ukrainian, uppersorbian, 
-welsh, loaded.
-(/hg/s/linux/9/app/teTeX/07.12/texmf-dist/tex/latex/base/article.cls
+Babel <3.9f> and hyphenation patterns for 78 languages loaded.
+(/hg/s/linux/9/app/teTeX/05.13/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2007/10/19 v1.4h Standard LaTeX document class
-(/hg/s/linux/9/app/teTeX/07.12/texmf-dist/tex/latex/base/size10.clo
+(/hg/s/linux/9/app/teTeX/05.13/texmf-dist/tex/latex/base/size10.clo
 File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 )
 \c@part=\count79
@@ -33,7 +23,7 @@ File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
 )
-(/hg/s/linux/9/app/teTeX/07.12/texmf-dist/tex/latex/tools/multicol.sty
+(/hg/s/linux/9/app/teTeX/05.13/texmf-dist/tex/latex/tools/multicol.sty
 Package: multicol 2011/06/27 v1.7a multicolumn formatting (FMi)
 \c@tracingmulticols=\count87
 \mult@box=\box26
@@ -82,17 +72,17 @@ Package: multicol 2011/06/27 v1.7a multicolumn formatting (FMi)
 \multicol@sort@counter=\count95
 )
 (/u/sfs/tex/tex/latex/parskip.sty)
-(/hg/s/linux/9/app/teTeX/07.12/texmf-dist/tex/latex/tools/verbatim.sty
+(/hg/s/linux/9/app/teTeX/05.13/texmf-dist/tex/latex/tools/verbatim.sty
 Package: verbatim 2003/08/22 v1.5q LaTeX2e package for verbatim enhancements
 \every@verbatim=\toks14
 \verbatim@line=\toks15
 \verbatim@in@stream=\read1
 )
-(/hg/s/linux/9/app/teTeX/07.12/texmf-dist/tex/latex/preprint/fullpage.sty
+(/hg/s/linux/9/app/teTeX/05.13/texmf-dist/tex/latex/preprint/fullpage.sty
 Package: fullpage 1999/02/23 1.1 (PWD)
 \FP@margin=\skip45
 )
-(/hg/s/linux/9/app/teTeX/07.12/texmf-dist/tex/latex/svn/svn.sty
+(/hg/s/linux/9/app/teTeX/05.13/texmf-dist/tex/latex/svn/svn.sty
 Package: svn 2007/09/25 r43 Typeset Subversion keywords.
 )
 No file refcard.aux.
@@ -170,7 +160,7 @@ Overfull \hbox (51.25189pt too wide) in paragraph at lines 192--201
 
 [1
 
-{/hg/s/linux/9/app/teTeX/07.12/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+{/hg/s/linux/9/app/teTeX/05.13/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 Overfull \hbox (5.63393pt too wide) in paragraph at lines 227--246
 [][] 
  []
@@ -192,29 +182,29 @@ Underfull \hbox (badness 6961) in paragraph at lines 291--293
 
 [2] (./refcard.aux) ) 
 Here is how much of TeX's memory you used:
- 432 strings out of 493488
- 5797 string characters out of 3138791
- 91606 words of memory out of 3000000
- 3794 multiletter control sequences out of 15000+200000
- 6660 words of font info for 25 fonts, out of 3000000 for 9000
+ 431 strings out of 493311
+ 5793 string characters out of 6135193
+ 94520 words of memory out of 5000000
+ 3942 multiletter control sequences out of 15000+600000
+ 6660 words of font info for 25 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 23i,12n,17p,170b,738s stack positions out of 5000i,500n,10000p,200000b,50000s
-</hg/s/linux/9/app/teTeX/07.12/texmf-dist/fonts/type1/publ
-ic/amsfonts/cm/cmbx10.pfb></hg/s/linux/9/app/teTeX/07.12/texmf-dist/fonts/type1
-/public/amsfonts/cm/cmbx12.pfb></hg/s/linux/9/app/teTeX/07.12/texmf-dist/fonts/
-type1/public/amsfonts/cm/cmbxti10.pfb></hg/s/linux/9/app/teTeX/07.12/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></hg/s/linux/9/app/teTeX/07.12/texm
-f-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></hg/s/linux/9/app/teTeX/07.12
+ 23i,12n,17p,170b,738s stack positions out of 5000i,500n,10000p,200000b,80000s
+</hg/s/linux/9/app/teTeX/05.13/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmbx10.pfb></hg/s/linux/9/app/teTeX/05.13/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmbx12.pfb></hg/s/linux/9/app/teTeX/05.13/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmbxti10.pfb></hg/s/linux/9/app/teTeX/05.13/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></hg/s/linux/9/app/teTeX/05.13/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></hg/s/linux/9/app/teTeX/05.13
 /texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></hg/s/linux/9/app/teTeX/0
-7.12/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></hg/s/linux/9/app/teT
-eX/07.12/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></hg/s/linux/9/app
-/teTeX/07.12/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></hg/s/linux/9/
-app/teTeX/07.12/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></hg/s/linux
-/9/app/teTeX/07.12/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></hg/s/
-linux/9/app/teTeX/07.12/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></
-hg/s/linux/9/app/teTeX/07.12/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.p
-fb></hg/s/linux/9/app/teTeX/07.12/texmf-dist/fonts/type1/public/amsfonts/cm/cmt
-t8.pfb></hg/s/linux/9/app/teTeX/07.12/texmf-dist/fonts/type1/public/amsfonts/cm
+5.13/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></hg/s/linux/9/app/teT
+eX/05.13/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></hg/s/linux/9/app
+/teTeX/05.13/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></hg/s/linux/9/
+app/teTeX/05.13/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></hg/s/linux
+/9/app/teTeX/05.13/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></hg/s/
+linux/9/app/teTeX/05.13/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></
+hg/s/linux/9/app/teTeX/05.13/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.p
+fb></hg/s/linux/9/app/teTeX/05.13/texmf-dist/fonts/type1/public/amsfonts/cm/cmt
+t8.pfb></hg/s/linux/9/app/teTeX/05.13/texmf-dist/fonts/type1/public/amsfonts/cm
 /cmtt9.pfb>
 Output written on refcard.pdf (2 pages, 164161 bytes).
 PDF statistics:

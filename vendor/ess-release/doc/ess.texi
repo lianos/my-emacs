@@ -1,14 +1,14 @@
 \input texinfo   @c -*-texinfo-*-
 @comment %**start of header
 @setfilename ess.info
-@settitle ESS --- Emacs Speaks Statistics
+@settitle ESS -- Emacs Speaks Statistics
 @comment %**end of header
 
 @synindex pg fn
 
 @include ess-defs.texi
 @titlepage
-@title ESS --- Emacs Speaks Statistics
+@title ESS -- Emacs Speaks Statistics
 ESS version @ESSVER
 
 @c --- KEEP this synchronized with ./authors.texi :
@@ -289,7 +289,7 @@ unnecessary prompts.
 @section New features in ESS
 
 @include newfeat.texi
-@include onewfeat.texi
+@comment @include onewfeat.texi
 
 @node Credits
 @section Authors of and contributors to ESS
@@ -356,7 +356,7 @@ The following section details those steps necessary to get ESS running
 on your system.
 
 @menu
-* Unix installation::           Installing ESS on your Unix (Linux, MacOS, ...) system
+* Unix installation::           Installing ESS on your Unix (Linux/Mac OS X/etc.) system
 * Microsoft Windows installation::  Installing ESS on your MS Windows system
 * License::
 * Stability::
@@ -369,7 +369,7 @@ on your system.
 @c @include inst_tar.texi
 
 @node Unix installation
-@section Unix (Linux / MacOS / Solaris / ...) Installation
+@section Unix (Linux/Mac OS X/Solaris/etc.) Installation
 @include unixlike.texi
 
 @node Microsoft Windows installation
@@ -485,10 +485,36 @@ processes.  This is a good command to consider binding to a global key.
 @cindex ESS-elsewhere
 @cindex S+elsewhere
 
-ESS works with processes on remote computers as easily as with
-processes on the local machine.  The recommended way to access a
-statistical program on remote computer is to start it from a telnet or
-ssh buffer and then connect ESS to that buffer.
+ESS works with processes on remote computers as easily as with processes
+on the local machine.  The recommended way to access a statistical
+program on remote computer is to start it with tramp. Require tramp in your .emacs file:
+
+@code{(require 'tramp)}
+
+Now start an ssh session with @samp{C-x f /ssh:user@@host: RET}. Tramp
+shoul open a dired buffer in your remote home directory. Now call your
+favorite ESS process (@code{R}, @code{Julia}, @code{stata} etc) as you
+would usually do on local machine: @code{M-x R}.
+
+To simplify the process even further create a "config" file in your
+@code{.ssh/} folder and add an account. For example if you use amazon
+EC2, it might look like following:
+
+@verbatim
+   Host amazon
+      Hostname ec2-54-215-203-181.us-west-1.compute.amazonaws.com
+      User ubuntu
+      IdentityFile ~/.ssh/my_amazon_key.pem
+@end verbatim
+
+With this configuration, a simple @code{C-x f /ssh:amazon:} is enough to
+start a connection.
+
+Older ways to setup a remote ESS connection are through
+@code{ess-remote}. 
+
+Note: @emph{Unfortunately, ess-remote doesn't work with the recent
+ESS. We are working to correct this.}
 
 @enumerate
 @item Start a new telnet or ssh buffer and connect to the remote computer
@@ -514,7 +540,7 @@ you need to end every PROC and DATA step with a "RUN;" statement.  The
 input statements.
 
 @item Graphics (interactive) on the remote machine.  If you run X11
-(@xref{X11}, X-windows)
+(@xref{X11}, X Windows)
 on both the local and remote machines then you should be able to
 display the graphs locally by setting the @samp{DISPLAY} environment
 variable appropriately.  Windows users can download @samp{xfree86}
@@ -595,7 +621,7 @@ commands from @samp{myfile.s} or @samp{myfile.r} on the PC to the
 
 @item Graphics on the remote machine works fine.  If you run the X window
 system on the remote unix machine you should be able to display them in
-@samp{xfree86} on your PC.  If you don't run X11, then you can write
+@samp{xfree86} on your PC.  If you don't run X Windows, or X11, then you can write
 graphics to the postscript device and copy it to your PC with dired and
 display it with ghostscript.
 @end enumerate
@@ -1723,7 +1749,9 @@ there is nothing to indent.
 @end defvr
 
 @defvr {User Option} ess-first-tab-never-complete
-If non-@code{nil}, @kbd{TAB} never tries to complete in ess-mode.
+If non-@code{nil}, @kbd{TAB} never tries to complete in ess-mode.  The
+default @code{'symbol} does not try to complete if the next char is a valid
+symbol constituent.  There are more options, see the help (@kbd{C-h v}).
 @end defvr
 
 @deffn Command ess-indent-exp
@@ -2503,88 +2531,85 @@ packages:
 @section ESS tracebug
 @cindex ESS tracebug
 @findex ess-tracebug
-@emph{Note:} The official ess-tracebug documentation is still at
-@uref{http://code.google.com/p/ess-tracebug/}.
 
-ESS @code{tracebug} package offers visual debugging, interactive error
+ESS @code{tracebug} offers visual debugging, interactive error
 navigation, interactive backtrace, breakpoint manipulation, control over
 R error actions, watch window and interactive flagging/unflagging of
 functions for debugging.
 
-All of the tracebug functionality can be found on @code{ess-dev-map},
-bound to @kbd{C-c C-t}. 
+From ESS13.05 @code{ess-tracebug} is on by default. You can toggle it on
+and off with @kbd{M-x} @code{ess-tracebug}. To disable startup
+activation of @code{ess-tracebug} set @code{ess-use-tracebug} to nil.
 
-Additionally when subprocess is in a debugging mode,
-@code{ess-debug-minor-mode} is active wich bounds
-@code{ess-debug-minor-mode-map}:
+Tracebug functionality can be found on @code{ess-dev-map}, bound to
+@kbd{C-c C-t}. Additionally, when subprocess is in a debugging state
+@code{ess-debug-minor-mode} is active and the following shortcuts are
+available:
 
 @verbatim
-M-C             ess-debug-command-continue
-M-N             ess-debug-command-next
-M-Q             ess-debug-command-quit
-M-U             ess-debug-command-up
-C-M-S-c         ess-debug-command-continue-multi
-C-M-S-n         ess-debug-command-next-multi
+* Interactive Debugging (`ess-debug-minor-mode-map'):
+
+ M-C   . Continue                  . `ess-debug-command-continue'
+ M-C-C . Continue multi            . `ess-debug-command-continue-multi'
+ M-N   . Next step                 . `ess-debug-command-next'
+ M-C-N . Next step multi           . `ess-debug-command-next-multi'
+ M-U   . Up frame                  . `ess-debug-command-up'
+ M-Q   . Quit debugging            . `ess-debug-command-quit'
+
 @end verbatim
 
-You can always call @kbd{C-c C-t ?}  to display the following menu with
-all the tracebug keys (prefix not included):
 
-@c @multitable {123} {123} {really-really-really-really-really-long}
-@c @item Key @tab Description                      @tab Function
-@c @item b   @tab Set BP (repeat to cycle)         @tab `ess-bp-set'
-@c @item B   @tab Set conditional BP               @tab `ess-bp-set-conditional'
-@c @item k   @tab Kill BP                          @tab `ess-bp-kil'
-@c @item K   @tab Kill all BPs                     @tab `ess-bp-kill-all'
-@c @item t   @tab Toggle BP state                  @tab `ess-bp-toggle-state'
-@c @item l   @tab Set logger BP                    @tab `ess-bp-set-logger'
-@c @item C-n @tab Goto next BP                     @tab `ess-bp-next'
-@c @item C-p @tab Goto previous BP                 @tab `ess-bp-previous'
-@c @end multitable
+Here are all the tracebug commands defined in @code{ess-dev-map}
+(@kbd{C-c C-t ?} to show this table):
 
 @verbatim
- * Breakpoints:
 
-b   . Set BP (repeat to cycle BP type) . `ess-bp-set'
-B   . Set conditional BP               . `ess-bp-set-conditional'
-k   . Kill BP                          . `ess-bp-kil'
-K   . Kill all BPs                     . `ess-bp-kill-all'
-t   . Toggle BP state                  . `ess-bp-toggle-state'
-l   . Set logger BP                    . `ess-bp-set-logger'
-C-n . Goto next BP                     . `ess-bp-next'
-C-p . Goto previous BP                 . `ess-bp-previous'
+* Breakpoints (`ess-dev-map'):
 
- * General Debugging:
+ b   . Set BP (repeat to cycle BP type) . `ess-bp-set'
+ B   . Set conditional BP               . `ess-bp-set-conditional'
+ k   . Kill BP                          . `ess-bp-kil'
+ K   . Kill all BPs                     . `ess-bp-kill-all'
+ o   . Toggle BP state                  . `ess-bp-toggle-state'
+ l   . Set logger BP                    . `ess-bp-set-logger'
+ n   . Goto next BP                     . `ess-bp-next'
+ p   . Goto previous BP                 . `ess-bp-previous'
 
-`   . Show R Traceback                     . `ess-show-R-traceback'
-e   . Toggle error action (repeat to cycle). `ess-dbg-toggle-error-action'
-d   . Flag for debugging                   . `ess-dbg-flag-for-debugging'
-D   . Unflag for debugging                 . `ess-dbg-unflag-for-debugging'
-w   . Watch window                         . `ess-watch'
+  (C- prefixed equivalents are also defined)
 
+* Debugging (`ess-dev-map'):
+ `   . Show traceback                       . `ess-show-traceback' (also on C-c `)
+ ~   . Show callstack                       . `ess-show-call-stack' (also on C-c ~)
+ e   . Toggle error action (repeat to cycle). `ess-debug-toggle-error-action'
+ d   . Flag for debugging                   . `ess-debug-flag-for-debugging'
+ u   . Unflag for debugging                 . `ess-debug-unflag-for-debugging'
+ w   . Watch window                         . `ess-watch'
 
- * Interactive Debugging:
+  (C- prefixed equivalents are also defined)
 
-M-C   . Continue                  . `ess-debug-command-continue'
-M-C-C . Continue multi            . `ess-debug-command-continue-multi'
-M-N   . Next step                 . `ess-debug-command-next'
-M-C-N . Next step multi           . `ess-debug-command-next-multi'
-M-U   . Up frame                  . `ess-debug-command-up'
-M-Q   . Quit debugging            . `ess-debug-command-quit'
-1..9  . Enter recover frame       . `ess-debug-command-digit'
-0     . Exit recover (also q,n,c) . `ess-debug-command-digit'
+* Navigation to errors (general emacs functionality):
 
- * Misc:
+ C-x `, M-g n   . `next-error'
+ M-g p          . `previous-error'
+
+* Misc:
 
 ?   . Show this help		. `ess-tracebug-show-help'
 
- * Navigation to errors (emacs general functionality):
-
-C-x `, M-g n   . `next-error'
-M-g p          . `previous-error'
-
 @end verbatim
 
+A more detailed ess-tracebug documentation with screenshots is available
+at @uref{http://code.google.com/p/ess-tracebug/}.
+
+A short tutorial is at @uref{http://code.google.com/p/ess-tracebug/wiki/GettingStarted}.
+
+@emph{Note:} Currently, ess-tracebug does not detect some of R's debug
+related messages in non-English locales. To set your R messages to
+English add the following line to your .Rprofile init file:
+
+@verbatim
+   Sys.setlocale("LC_MESSAGES", "C")
+@end verbatim
 
 @node Editing documentation
 @section Editing documentation
@@ -2842,8 +2867,8 @@ string.
 @cindex ess developer
 
 Usual ESS evaluation commands, @xref{Evaluating code}, send portions of
-the current buffer for the evaluation in current environment
-(@code{R_GlobalEnv}). Often, in process of the developing packages with
+the current buffer for evaluation in current environment (commonly
+@code{R_GlobalEnv}). Often, in process of the developing packages with
 namespaces, it is necessary to evaluate code directly in the package's
 environment or it's namespace. The @code{ess-developer} utility provides
 such a functionality with minimal disruption of the usual ESS work-flow.
@@ -2868,25 +2893,53 @@ and functions defined in .GlobalEnv can see the objects in
 'package:foo'. See also
 @uref{http://cran.r-project.org/doc/manuals/R-ints.html#Namespaces}.
 
-In order to use ess-developer mode add names of the packages you are
-developing to @code{ess-developer-packages}. You can do that interactively
-with @kbd{C-c C-t a}, and remove packages with @kbd{C-c C-t r}. When
-developer mode is on, the name of the process in the mode line is
-highlighted with @code{ess-developer-indicator-face}.
+In order to use ess-developer, add names of the packages you are
+developing to @code{ess-developer-packages}. You can do that
+interactively with @kbd{C-c C-t C-a}. To remove packages use @kbd{C-c
+C-t C-r}. When developer mode is on, the process mode line indicator
+features a small or capital letter "d", highlighted with
+@code{ess-developer-indicator-face}.
+
+If variable @code{ess-developer-activate-in-package} is @code{t} (the
+default), R mode will check on startup if the file is part of the
+package. If so, developer mode is activated automatically. This takes
+place only when the parent package has been already added to
+@code{ess-developer-packages}.
+
+Developer mode is usually activated on per-file basis. When so, a small
+"d" appears in the modeline. You can also activate ess-developer on per
+process basis. Then all the buffers associated with the process are put
+into developer mode, regardless of whether they are part of a package or
+not. In this case a big "D" appears in the modeline.
 
 @deffn Command ess-developer @var{val}
 @kindex C-c C-t C-t
-@kbd{C-c C-t C-t} Toggle developer mode on and off.
+@kbd{C-c C-t C-t} Toggle developer mode on and off. If called from
+script buffer, toggle developer on file-by-file basis. When called from
+process buffer, toggle developer on per-process basis.
 @end deffn
 
 @deffn Command ess-developer-add-package @var{from-attached} @var{remove}
 @kindex C-c C-t C-a
-@kbd{C-c C-t C-a} Add a package to your development list.
+@kbd{C-c C-t C-a} Add a package to your development list (@code{ess-developer-packages}).
 @end deffn
 
 @deffn Command ess-developer-remove-package
 @kindex C-c C-t C-r
 @kbd{C-c C-t C-r} Remove a package from your development list.
+@end deffn
+
+When you add a package to @code{ess-developer-packages}, ESS will ask
+for loading command. By default there are two options @code{library} and
+@code{load_all} from @code{devtools} package. You can configure this
+list in @code{ess-developer-load-on-add-commands}. At any time you can
+explicitly load the package containing current file with @kbd{C-c C-t
+l}.
+
+@deffn Command ess-developer-load-package
+@kindex C-c C-t l
+@kbd{C-c C-t l} Load package with @code{load_all} utility from
+@code{devtools} package.
 @end deffn
 
 When developer mode is on, ESS evaluation commands behave differently:
@@ -2895,7 +2948,7 @@ When developer mode is on, ESS evaluation commands behave differently:
 
 @item @kbd{C-c C-l} (@code{ess-load-file}) asks for the package to source
 into and inserts all redefined objects into the package:foo or
-namespace:foo accordingly
+namespace:foo accordingly.
 
 @itemize @minus
 
@@ -3140,7 +3193,7 @@ features for dealing with such plots.
 
 @menu
 * printer::                     The printer() graphics driver
-* X11::                         The X11() (and other X-windows based) driver
+* X11::                         The X11() (and other X Windows based) driver
 * winjava::                     Java Graphics Device
 @end menu
 
@@ -3164,9 +3217,9 @@ is issued, which displays the current figure.
 @node X11
 @subsection Using ESS with windowing devices
 
-@cindex X windows
+@cindex X Windows
 Of course, the ideal way to use graphics with ESS is to use a windowing
-system.  Under X11, this requires that the DISPLAY environment
+system.  Under X Windows, or X11, this requires that the DISPLAY environment
 variable be appropriately set.
 
 @node winjava
@@ -3306,7 +3359,6 @@ the customizable variable @code{ess-rutils-keys} is true, several key
 bindings become available in iESS process buffers:
 
 @deffn Command ess-rutils-local-pkgs
-@kindex C-c C-. l
 @kindex C-c C-. l
 @kbd{C-c C-. l} List all packages in all available libraries.
 @end deffn

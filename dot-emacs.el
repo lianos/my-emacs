@@ -36,7 +36,7 @@
 
 (require 'uniquify)
 
-(vendor 'autopair)
+;; (vendor 'autopair)
 (vendor 'browse-kill-ring)
 (vendor 'color-theme)
 ; (vendor 'cedet)
@@ -61,6 +61,7 @@
 (load "my/cua")
 (load "my/tabs")
 (load "my/spelling")
+(load "my/smartparens.el")
 (load "my/expand-region")
 (load "my/auto-complete.el")
 

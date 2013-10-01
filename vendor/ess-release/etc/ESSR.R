@@ -33,7 +33,7 @@
          }
          ## don't remove; really need eval(parse(  here!!
          fun <- tryCatch(eval(parse(text=funname)),
-                         error=function(e) NULL) ## works for special objects also
+                         error=function(e) NULL) ## also works for special objects containing @:$ etc
          if(is.function(fun)) {
              special <- grepl('[:$@[]', funname)
              args <- if(!special){
@@ -48,7 +48,9 @@
 
              fmls <- formals(args)
              fmls_names <- names(fmls)
-             fmls <- gsub('\"', '\\\"', as.character(fmls), fixed=TRUE)
+             fmls <- gsub('\"', '\\\"',
+                          gsub("\\", "\\\\", as.character(fmls),fixed = TRUE),
+                          fixed=TRUE)
              args_alist <-
                  sprintf("'(%s)",
                          paste("(\"", fmls_names, "\" . \"", fmls, "\")",
@@ -60,6 +62,7 @@
              allargs <- sprintf("'(\"%s\")",
                                 paste(allargs, collapse = '\" "'))
              envname <- environmentName(environment(fun))
+             if(envname == "R_GlobalEnv") envname <- ""
              cat(sprintf('(list \"%s\" %s %s)\n',
                          envname, args_alist, allargs))
          }
@@ -81,6 +84,24 @@
            utils:::.retrieveCompletions())
      }
 
+### SOURCING
+
+     .ess_eval <- function(string, echo = TRUE, print.eval = TRUE, max.deparse.length = 300,
+                           file = tempfile("ESS"), local = parent.frame()){
+         cat(string, file = file)
+         .ess_source(file, echo = echo, print.eval = print.eval,
+                     max.deparse.length = max.deparse.length, local = local)
+     }
+
+     .ess_source <- function(file, echo = TRUE, print.eval = TRUE,
+                             max.deparse.length = 300, local = parent.frame()){
+         invisible(base::source(file = file,
+                                echo = echo, local = local,
+                                print.eval = print.eval,
+                                max.deparse.length = 300,
+                                keep.source = TRUE)$value) ## return value for org-babel
+     }
+
 ### WEAVING
      .ess_weave <- function(command, file, encoding = NULL){
          if(grepl('knit|purl', deparse(substitute(command))))
@@ -94,6 +115,8 @@
              command(file, encoding = encoding)
      }
 
+### BREAKPOINTS
+     .ESSBP. <- list()
 
 ### DEBUG/UNDEBUG
      .ess_find_funcs <- function(env)
@@ -160,8 +183,8 @@
          all <- .ess_all_functions(packages = packages, env = env)
          which_deb <- lapply(all, function(nm){
              ## if isdebugged is called with string it doess find
-	     tryCatch(isdebugged(get(nm, envir = env)),
-		      error = function(e) FALSE)
+             tryCatch(isdebugged(get(nm, envir = env)),
+                      error = function(e) FALSE)
              ## try(eval(substitute(isdebugged(nm), list(nm = as.name(nm)))), silent = T)
          })
          debugged <- all[which(unlist(which_deb, recursive=FALSE, use.names=FALSE))]
@@ -192,14 +215,15 @@
                      undebug(name)
                  else
                      undebug(get(name, envir = env))
-             }}}
+             }}
+}
 
      .ess_dbg_UndebugALL <- function(funcs)
      {
          tr_state <- tracingState(FALSE)
          on.exit(tracingState(tr_state))
          env <- parent.frame()
-         invisible(lapply(funcs, function( nm ){
+         invisible(lapply(funcs, function( nm ) {
              ## ugly tryCatch, but there might be several names pointing to the
              ## same function, like foo:::bar and bar. An alternative would be
              ## to call .ess_dbg_getTracedAndDebugged each time but that might
@@ -213,10 +237,10 @@
 
      .ess_watch_eval <- function()
      {
-         if(!exists('.ess_watch_expressions')){
+         if(!exists('.ess_watch_expressions')) {
              assign('.ess_watch_expressions', list(), envir = .GlobalEnv)
          }
-         if(length(.ess_watch_expressions) == 0L){
+         if(length(.ess_watch_expressions) == 0L) {
              cat('\n# Watch list is empty!\n
 # a       append new expression
 # i       insert new expression
@@ -227,12 +251,12 @@
 # u/d,U   move the expression up/down
 # q       kill the buffer
 ')
-         }else{
+         } else {
              .parent_frame <- parent.frame()
              .essWEnames <- allNames(.ess_watch_expressions)
              len0p <- !nzchar(.essWEnames)
              .essWEnames[len0p] <- seq_along(len0p)[len0p]
-             for(i in seq_along(.ess_watch_expressions)){
+             for(i in seq_along(.ess_watch_expressions)) {
                  cat('\n@---- ', .essWEnames[[i]], ' ',
                      rep.int('-', max(0, 35 - nchar(.essWEnames[[i]]))), '-@\n', sep = '')
                  cat(paste('@---:', deparse(.ess_watch_expressions[[i]][[1L]])), ' \n', sep = '')
@@ -240,7 +264,8 @@
                                      envir = .parent_frame)),
                           error = function(e) cat('Error:', e$message, '\n' ),
                           warning = function(w) cat('warning: ', w$message, '\n' ))
-             }}
+             }
+}
      }
 
      .ess_log_eval <- function(log_name)
@@ -251,8 +276,8 @@
          .essWEnames <- allNames(.ess_watch_expressions)
          cur_log <- list()
          .parent_frame <- parent.frame()
-         for(i in seq_along(.ess_watch_expressions)){
-             capture.output({
+         for(i in seq_along(.ess_watch_expressions)) {
+             capture.output( {
                  cur_log[[i]] <-
                      tryCatch(eval(.ess_watch_expressions[[i]]),
                               envir = .parent_frame,
@@ -265,6 +290,10 @@
          names(cur_log) <- .essWEnames
          assign(log_name, c(log, list(cur_log)), envir = .GlobalEnv)
          invisible(NULL)
+     }
+
+     .ess_package_attached <- function(pack_name){
+         as.logical(match(paste0("package:", pack_name), search()))
      }
  })}
 

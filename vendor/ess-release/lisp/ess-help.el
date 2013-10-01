@@ -142,7 +142,7 @@ If COMMAND is suplied, it is used instead of `inferior-ess-help-command'.
    (progn
      (ess-force-buffer-current)
      (when current-prefix-arg ;update cache if prefix
-       (with-current-buffer (process-buffer (get-ess-process ess-current-process-name))
+       (with-current-buffer (process-buffer (ess-get-process ess-current-process-name))
          (ess-process-put 'sp-for-help-changed? t)))
      (if (ess-ddeclient-p)
          (list (read-string "Help on: "))
@@ -289,19 +289,19 @@ if necessary.  It is bound to RET and C-m in R-index pages."
             reg-keyword             "^\\([-a-zA-Z0-9._@$]+\\)[^:\n]*$"
             reg-start              "^Index:"))
      ((string-match "julia" ess-dialect)
-      (setq  com-packages           "_ess_list_categories()\n"
-             com-package-index      "_ess_print_index(\"%s\")\n"
-             reg-keyword             "^\\(.*+\\):$*"
-             reg-start              ":"
-             ))
+      (setq com-packages           "_ess_list_categories()\n"
+            com-package-index      "_ess_print_index(\"%s\")\n"
+            reg-keyword             "^\\(.*+\\):$*"
+            reg-start              ":"
+            ))
      (t (error "Sorry, not implemented for %s " ess-dialect)))
-    
+
     (when (and com-package-for-object
                ess-help-object
                (eq ess-help-type 'help))
       (setq pack (car (ess-get-words-from-vector
                        (format com-package-for-object ess-help-object)))))
-    
+
     (setq all-packs (ess-get-words-from-vector com-packages))
     (unless pack ;try symbol at point
       (setq pack  (car (member (ess-read-object-name-default) all-packs))))
@@ -309,7 +309,7 @@ if necessary.  It is bound to RET and C-m in R-index pages."
                                     all-packs nil nil nil nil pack))
     ;; (setq buff  (get-buffer-create (format "*help[%s](index:%s)*"  ess-dialect pack)))
 
-    
+
     (ess--display-indexed-help-page
      (format com-package-index pack)
      reg-keyword
@@ -362,7 +362,7 @@ if necessary.  It is bound to RET and C-m in R-index pages."
                               'follow-link t
                               'help-echo (or help-echo "help on object")))
           ))
-      
+
       ;; (save-excursion ;; why R places all these spaces?
       ;;   (goto-char (point-min))
       ;;   (while (re-search-forward " \\{10,\\} *" nil t)
@@ -387,7 +387,7 @@ if necessary.  It is bound to RET and C-m in R-index pages."
            (setq com "apropos(\"%s\")\n"
                  regexp "^\\(\\(\\w\\|\\s_\\)+\\)("))
           (t (error "Not implemented for dialect %s" ess-dialect)))
-    
+
     (ess--display-indexed-help-page
      (format com pattern) regexp
      (format "*ess-apropos[%s](%s)*" ess-current-process-name pattern)
@@ -401,13 +401,13 @@ if necessary.  It is bound to RET and C-m in R-index pages."
            (setq com "demo()\n"
                  regexp "^\\([^ \n:]+\\)  +"))
           (t (error "Not implemented for dialect %s" ess-dialect)))
-    
+
     (ess--display-indexed-help-page
      com regexp
      (format "*ess-demos[%s]*" ess-current-process-name)
      'demos #'ess--action-demo)))
 
-  
+
 (defun ess--action-demo (&optional button)
   "Provide help on object at the beginning of line.
 It's intended to be used in R-index help pages. Load the package
@@ -451,7 +451,7 @@ if necessary.  It is bound to RET and C-m in R-index pages."
               (setq packs (append (list (cons p details)) packs))
               (setq details nil)))
           ))
-      (setq buff  (get-buffer-create (format "*[%s]vignettes*"  ess-dialect)))
+      (setq buff (get-buffer-create (format "*[%s]vignettes*" ess-dialect)))
       (ess-with-current-buffer buff
         (setq buffer-read-only nil)
         (delete-region (point-min) (point-max))
@@ -520,6 +520,15 @@ if necessary.  It is bound to RET and C-m in R-index pages."
   (interactive)
   (ess-help-quit t))
 
+(defun ess--find-displayed-help-window ()
+  (catch 'win
+    (dolist (f (frame-list))
+      (when (frame-visible-p f)
+       (dolist (w (window-list f))
+         (when (eq (buffer-local-value 'major-mode (window-buffer w))
+                   'ess-help-mode)
+           (throw 'win w)))))))
+
 (defun ess--switch-to-help-buffer (buff &optional curr-major-mode)
   "Switch to help buffer and take into account `ess-help-own-frame'.
 For internal use. Used in `ess-display-help-on-object',
@@ -531,17 +540,18 @@ For internal use. Used in `ess-display-help-on-object',
         (special-display-frame-alist ess-help-frame-alist)
         (special-display-function (if (eq ess-help-own-frame 'one)
                                       'ess-help-own-frame
-                                    special-display-function)))
-    (if (eq curr-major-mode 'ess-help-mode)
-        (if ess-help-own-frame
-            (pop-to-buffer buff)
-          (switch-to-buffer buff))
+                                    special-display-function))
+        (help-win (or (and (eq curr-major-mode 'ess-help-mode)
+                           (selected-window))
+                      (and ess-help-reuse-window
+                           (ess--find-displayed-help-window)))))
+    (if help-win
+        (progn
+          (select-window help-win)
+          (switch-to-buffer buff nil 'force))
       (if ess-help-pop-to-buffer
           (pop-to-buffer buff)
-        (ess-display-temp-buffer buff))
-      )))
-
-
+        (ess-display-temp-buffer buff)))))
 
 (defvar ess-help-frame nil
   "Stores the frame used for displaying R help buffers.")
@@ -564,20 +574,24 @@ For internal use. Used in `ess-display-help-on-object',
       window)))
 
 
-
 (defun ess-help-web-search ()
   "Search the web for documentation"
   (interactive)
   (ess-execute-dialect-specific ess-help-web-search-command "Search for: "))
 
-;;*;; Major mode definition
+(defun ess-manual-lookup ()
+  "Search manual for topic"
+  (interactive)
+  (ess-execute-dialect-specific ess-manual-lookup-command ))
 
+(defun ess-reference-lookup ()
+  "Search manual for topic"
+  (interactive)
+  (ess-execute-dialect-specific ess-reference-lookup-command))
 
 (defvar ess-help-sec-map nil "Sub-keymap for ESS help mode.")
 ;; this breaks "s ?" rather than to fix any (unbroken !) thing:
 ;; (make-variable-buffer-local 'ess-help-sec-map)
-
-
 
 (defvar ess-doc-map
   (let (ess-doc-map)
@@ -596,6 +610,10 @@ For internal use. Used in `ess-display-help-on-object',
     (define-key ess-doc-map "o" 'ess-display-demos)
     (define-key ess-doc-map "\C-w" 'ess-help-web-search)
     (define-key ess-doc-map "w" 'ess-help-web-search)
+    (define-key ess-doc-map "\C-m" 'ess-manual-lookup)
+    (define-key ess-doc-map "m" 'ess-manual-lookup)
+    (define-key ess-doc-map "\C-r" 'ess-reference-lookup)
+    (define-key ess-doc-map "r" 'ess-reference-lookup)
     ess-doc-map
     )
   "ESS documentaion map.")
@@ -646,7 +664,7 @@ For internal use. Used in `ess-display-help-on-object',
     (define-key map "\C-c\M-l" 'ess-load-file); alias, as in 'iESS' where C-c C-l is comint-list-*
     (define-key map "\C-c\C-v" 'ess-display-help-on-object)
     (define-key map "\C-c\C-k" 'ess-request-a-process)
-    
+
     (define-key map "\C-c\C-d"   'ess-doc-map)
     (define-key map "\C-c\C-e"   'ess-extra-map)
     (define-key map "\C-c\C-t"   'ess-dev-map)
@@ -933,8 +951,7 @@ specific.")
   "Get info for object at point, and display it in an electric buffer or tooltip.
 This is an electric command (see `ess--execute-electric-command').
 
-If region is active (`region-active-p') use it instead of the
-object at point.
+If region is active use it instead of the object at point.
 
 After invocation of this command, all standard emacs commands,
 except those containing 'window' in their names, remove the
@@ -952,7 +969,7 @@ option for other dialects).
       (message "Not implemented for dialect %s" ess-dialect)
     (ess-force-buffer-current)
     (let ((map (make-sparse-keymap))
-          (objname (or (and (region-active-p)
+          (objname (or (and (use-region-p)
                             (buffer-substring-no-properties (point) (mark)))
                        (symbol-at-point)))
           bs ess--descr-o-a-p-commands) ;; used in ess--describe-object-at-point
@@ -961,7 +978,7 @@ option for other dialects).
       ;; todo: put digits into the map
       (let* ((inhibit-quit t) ;; C-g removes the buffer
              (buf (ess--execute-electric-command
-                   map (format "Press %c to cycle" (event-basic-type last-command-event))
+                   map (format "Press %s to cycle" (single-key-description last-command-event))
                    nil nil objname))
              ;; read full command
              (keys (read-key-sequence-vector ""))
