@@ -7,8 +7,16 @@
 ;;      '( ("R-something" "/usr/local/bin/R-something")
 ;;         ("R-other" "/opt/local/bin/R-other" "-j")))
 
-(setq ess-s-versions-list
-   '( ("R-devel" "~/sw/bin/R-devel") ))
+;; ESS already searches for R-devel, R-patched, and others in the path, so this
+;; wasn't really doing anything:
+;; https://stat.ethz.ch/pipermail/ess-help/2013-March/008729.html
+;; (setq ess-r-versions-list
+;;    '(("R-devel" "~/sw/bin/R-devel")
+;;      ("R-bioc213" "~/sw/bin/R-bioc213")))
+(defun Rbioc213 ()
+  (interactive)
+  (let ((inferior-R-program-name "~/sw/bin/R-bioc213"))
+    (R)))
 
 (setq ess-default-style 'DEFAULT)
 (load (expand-file-name "~/.emacs.d/vendor/ess-release/lisp/ess-site"))
