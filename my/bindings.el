@@ -24,6 +24,7 @@
 (global-set-key (kbd "C-;") 'kill-start-of-line)
 (global-set-key "\M-;" 'comment-dwim-line)
 (define-key ctl-x-map "p" 'goto-embedded-match-paren)
+(global-set-key "\M-p" 'goto-embedded-match-paren)
 (global-set-key [M-down] 'gcm-scroll-down)
 (global-set-key [M-up]   'gcm-scroll-up)
 (global-set-key [C-x s] 'find-grep-dired-do-search)
