@@ -18,3 +18,9 @@
 (require 'auto-complete-config)
 (add-to-list 'ac-dictionary-directories (expand-file-name "~/.emacs.d/vendor/ac-dict"))
 (ac-config-default)
+
+;; Do not auto-complete automatically:
+;; http://cx4a.org/software/auto-complete/manual.html#Not_to_complete_automatically
+;; http://cx4a.org/software/auto-complete/manual.html#Trigger_Key
+;; (setq ac-auto-start t)
+;; (ac-set-trigger-key "TAB")
