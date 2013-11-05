@@ -1,18 +1,17 @@
-;; To add custom launch commands to different versions of R that aren't found
-;; on your path, configure the `ess-s-versions-list` variable, like below.
-;; This has to be defined before (require 'ess-site). The third argument is
-;; for optional command line arguments to pass to the process at launch:
+;; It seems that if you want to add custom "launch" commands
+;; (eg. M-x R-something) you need to define functions to do so. ESS has a hard
+;; coded ess-r-versions-lists (eg. R-devel, R-patched, etc.) which I cannot add
+;; to. I previously setup up an ess-s-vesrions-list like so (The third argument
+;; is for optional command line arguments to pass to the process at launch):
 ;;
 ;; (setq ess-s-versions-list
 ;;      '( ("R-something" "/usr/local/bin/R-something")
 ;;         ("R-other" "/opt/local/bin/R-other" "-j")))
+;;
+;; but these buffers are *S* buffers unless the R-pattern is one that is already
+;; hunted for, which was not helpful to setup new ones.
+;; This has to be defined before (require 'ess-site). :
 
-;; ESS already searches for R-devel, R-patched, and others in the path, so this
-;; wasn't really doing anything:
-;; https://stat.ethz.ch/pipermail/ess-help/2013-March/008729.html
-;; (setq ess-r-versions-list
-;;    '(("R-devel" "~/sw/bin/R-devel")
-;;      ("R-bioc213" "~/sw/bin/R-bioc213")))
 (defun Rbioc213 ()
   (interactive)
   (let ((inferior-R-program-name "~/sw/bin/R-bioc213"))
@@ -30,6 +29,13 @@
           (lambda ()
             (setq tab-width 2)
             (setq yas/buffer-local-condition t)))
+
+;; R launched from my local terminal is setup to show help in the browser
+;; but let ESS show help in an emacs buffer
+(setq inferior-ess-r-help-command "help(\"%s\", help_type=\"text\")\n")
+
+;; Do not put spaces around equals signs in `param=value`s for functions
+(setq ess-ac-R-argument-suffix "=")
 
 ;; Get smartparens to work in the interactive ESS (iESS) buffer
 (add-hook 'ess-R-post-run-hook 'smartparens-mode)
