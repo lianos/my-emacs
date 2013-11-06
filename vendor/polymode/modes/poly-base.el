@@ -59,15 +59,22 @@ is in place at that time."
   :group 'base-submodes
   :type 'object)
 
+(defcustom pm-base/yaml
+  (pm-submode "text"
+              :mode 'yaml-mode)
+  "YAML submode"
+  :group 'base-submodes
+  :type 'object)
 
-;; CONFIG
+;;; CONFIG objects
+;; These are generic configuration objects. More specialized configuration
+;; objects are defined in corresponding mode-specific files (e.g. poly-R.el).
 (defcustom pm-config/brew
   (pm-config-one "brew"
                  :base-submode-name 'pm-base/text
                  :inner-submode-name 'pm-submode/fundamental)
-  "HTML typical configuration"
+  "Typical Brew configuration"
   :group 'polymode :type 'object)
-
 
 (defcustom pm-config/html
   (pm-config-one "html"
@@ -75,7 +82,6 @@ is in place at that time."
                  :inner-submode-name 'pm-submode/fundamental)
   "HTML typical configuration"
   :group 'polymode :type 'object)
-
 
 (defcustom pm-config/C++
   (pm-config-one "C++"

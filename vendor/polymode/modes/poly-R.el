@@ -1,5 +1,12 @@
 (require 'poly-base)
 
+(defcustom pm-config/R
+  (pm-config-one "R"
+                 :base-submode-name 'pm-base/R
+                 :inner-submode-name 'pm-submode/fundamental)
+  "HTML typical configuration"
+  :group 'polymode :type 'object)
+
 ;; NOWEB
 (require 'poly-noweb)
 (defcustom pm-config/noweb+R
@@ -28,6 +35,29 @@
 
 
 
+;; RAPPORT
+(defcustom pm-config/rapport
+  (clone pm-config/markdown "rapport"
+         :inner-submode-names '(pm-submode/brew+R
+                                pm-submode/rapport+YAML))
+  "Rapport template configuration"
+  :group 'polymode  :type 'object)
+
+(defcustom  pm-submode/rapport+YAML
+  (pm-inner-submode "rapport+YAML"
+                    :mode 'yaml-mode
+                    :head-reg "<!--head"
+                    :tail-reg "head-->"
+                    :protect-indent-line-function t)
+  "YAML header in Rapport files"
+  :group 'polymode  :type 'object)
+
+(define-polymode poly-rapport-mode pm-config/rapport nil)
+
+(add-to-list 'auto-mode-alist '("\\.rapport" . poly-rapport-mode))
+
+
+
 ;; HTML
 (defcustom pm-config/html+R
   (clone pm-config/html "html+R" :inner-submode-name 'pm-submode/html+R)
@@ -50,7 +80,8 @@
 
 ;;; R-brew
 (defcustom pm-config/brew+R
-  (clone pm-config/brew "brew+R" :inner-submode-name 'pm-submode/brew+R)
+  (clone pm-config/brew "brew+R"
+         :inner-submode-name 'pm-submode/brew+R)
   "Brew + R configuration"
   :group 'polymode  :type 'object)
 
@@ -67,6 +98,7 @@
 (add-to-list 'auto-mode-alist '("\\.Rbrew" . poly-brew+r-mode))
 
 
+
 
 ;;; R+C++
 ;; todo: move into :matcher-subexp functionality?
@@ -81,13 +113,6 @@
   (let ((end (or (ignore-errors (scan-sexps (point) 1))
                  (buffer-end 1))))
     (cons (max 1 (- end 1)) end)))
-
-(defcustom pm-config/R
-  (pm-config-one "R"
-                 :base-submode-name 'pm-base/R
-                 :inner-submode-name 'pm-submode/fundamental)
-  "HTML typical configuration"
-  :group 'polymode :type 'object)
 
 (defcustom pm-config/R+C++
   (clone pm-config/R "R+C++" :inner-submode-name 'pm-submode/R+C++)
