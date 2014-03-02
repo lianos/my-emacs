@@ -43,7 +43,7 @@
 ;;  - on the fly  debug/undebug of R functions and methods
 ;;  - highlighting of error source references and easy error navigation
 ;;  - interactive traceback.
-;;  
+;;
 ;;  For a complete description please see the documentation at
 ;;  http://code.google.com/p/ess-tracebug/ and a brief tutorial at
 ;;  http://code.google.com/p/ess-tracebug/wiki/GettingStarted
@@ -55,6 +55,7 @@
 (require 'ess)
 (require 'format-spec)
 (eval-when-compile
+  (require 'tramp)
   (require 'compile)
   (require 'overlay)
   (require 'cl))
@@ -143,11 +144,15 @@ region is marked.  When debugger enteres the code it desplayes
 this reference number. Ess-debug finds this number in the
 referenced buffer.")
 
-
-;; (defvar ess--tb-buffer-sym nil)
-;; (make-variable-buffer-local 'ess--tb-buffer-sym)
-
+;; these vars are org variables that store the src block locations
 (defvar org-edit-src-beg-marker nil)
+(defvar org-babel-current-src-block-location nil
+  "Marker pointing to the src block currently being executed.
+This may also point to a call line or an inline code block.  If
+multiple blocks are being executed (e.g., in chained execution
+through use of the :var header argument) this marker points to
+the outer-most code block.")
+
 ;; hash to store soruce references of the form: tmpname -> (filename . src_start)
 (defvar ess--srcrefs (make-hash-table :test 'equal :size 100))
 
@@ -170,7 +175,8 @@ Return new command, a string."
                    ;; should this be done in process buffer?
                    (tramp-dissect-file-name proc-dir)))
          (orig-marker (or ess-tracebug-original-buffer-marker
-                         org-edit-src-beg-marker))
+                          org-edit-src-beg-marker
+                          org-babel-current-src-block-location))
          orig-beg)
     (setq ess--tracebug-eval-index (1+ ess--tracebug-eval-index))
     (goto-char beg)
@@ -180,7 +186,7 @@ Return new command, a string."
     (skip-chars-backward " \t\n")
     (setq end (point)
           orig-beg beg)
-    
+
     ;; delete all old temp files
     (when (and (not (ess-process-get 'busy))
                (< 1 (time-to-seconds
@@ -196,8 +202,9 @@ Return new command, a string."
       (setq orig-beg (+ beg (marker-position orig-marker))))
 
      (let ((tmpfile
-            (expand-file-name (concat (file-name-nondirectory (or filename "unknown")) "@"
-                                      (number-to-string ess--tracebug-eval-index))
+            (expand-file-name (make-temp-name
+                               (concat (file-name-nondirectory
+                                        (or filename "unknown")) "@"))
                               (if remote
                                   (tramp-get-remote-tmpdir remote)
                                 temporary-file-directory)))
@@ -212,7 +219,7 @@ Return new command, a string."
        (when remote
          ;; get local name (should this be done in process buffer?)
          (setq tmpfile (with-parsed-tramp-file-name tmpfile nil localname)))
-       
+
        (if (not filename)
            (puthash tmpfile (list nil ess--tracebug-eval-index nil) ess--srcrefs)
          (puthash tmpfile (list filename ess--tracebug-eval-index orig-beg) ess--srcrefs)
@@ -220,7 +227,7 @@ Return new command, a string."
                   (list filename ess--tracebug-eval-index orig-beg) ess--srcrefs)
          (with-silent-modifications
            (put-text-property beg end 'tb-index ess--tracebug-eval-index)))
-       
+
        ;; sending string to subprocess is considerably faster than tramp file
        ;; transfer. So, give priority to ess-eval-*-command if available
        (if eval-format
@@ -529,7 +536,6 @@ in inferior buffers.  ")
             (ess--tb-make-last-input-overlay
              (point-at-bol) (point-at-eol))))
     ;; busy timer
-    (make-local-variable 'ess--was-busy)
     (setq mode-line-buffer-identification
           (list (car (propertized-buffer-identification "%3b"))
                 `(:eval  (nth ess--busy-count ess-busy-strings)))) ;; 'face 'mode-line-buffer-id))))
@@ -868,10 +874,9 @@ by default."
   (let (ess-electric-selection-map)
     (define-prefix-command 'ess-electric-selection-map)
     ;; command-c and command-Q are not always working reliably
-    (define-key ess-electric-selection-map "M-C" 'ess-debug-command-continue)
-    (define-key ess-electric-selection-map "c" 'ess-debug-command-continue)
-    (define-key ess-electric-selection-map "M-Q" 'ess-debug-command-quit)
-    (define-key ess-electric-selection-map "q" 'ess-debug-command-quit)
+    (define-key ess-electric-selection-map "\M-N" 'ess-debug-command-continue)
+    (define-key ess-electric-selection-map "\M-C" 'ess-debug-command-continue)
+    (define-key ess-electric-selection-map "\M-Q" 'ess-debug-command-quit)
     (define-key ess-electric-selection-map "0" 'ess-debug-command-digit)
     (define-key ess-electric-selection-map "1" 'ess-debug-command-digit)
     (define-key ess-electric-selection-map "2" 'ess-debug-command-digit)
@@ -1192,7 +1197,7 @@ If in debugging state, mirrors the output into *ess.dbg* buffer."
          (match-dbg (or match-skip (and match-input (not match-selection))))
          ;;check for main  prompt!! the process splits the output and match-end == nil might indicate this only
          ;; (prompt-regexp "^>\\( [>+]\\)*\\( \\)$") ;; default prompt only
-         (prompt-replace-regexp "\\(^> \\|\\([>+] \\)\\{2,\\}\\)\\(?1: \\)") ;; works only with the default prompt
+         (prompt-replace-regexp "\\(^> \\|^\\([>+] \\)\\{2,\\}\\)\\(?1: \\)") ;; works only with the default prompt
          (is-ready (not (inferior-ess-set-status proc string)))
          (new-time (float-time))
          (last-time (process-get proc 'last-flush-time))
@@ -1210,15 +1215,7 @@ If in debugging state, mirrors the output into *ess.dbg* buffer."
       ;; FIXME: this should be in comint filters!!
       ;; insert \n after the prompt when necessary
       (setq string (replace-regexp-in-string prompt-replace-regexp " \n" string nil nil 1))
-      (with-current-buffer pbuf
-        (save-excursion
-          (let ((pmark (process-mark proc)))
-            (goto-char pmark)
-            ;; (beginning-of-line) ;;todo: do it with looking-back and primary-prompt
-            (when (looking-back inferior-ess-primary-prompt)
-              ;; (goto-char pmark)
-              (insert-before-markers "\n")
-              (set-marker pmark (point))))))
+
       ;; replace long prompts
       (when inferior-ess-replace-long+
         (setq string (replace-regexp-in-string "\\(\\+ \\)\\{4\\}\\(\\+ \\)+" ess-long+replacement string)))
@@ -1227,20 +1224,41 @@ If in debugging state, mirrors the output into *ess.dbg* buffer."
       (with-current-buffer (get-buffer-create (process-get proc 'accum-buffer-name))
         (goto-char (point-max))
         (insert string))
-      ;; Need this timer here.  Process might be waiting for user output
+
+      ;; Need this timer here; process might be waiting for user's input!
       (when (timerp flush-timer)
+        ;; cancel the timer each time we enter the filter
         (cancel-timer flush-timer)
         (process-put proc 'flush-timer nil))
+      ;; ... and setup a new one
       (process-put proc 'flush-timer
                    (run-at-time .2 nil 'ess--flush-process-output-cache proc))
+
+      (when (or (null last-time)
+                (> (- new-time last-time) .5))
+
+        ;; Very slow in long comint buffers. Probably because of some comint
+        ;; interaction. Not a reall issue, as it is executed periodically
+        ;; or only on first output after a command.
+
+        (with-current-buffer pbuf
+          (save-excursion
+            (let ((pmark (process-mark proc)))
+              (goto-char pmark)
+              (when (looking-back inferior-ess-primary-prompt)
+                (insert-before-markers "\n")
+                (set-marker pmark (point)))))))
+
+
       (unless last-time ;; don't flush first time
         (setq last-time new-time)
         (process-put proc 'last-flush-time new-time))
+
       (when (or is-ready
                 (process-get proc 'sec-prompt) ; for the sake of ess-eval-linewise
-                ;; (null last-time)
                 ;; flush periodically
                 (> (- new-time last-time) .6))
+
         (ess--flush-process-output-cache proc)))
 
     ;; WATCH
@@ -1416,7 +1434,7 @@ If FILENAME is not found at all, ask the user where to find it if
         (spec-dir default-directory)
         buffsym buffer thisdir fmts name buffername)
     (setq dirs (cons spec-dir dirs)) ;; current does not have priority!! todo:should be R working dir
-    ;; 1. first search already open buffers for match (associated file might not even exist yet)
+    ;; 1. search already open buffers for match (associated file might not even exist yet)
     (dolist (bf (buffer-list))
       (with-current-buffer  bf
         (when (and buffer-file-name
@@ -1718,7 +1736,8 @@ ARGS are ignored to allow using this function in process hooks."
 
 (defun ess--tb-R-source-current-file (&optional filename)
   "Save current file and source it in the .R_GlobalEnv environment."
-  ;; make it more elaborate :todo:
+  ;; fixme: this sucks as it doesn't use ess-load-command and the whole thing
+  ;; seems redundand to the ess-load-file
   (interactive)
   (ess-force-buffer-current "R process to use: ")
   (let ((proc (get-process ess-local-process-name))
@@ -1727,7 +1746,7 @@ ARGS are ignored to allow using this function in process hooks."
             (ess-get-process-variable 'ess-developer))
         (ess-developer-source-current-file filename)
       (if (not file)
-          ;; source the buffer content, org-mode scratch for ex.
+          ;; source the buffer content, org-mode, *scratch* etc.
           (let ((ess-inject-source t))
             (ess-tracebug-send-region proc (point-min) (point-max) nil
                                       (format "Sourced buffer '%s'" (propertize (buffer-name) 'face 'font-lock-function-name-face))))
@@ -1735,8 +1754,8 @@ ARGS are ignored to allow using this function in process hooks."
         (save-selected-window
           (ess-switch-to-ESS t))
         (ess-send-string (get-process ess-current-process-name)
-                         (concat "\ninvisible(eval({source(file=\"" buffer-file-name
-                                 "\")\n cat(\"Sourced file '" buffer-file-name "'\\n\")}, env=globalenv()))"))))))
+                         (concat "\ninvisible(eval({source(file=\"" filename
+                                 "\")\n cat(\"Sourced file '" filename "'\\n\")}, env=globalenv()))"))))))
 
 ;;;_ + BREAKPOINTS
 
@@ -1774,7 +1793,7 @@ ARGS are ignored to allow using this function in process hooks."
 
 (defvar ess--bp-identifier 1)
 (defcustom ess-bp-type-spec-alist
-  '((browser "browser(expr=is.null(.ESSR_Env[['.ESSBP.']][[%s]]))" "B>\n"   filled-square  ess-bp-fringe-browser-face)
+  '((browser "browser(expr=is.null(.ESSBP.[[%s]]))" "B>\n"   filled-square  ess-bp-fringe-browser-face)
     (recover "recover()" "R>\n"   filled-square  ess-bp-fringe-recover-face))
   "List of lists of breakpoint types.
 Each sublist  has five elements:
@@ -2090,13 +2109,13 @@ If there is no active R session, this command triggers an error."
                                   'display (list 'left-fringe (nth 2 ess-bp-inactive-spec) fringe-face))
               (put-text-property beg-pos-command (cdr pos)
                                  'bp-active nil)
-              (ess-command (format ".ESSR_Env[['.ESSBP.']][[%s]] <- TRUE\n" bp-id)))
+              (ess-command (format ".ESSBP.[[%s]] <- TRUE\n" bp-id)))
           (setq bp-specs (assoc (get-text-property (point) 'bp-type) ess-bp-type-spec-alist))
           (put-text-property beg-pos-command (cdr pos)
                              'bp-active t)
           (put-text-property  (car pos) beg-pos-command
                               'display (list 'left-fringe (nth 3 bp-specs) (nth 4 bp-specs)))
-          (ess-command (format ".ESSR_Env[['.ESSBP.']][[%s]] <- NULL\n" bp-id))
+          (ess-command (format ".ESSBP.[[%s]] <- NULL\n" bp-id))
           ;; (insert (propertize "##"
           ;;                     'ess-bp t
           ;;                     'intangible 'ess-bp
@@ -2615,6 +2634,7 @@ Optional N if supplied gives the number of backward steps."
 Ask the user for a function and if it turns to be generic, ask
 for signature and trace it with browser tracer."
   (interactive)
+  (ess-force-buffer-current "Process to use: ")
   (let* ((tbuffer (get-buffer-create " *ess-command-output*")) ;; output buffer name is hard-coded in ess-inf.el
          (all-functions (ess-get-words-from-vector
                          (if ess-developer-packages

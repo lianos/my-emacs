@@ -52,6 +52,7 @@
 (autoload 'ess-eval-line                "ess-inf" "[autoload]" t)
 (autoload 'ess-eval-line-and-go         "ess-inf" "[autoload]" t)
 (autoload 'ess-eval-line-and-step       "ess-inf" "[autoload]" t)
+(autoload 'ess-with-current-buffer      "ess-inf" "[autoload]" t)
 
 (autoload 'ess-goto-beginning-of-function-or-para    "ess-mode" "[autoload]" t)
 (autoload 'ess-goto-end-of-function-or-para          "ess-mode" "[autoload]" t)
@@ -142,8 +143,7 @@ If COMMAND is suplied, it is used instead of `inferior-ess-help-command'.
    (progn
      (ess-force-buffer-current)
      (when current-prefix-arg ;update cache if prefix
-       (with-current-buffer (process-buffer (ess-get-process ess-current-process-name))
-         (ess-process-put 'sp-for-help-changed? t)))
+       (ess-process-put 'sp-for-help-changed? t))
      (if (ess-ddeclient-p)
          (list (read-string "Help on: "))
        (list (ess-find-help-file "Help on")))))
@@ -283,9 +283,10 @@ if necessary.  It is bound to RET and C-m in R-index pages."
         )
     (cond
      ((string-match "^R" ess-dialect)
-      (setq com-package-for-object "sub('package:', '', utils::find('%s'))\n"
+      ;; carefully using syntax to be parsed in old R versions (no '::', '_'):
+      (setq com-package-for-object "sub('package:', '', .ess.findFUN('%s'))\n"
             com-packages           ".packages(all.available=TRUE)\n"
-            com-package-index      "help(package='%s', help_type='text')\n"
+            com-package-index      ".ess.help(package='%s', help.type='text')\n"
             reg-keyword             "^\\([-a-zA-Z0-9._@$]+\\)[^:\n]*$"
             reg-start              "^Index:"))
      ((string-match "julia" ess-dialect)
@@ -547,8 +548,10 @@ For internal use. Used in `ess-display-help-on-object',
                            (ess--find-displayed-help-window)))))
     (if help-win
         (progn
-          (select-window help-win)
-          (switch-to-buffer buff nil 'force))
+          (select-window help-win 'norecord)
+          (set-window-buffer help-win buff)
+          ;; (switch-to-buffer buff nil 'force) <- 3rd argument appeared in emacs 24
+          )
       (if ess-help-pop-to-buffer
           (pop-to-buffer buff)
         (ess-display-temp-buffer buff)))))
@@ -616,7 +619,7 @@ For internal use. Used in `ess-display-help-on-object',
     (define-key ess-doc-map "r" 'ess-reference-lookup)
     ess-doc-map
     )
-  "ESS documentaion map.")
+  "ESS documentation map.")
 
 
 (defvar ess-help-mode-map
@@ -674,31 +677,31 @@ For internal use. Used in `ess-display-help-on-object',
 ;; One reason for the following menu is to <TEACH> the user about key strokes
 (defvar ess-help-mode-menu
   (list "ESS-help"
-        ["Search Forward"               isearch-forward t]
-        ["Next Section"                 ess-skip-to-next-section t]
-        ["Previous Section"             ess-skip-to-previous-section t]
-        ["Help on Section Skipping"     ess-describe-sec-map t]
-        ["Beginning of Buffer"          beginning-of-buffer t]
-        ["End of Buffer"                end-of-buffer t]
-        "-"
-        ["Help on ..."                  ess-display-help-on-object t]
-        ["Apropos of ..."               ess-display-help-apropos t]
-        ["Index of ..."                 ess-display-package-index t]
-        ["Vignettes"                    ess-display-vignettes t]
-        ["Open in Browser"              ess-display-help-in-browser t]
-        "-"
-        ["Eval Line"                    ess-eval-line-and-step t]
-        ["Eval Paragraph & step"        ess-eval-paragraph-and-step t]
-        ["Eval Region & Go"             ess-eval-region-and-go t]
-        ["Switch to ESS Process"        ess-switch-to-ESS t]
-        ["Switch to End of ESS Proc."   ess-switch-to-end-of-ESS t]
-        ["Switch _the_ Process"         ess-switch-process t]
-        "-"
-        ["Kill Buffer"                  kill-this-buffer t]
-        ["Kill Buffer & Go"             ess-kill-buffer-and-go t]
-        "-"
-        ["Handy comomands"              ess-handy-commands t]
-        ["Describe ESS-help Mode"       ess-describe-help-mode t]
+	["Search Forward"		isearch-forward t]
+	["Next Section"			ess-skip-to-next-section t]
+	["Previous Section"		ess-skip-to-previous-section t]
+	["Help on Section Skipping"	ess-describe-sec-map t]
+	["Beginning of Buffer"		beginning-of-buffer t]
+	["End of Buffer"		end-of-buffer t]
+	"-"
+	["Help on ..."			ess-display-help-on-object t]
+	["Apropos of ..."		ess-display-help-apropos t]
+	["Index of ..."			ess-display-package-index t]
+	["Vignettes"			ess-display-vignettes t]
+	["Open in Browser"		ess-display-help-in-browser t]
+	"-"
+	["Eval Line"			ess-eval-line-and-step t]
+	["Eval Paragraph & step"	ess-eval-paragraph-and-step t]
+	["Eval Region & Go"		ess-eval-region-and-go t]
+	["Switch to ESS Process"	ess-switch-to-ESS t]
+	["Switch to End of ESS Proc."	ess-switch-to-end-of-ESS t]
+	["Switch _the_ Process"		ess-switch-process t]
+	"-"
+	["Kill Buffer"			kill-this-buffer t]
+	["Kill Buffer & Go"		ess-kill-buffer-and-go t]
+	"-"
+	["Handy commands"		ess-handy-commands t]
+	["Describe ESS-help Mode"	ess-describe-help-mode t]
         )
   "Menu used in ess-help mode.")
 
@@ -760,7 +763,8 @@ to see which keystrokes find which sections."
                                ess-help-sec-keys-alist))))
       (if (not the-sec) (error "Invalid section key: %c"
                                last-command-event)
-        (if (re-search-forward (concat "^" the-sec) nil t) nil
+        (if (re-search-forward (concat "^" the-sec) nil t)
+            (recenter)
           (message "No %s section in this help. Sorry." the-sec)
           (goto-char old-point))))))
 
@@ -882,16 +886,8 @@ return it.  Otherwise, return `ess-help-topics-list'."
 
 (defun ess-get-help-aliases-list ()
   "Return a list of aliases which have help available."
-  (let ((readrds (if (ess-current-R-at-least "2.13.0")
-                     "readRDS"
-                   ".readRDS")))
-    (apply 'nconc
-           (mapcar (lambda (str)
-                     (let ((a-file (concat str "/help/aliases.rds")))
-                       (and (file-exists-p a-file)
-                            (ess-get-words-from-vector
-                             (format "names(%s(\"%s\"))\n" readrds a-file)))))
-                   (ess-get-words-from-vector "searchpaths()\n")))))
+  (ess-write-to-dribble-buffer "Processing RDS files ...\n")
+  (ess-get-words-from-vector ".ess.getHelpAliases()\n"))
 
 (defun ess-nuke-help-bs ()
   "Remove ASCII underlining and overstriking performed by ^H codes."
@@ -949,11 +945,13 @@ specific.")
 
 (defun ess-describe-object-at-point ()
   "Get info for object at point, and display it in an electric buffer or tooltip.
-This is an electric command (see `ess--execute-electric-command').
-
 If region is active use it instead of the object at point.
 
-After invocation of this command, all standard emacs commands,
+This is an electric command (`ess--execute-electric-command'),
+which means that you can use the last key to cycle through the
+action set (in this case `C-e').
+
+After invocation of this command all standard emacs commands,
 except those containing 'window' in their names, remove the
 electric *ess-describe* buffer. Use `other-window' to switch to
 *ess-describe* window.
@@ -962,8 +960,7 @@ Customize `ess-describe-at-point-method' if you wan to display
 the description in a tooltip.
 
 See also `ess-R-describe-object-at-point-commands' (and similar
-option for other dialects).
-"
+option for other dialects)."
   (interactive)
   (if (not ess-describe-object-at-point-commands)
       (message "Not implemented for dialect %s" ess-dialect)
@@ -978,14 +975,16 @@ option for other dialects).
       ;; todo: put digits into the map
       (let* ((inhibit-quit t) ;; C-g removes the buffer
              (buf (ess--execute-electric-command
-                   map (format "Press %s to cycle" (single-key-description last-command-event))
+                   map (format "Press %s to cycle"
+                               (single-key-description last-command-event))
                    nil nil objname))
              ;; read full command
              (keys (read-key-sequence-vector ""))
              (command (and keys (key-binding keys))))
         (when (and (commandp command)
                    (bufferp buf)
-                   (not (string-match "window" (symbol-name command))))
+                   (or (not (symbolp command)) ;; kill on lambdas
+                       (not (string-match "window" (symbol-name command)))))
           (kill-buffer buf)) ;; bury does not work here :( (emacs bug?)
         (setq unread-command-events
               (append keys unread-command-events)))
@@ -1001,13 +1000,15 @@ option for other dialects).
       ;; can take some time for the command to execute
       (display-buffer buf))
     (sit-for .01)
-    (ess-command (concat com "\n") buf)
+    (ess-command (concat com "\n") buf) ;; erases buf
     (with-current-buffer buf
       (goto-char (point-min))
       (insert (propertize (format "%s:\n\n" com) 'face 'font-lock-string-face))
       (forward-line -1)
       (setq pos (point))
-      (setq buffer-read-only t))
+      ;; set the keys that we are used to in help mode
+      (special-mode)
+      (local-set-key "k" 'kill-this-buffer))
     (if (eq ess-describe-at-point-method 'tooltip)
         (ess-tooltip-show-at-point
          (with-current-buffer buf (buffer-string))  0 30)

@@ -154,7 +154,7 @@
     (define-key map "\C-c\C-k"   'ess-force-buffer-current)
     (define-key map "\C-c`"      'ess-show-traceback)
     (define-key map [(control ?c) ?~] 'ess-show-call-stack)
-    (define-key map "\C-c."      'ess-set-style); analogous to binding in C-mode
+    (define-key map "\C-c."      (lambda () (interactive) (message "ess-set-style moved to C-c C-e C-s. Sorry for the inconvenience")))
     (define-key map "{"          'ess-electric-brace)
     (define-key map "}"          'ess-electric-brace)
     (define-key map "\C-\M-q"    'ess-indent-exp)
@@ -164,6 +164,8 @@
     ;;(define-key map [delete]   'backward-delete-char-untabify)
     (define-key map "\t"         'ess-indent-or-complete)
     (define-key map "\C-c\C-q"   'ess-quit)
+    (define-key map "\M-\r"      'ess-use-this-dir)
+
     ;; smart operators; most likely will go in the future into a separate local map
     (define-key map ","          'ess-smart-comma)
 
@@ -188,22 +190,26 @@
     ;; (define-key map "\M-j"    'ess-eval-line-and-go)
     map)
   "Keymap for ess-eval functions.")
-(make-obsolete-variable 'ess-eval-map nil "ESS12.09.1")
+(make-obsolete-variable 'ess-eval-map nil "ESS[12.09.1]")
 
 (defvar ess-extra-map
   (let (ess-extra-map)
     (define-prefix-command 'ess-extra-map)
     (define-key ess-extra-map "\C-d" 'ess-dump-object-into-edit-buffer)
     (define-key ess-extra-map "d" 'ess-dump-object-into-edit-buffer)
-    (define-key ess-extra-map "\C-t" 'ess-build-tags-for-directory)
-    (define-key ess-extra-map "t" 'ess-build-tags-for-directory)
-    (define-key ess-extra-map "\C-l" 'ess-load-library)
-    (define-key ess-extra-map "l" 'ess-load-library)
+    (define-key ess-extra-map "\C-e" 'ess-execute)
+    (define-key ess-extra-map "e" 'ess-execute)
     (define-key ess-extra-map "\C-i" 'ess-install-library)
     (define-key ess-extra-map "i" 'ess-install-library)
+    (define-key ess-extra-map "\C-l" 'ess-load-library)
+    (define-key ess-extra-map "l" 'ess-load-library)
+    (define-key ess-extra-map "\C-s" 'ess-set-style)
+    (define-key ess-extra-map "s" 'ess-set-style)
+    (define-key ess-extra-map "\C-t" 'ess-build-tags-for-directory)
+    (define-key ess-extra-map "t" 'ess-build-tags-for-directory)
     (define-key ess-extra-map "\C-w" 'ess-execute-screen-options)
     (define-key ess-extra-map "w" 'ess-execute-screen-options)
-    ;; (define-key map "C-t"
+    (define-key ess-extra-map "/" 'ess-set-working-directory)
     ess-extra-map)
   "ESS extra map")
 
@@ -219,7 +225,7 @@
     ["Eval region | func | para" ess-eval-region-or-function-or-paragraph t]
     ["Eval region | func | para & step" ess-eval-region-or-function-or-paragraph-and-step t]
     ["Eval region | line" ess-eval-region-or-line-and-step t]
-    ["Enter expression" ess-execute-in-tb                 t]
+    ["Enter expression" ess-execute                 t]
     ;; sub menus
     "------"
     ("Process"
@@ -304,7 +310,7 @@
     "------"
     ("Font Lock"
      :active ess-font-lock-keywords
-     :filter ess-generate-font-lock-submenu)
+     :filter ess--generate-font-lock-submenu)
     "------"
     ["Describe"         describe-mode                   t]
     ["About editing" (ess-goto-info "Editing")  t]
@@ -523,7 +529,7 @@ ess-mode."
      (repl "\\(<-\\)?")                 ; replacement (function)
      (Sym-0 "\\(\\sw\\|\\s_\\)")        ; symbol
      (Symb  (concat Sym-0 "+"))
-     (xSymb (concat "\\[?\\[?" Sym-0 "*")); symbol / [ / [[ / [symbol / [[symbol
+     (xSymb "[^ \t\n\"']+") ;; (concat "\\[?\\[?" Sym-0 "*")); symbol / [ / [[ / [symbol / [[symbol
      ;; FIXME: allow '%foo%' but only when quoted; don't allow [_0-9] at beg.
      (_or_  "\\)\\|\\(")                ; OR
      (space "\\(\\s-\\|\n\\)*")         ; white space
@@ -531,8 +537,7 @@ ess-mode."
      (part-1 (concat
               "\\(" ;;--------outer Either-------
               "\\(\\("          ; EITHER
-              ;; Q xSymb repl Sym-0 "*" Q  ; quote ([) (replacement) symbol quote
-              Q "[^ \t\n\"']+" Q ;; any function name between quotes
+              Q xSymb Q         ; any function name between quotes
               _or_
               "\\(^\\|[ ]\\)" Symb      ; (beginning of name) + Symb
               "\\)\\)"))        ; END EITHER OR
@@ -555,6 +560,7 @@ ess-mode."
               space "function\\s-*(" ; whitespace, function keyword, parenthesis
               ))
      )
+
   (defvar ess-R-function-pattern
     (concat part-1
             "\\s-*\\(<-\\|=\\)" ; whitespace, assign

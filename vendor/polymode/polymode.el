@@ -232,6 +232,26 @@ Return, how many chucks actually jumped over."
 (defun pm/get-innermost-span (&optional pos)
   (pm/get-span pm/config pos))
 
+(defvar pm--ignore-post-command-hook nil)
+(defun pm--restore-ignore ()
+  (setq pm--ignore-post-command-hook nil))
+
+;; This function is for debug convenience only in order to avoid limited debug
+;; context in polymode-select-buffer
+(defun pm--sel-buf ()
+  (unless pm--ignore-post-command-hook
+    (let ((*span* (pm/get-innermost-span))
+          (pm--can-move-overlays t))
+      (pm/select-buffer (car (last *span*)) *span*))))
+
+(defun polymode-select-buffer ()
+  "Select the appropriate (indirect) buffer corresponding to point's context.
+This funciton is placed in local post-command hook."
+  (condition-case error
+      (pm--sel-buf)
+    (error (message "polymode error: %s"
+                    (error-message-string error)))))
+
 (defvar pm--can-narrow? t)
 
 (defun pm/map-over-spans (fun beg end &optional count backward?)
@@ -315,21 +335,29 @@ in polymode buffers."
                (when (and font-lock-mode font-lock-keywords)
                  (when parse-sexp-lookup-properties
                    (pm--comment-region 1 sbeg))
-                 (unwind-protect 
+                 (condition-case err
                      (if (oref pm/submode :font-lock-narrow)
                          (save-restriction
+                           ;; fixme: optimization oportunity: Cache chunk state
+                           ;; in text properties. For big chunks font-lock
+                           ;; fontifies it by smaller segments, thus
+                           ;; pm/fontify-region is called multiple times per
+                           ;; chunk and spans are computed each time.
                            (narrow-to-region sbeg send)
                            (funcall pm--fontify-region-original
                                     (max sbeg beg) (min send end) verbose))
                        (funcall pm--fontify-region-original
                                 (max sbeg beg) (min send end) verbose))
-                   (when parse-sexp-lookup-properties
-                     (pm--uncomment-region 1 sbeg))
-                   ))
-               (pm--adjust-chunk-face sbeg send (pm/get-adj-face pm/submode))
+                   (error (message "polymode font-lock error: %s (beg: %s end: %s)"
+                                   (error-message-string err) beg end)))
+                 (when parse-sexp-lookup-properties
+                   (pm--uncomment-region 1 sbeg)))
+               (pm--adjust-chunk-face sbeg send (pm/get-adjust-face pm/submode))
                ;; might be needed by external applications like flyspell
+               ;; fixme: this should be in a more generic place like pm/get-span
                (put-text-property sbeg send 'inner-submode
                                   (object-of-class-p pm/submode 'pm-inner-submode))
+               ;; even if failed, set to t to avoid infloop
                (put-text-property beg end 'fontified t)))
            beg end)
           ;; needed to avoid moving last fontified buffer to second place
@@ -354,26 +382,6 @@ warnign."
       mode
     (message "Cannot find " mode " function, using 'fundamental-mode instead")
     'fundamental-mode))
-
-(defvar pm--ignore-post-command-hook nil)
-(defun pm--restore-ignore ()
-  (setq pm--ignore-post-command-hook nil))
-
-;; This function is for debug convenience only in order to avoid limited debug
-;; context in polymode-select-buffer
-(defun pm--sel-buf ()
-  (unless pm--ignore-post-command-hook
-    (let ((*span* (pm/get-innermost-span))
-          (pm--can-move-overlays t))
-      (pm/select-buffer (car (last *span*)) *span*))))
-
-(defun polymode-select-buffer ()
-  "Select the appropriate (indirect) buffer corresponding to point's context.
-This funciton is placed in local post-command hook."
-  (condition-case error
-      (pm--sel-buf)
-    (error (message "polymode error: %s"
-                    (error-message-string error)))))
 
 (defun pm--lighten-background (prop)
   ;; if > lighten on dark backgroun. Oposite on light.
@@ -494,7 +502,7 @@ This funciton is placed in local post-command hook."
       ;; should normally just bind `indent-line-function' to
       ;; handle indentation.
       (when (and indent-line-function ; not that it should ever be nil...
-                 (oref pm/submode :protect-indent-line-function))
+                 (oref pm/submode :protect-indent-line))
         (setq pm--indent-line-function-original indent-line-function)
         (set (make-local-variable 'indent-line-function) 'pm/indent-line))
 
@@ -512,8 +520,7 @@ This funciton is placed in local post-command hook."
       ;;           t t)
       
       (when pm--dbg-hook
-        (add-hook 'post-command-hook
-                  'polymode-select-buffer nil t))
+        (add-hook 'post-command-hook 'polymode-select-buffer nil t))
       (object-add-to-list pm/config :buffers (current-buffer)))
     buff))
 
@@ -734,25 +741,20 @@ that is t when MODE is active and nil othervise.
 MODE command is similar to standard emacs major modes and it can
 be used in `auto-mode-alist'. Standard hook MODE-hook is run at
 the end of the initialization of each polymode buffer, indirect
-and base alike. MODE-map is created only if nontrivial KEYMAP
-argument is supplied. See below.
+and base alike. Additionally MODE-map is created based on the
+CONFIG's :map slot and the value of the :keymap argument; see
+below.
+
+CONFIG is a name of a config object representing the mode.
 
 MODE command can also be use as a minor mode. Current major mode
 is not reinitialized if it coincides with the :mode slot of
 CONFIG object or if the :mode slot is nil.
 
-Optional KEYMAP is the default keymap bound to the mode
-  keymap. If nil, no new keymap is created and MODE uses
-  `polymode-mode-map'. If t, a new keymap is created with name
-  MODE-MAP that inherits form `polymode-mode-map'. Otherwise it
-  should be a variable name (whose value is a keymap), or an
-  alist of binding arguments passed to `easy-mmode-define-keymap'
-  and
-
 BODY contains code to be executed after the complete
   initialization of the polymode (`pm/initialize') and before
   running MODE-hook. Before the actual body code, you can write
-  keyword arguments, i.e. alternating keywords and values.  These
+  keyword arguments, i.e. alternating keywords and values.  The
   following special keywords are supported:
 
 :lighter SPEC   Optional LIGHTER is displayed in the mode line when
@@ -760,9 +762,22 @@ BODY contains code to be executed after the complete
                 the :lighter slot of CONFIG object.
 :keymap MAP	Same as the KEYMAP argument.
 
+                If nil, a new MODE-map keymap is created what
+                directly inherits from the keymap defined by
+                the :map slot of CONFIG object. In most cases it
+                is a simple map inheriting form
+                `polymode-mode-map'. If t or an alist (of
+                bindings suitable to be passed to
+                `easy-mmode-define-keymap') a keymap MODE-MAP is
+                build by mergin this alist with the :map
+                specification of the CONFIG object. If a symbol,
+                it should be a variable whose value is a
+                keymap. No MODE-MAP is automatically created in
+                the latter case and :map slot of the CONFIG
+                object is ignored.
+
 :after-hook     A single lisp form which is evaluated after the mode hooks
-                have been run.  It should not be quoted.
-"
+                have been run.  It should not be quoted."
   (declare 
    (debug (&define name name
                    [&optional [&not keywordp] sexp]
@@ -783,7 +798,7 @@ BODY contains code to be executed after the complete
          (modefun mode)          ;The minor mode function name we're defining.
 	 (after-hook nil)
 	 (hook (intern (concat mode-name "-hook")))
-	 keyw keymap-sym tmp)
+	 keyw keymap-sym key-alist tmp)
 
     ;; Check keys.
     (while (keywordp (setq keyw (car body)))
@@ -800,14 +815,26 @@ BODY contains code to be executed after the complete
     ;;   (setq group
     ;;         `(:group ',(intern (replace-regexp-in-string
     ;;     			"-mode\\'" "" mode-name)))))
+    (unless (keymapp keymap)
+      ;; keymap is either nil or list
+      (setq key-alist keymap)
+      (let* ((pi (symbol-value config))
+             map mm-name)
+        (while pi
+          (setq map (and (slot-boundp pi :map)
+                         (oref pi :map)))
+          (if (and (symbolp map)
+                   (keymapp (symbol-value map)))
+              (setq keymap  (symbol-value map)
+                    pi nil)
+            ;; go down to next parent
+            (setq pi (and (slot-boundp pi :parent-instance)
+                          (oref pi :parent-instance))
+                  key-alist (append key-alist map))))))
+
     (unless keymap
-      (setq keymap 'polymode-mode-map))
-    (when (or (eq keymap t)
-              (listp keymap))
-      (if (eq keymap t) (setq keymap nil))
-      (let ((map-name (concat mode-name "-map")))
-        (setq keymap-sym (intern map-name))))
-    
+      (setq keymap polymode-mode-map))
+    (setq keymap-sym (intern (concat mode-name "-map")))
 
     `(progn
        ;; Define the variable to enable or disable the mode.
@@ -850,11 +877,10 @@ BODY contains code to be executed after the complete
        :autoload-end
        
        ;; Define the minor-mode keymap.
-       ,(when keymap-sym
-          `(defvar ,keymap-sym
-             (easy-mmode-define-keymap ,keymap nil nil '(:inherit ,polymode-mode-map))
-             ,(format "Keymap for %s." pretty-name)))
-
+       (defvar ,keymap-sym
+         (easy-mmode-define-keymap ',key-alist nil nil '(:inherit ,keymap))
+         ,(format "Keymap for %s." pretty-name))
+       
        (add-minor-mode ',mode ',lighter ,(or keymap-sym keymap)))))
 
 

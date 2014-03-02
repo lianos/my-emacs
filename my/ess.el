@@ -7,14 +7,15 @@
 ;; (setq ess-s-versions-list
 ;;      '( ("R-something" "/usr/local/bin/R-something")
 ;;         ("R-other" "/opt/local/bin/R-other" "-j")))
-;;
+
+;; ess-r-versions-list
 ;; but these buffers are *S* buffers unless the R-pattern is one that is already
 ;; hunted for, which was not helpful to setup new ones.
 ;; This has to be defined before (require 'ess-site). :
 
-(defun Rbioc213 ()
+(defun Rbioc214 ()
   (interactive)
-  (let ((inferior-R-program-name "~/sw/bin/R-bioc213"))
+  (let ((inferior-R-program-name "~/sw/bin/R-bioc214"))
     (R)))
 
 (setq ess-default-style 'DEFAULT)
@@ -29,6 +30,9 @@
           (lambda ()
             (setq tab-width 2)
             (setq yas/buffer-local-condition t)))
+
+;; disable saving history on exit
+(setq ess-history-file nil)
 
 ;; R launched from my local terminal is setup to show help in the browser
 ;; but let ESS show help in an emacs buffer

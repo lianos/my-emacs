@@ -46,6 +46,20 @@
     :type list
     :documentation
     "Holds all buffers associated with current buffer")
+   (map
+    :initarg :map
+    :initform 'polymode-mode-map
+    :type (or symbol list)
+    "Has a similar role as the :keymap argument in `define-polymode'
+with the difference that this argument is inherited through
+cloning but :keymap argument is not. That is, child objects
+derived through clone will inherit the :map argument of its
+parents as follows. If :map is nil or an alist of keys, the
+parent is inspected for :map argument and the keys are
+merged. If :map is a symbol, it should be a keymap, in which case
+this keymap is used and no parents are further inspected for :map
+slot. If :map is an alist it should be suitable to be passed to
+`easy-mmode-define-keymap'.")
    (init-functions
     :initarg :init-functions
     :initform '()
@@ -121,14 +135,21 @@ that are not known in advance. Examples are org-mode and markdown.")
     :type symbol
     :initform nil
     :custom symbol)
-   (protect-indent-line-function
-    :initarg :protect-indent-line-function
+   (protect-indent-line
+    :initarg :protect-indent-line
     :type boolean
     :initform t
     :custom boolean
     :documentation
     "Whether to modify local `indent-line-function' by narrowing
     to current span first")
+   (indent-offset
+    :initarg :indent-offset
+    :type integer
+    :initform 0
+    :documentation
+    "Offset to add when indenting chunk's line. Takes efeect only
+    when :protect-indent-line is non-nil.")
    (font-lock-narrow
     :initarg :font-lock-narrow
     :type boolean
@@ -139,28 +160,29 @@ that are not known in advance. Examples are org-mode and markdown.")
     :initarg :buffer
     :type (or null buffer)
     :initform nil)
-   (adj-face
-    :initarg :adj-face
+   (adjust-face
+    :initarg :adjust-face
     :type (or number face list)
     :custom (or number face list)
     :initform nil
     :documentation
-    "Fontification adjustments face of the chunks. It is appended
-    to face specification of the body of the chunk and should be
-    either, nil, number, face or a list.
+    "Fontification adjustments chunk face. It should be either,
+    nil, number, face or a list of text properties as in
+    `put-text-property' specification.
 
     If nil no highlighting occurs. If a face, use that face. If a
     number, it is a percentage by which to lighten/darken the
-    background. If positive it used to lighten background on dark
-    themes and darken on light thems. If < 0, darken in dark
-    thems and lighten in light thems."))
+    default chunk background. If positive - lighten the
+    background on dark themes and darken on light thems. If
+    negative - darken in dark thems and lighten in light
+    thems."))
   
   "Represents a simple submode. Usually used for the definition
 of the base submodes (aka host submodes associated with the base
 buffer).")
 
 (defclass pm-inner-submode (pm-submode)
-  ((adj-face
+  ((adjust-face
     :initform 2)
    (head-mode
     :initarg :head-mode
@@ -202,21 +224,21 @@ buffer).")
     :type (or string symbol)
     :custom (or string symbol)
     :documentation "Regexp for chunk end (aka tail)")
-   (head-adj-face
-    :initarg :head-adj-face
+   (head-adjust-face
+    :initarg :head-adjust-face
     :initform font-lock-type-face
     :type (or null number face list)
     :custom (or null number face list)
     :documentation
     "Can be a number, list or face.")
-   (tail-adj-face
-    :initarg :tail-adj-face
+   (tail-adjust-face
+    :initarg :tail-adjust-face
     :initform nil
     :type (or null number face list)
     :custom (or null number face list)
     :documentation
     "Can be a number, list or face. If nil, take the
-configuration from :head-adj-face."))
+configuration from :head-adjust-face."))
   
   "Representation of an inner (aka child) submode in a buffer.")
 

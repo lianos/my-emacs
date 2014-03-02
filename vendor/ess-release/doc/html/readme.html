@@ -312,7 +312,7 @@ acronym[title]::after { content: "This acronym means" attr(title); speak:normal;
 <a name="index-README"></a>
 
 <p>This is the README file for the distribution of ESS version
-13.09
+13.09-1
 </p>
 <p>ESS is a GNU Emacs and XEmacs mode for interactive statistical
 programming and data analysis.  Languages supported: the S family (S,
@@ -353,17 +353,13 @@ Lumley).
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Installation" accesskey="5">Installation</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Unix-installation" accesskey="6">Unix installation</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#Starting-up" accesskey="6">Starting up</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Microsoft-Windows-installation" accesskey="7">Microsoft Windows installation</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#Current-Features" accesskey="7">Current Features</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Starting-up" accesskey="8">Starting up</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#New-Features" accesskey="8">New Features</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Current-Features" accesskey="9">Current Features</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
-</td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#New-Features">New Features</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
-</td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Reporting-Bugs">Reporting Bugs</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#Reporting-Bugs" accesskey="9">Reporting Bugs</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Mailing-Lists">Mailing Lists</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
@@ -509,389 +505,90 @@ GitHub branch for <acronym>ESS</acronym>, available at <a href="https://github.c
 <a name="Installation"></a>
 <div class="header">
 <p>
-Next: <a href="#Unix-installation" accesskey="n" rel="next">Unix installation</a>, Previous: <a href="#Latest-Version" accesskey="p" rel="previous">Latest Version</a>, Up: <a href="#General-Information" accesskey="u" rel="up">General Information</a> &nbsp; </p>
+Next: <a href="#Starting-up" accesskey="n" rel="next">Starting up</a>, Previous: <a href="#Latest-Version" accesskey="p" rel="previous">Latest Version</a>, Up: <a href="#General-Information" accesskey="u" rel="up">General Information</a> &nbsp; </p>
 </div>
 <a name="Installation-1"></a>
 <h3 class="section">1.5 Installation</h3>
 
-<hr>
-<a name="Unix-installation"></a>
-<div class="header">
-<p>
-Next: <a href="#Microsoft-Windows-installation" accesskey="n" rel="next">Microsoft Windows installation</a>, Previous: <a href="#Installation" accesskey="p" rel="previous">Installation</a>, Up: <a href="#General-Information" accesskey="u" rel="up">General Information</a> &nbsp; </p>
-</div>
-<a name="Unix-_0028Linux-_002f-MacOS-_002f-Solaris-_002f-_002e_002e_002e_0029-Installation"></a>
-<h3 class="section">1.6 Unix (Linux / MacOS / Solaris / ...) Installation</h3>
-
-
-<p>For a <b>Unix or Unix-like installation</b>, please follow the next steps.
-Retrieve the latest tgz file (<samp>ess-VERSION.tgz</samp>) from
-<a href="http://ess.r-project.org/index.php?Section=download">ESS downloads area</a>.
-</p>
-<p><em>GNU Emacs Simple Instructions:</em> for recent versions of Emacs (23.x or higher)
-and ESS, the installation process is simple.
-</p>
 <ol>
-<li> Extract all the files from <samp>ess-VERSION.tgz</samp> into
-the directory <samp>PREFIX/site-lisp</samp>
-where <samp>PREFIX</samp> is appropriate for GNU Emacs on your system;
-<samp>PREFIX</samp> will most likely be either
-<samp>/usr/share/emacs</samp> or <samp>/usr/local/share/emacs</samp>
-(on Mac OS X, <samp>PREFIX</samp> will most likely be something like
-<samp>/Applications/Emacs.app/Contents/Resources</samp>):
+<li> Download the latest zip or tgz archive from ESS 
+<a href="http://ess.r-project.org/index.php?Section=download">downloads
+area</a> and unpack it into a directory where you would like ESS to
+reside. We will denote this directory as <samp>/path/to/ESS/</samp> hereafter.
+
+<p>Alternatively you can use <code>svn</code> or <code>git</code> to fetch the most
+recent development version to your local machine with:
+</p>
 <div class="example">
-<pre class="example">GNU tar  % gtar zxf ess-VERSION.tgz -C PREFIX/site-lisp
-Unix tar % gunzip &lt; ess-VERSION.tgz | tar xf - -C PREFIX/site-lisp
+<pre class="example">svn checkout https://svn.r-project.org/ESS/trunk /path/to/ESS
 </pre></div>
 
-</li><li> Then, add the line
+<p>or 
+</p>
 <div class="example">
-<pre class="example">(require 'ess-site)
+<pre class="example">git clone https://github.com/emacs-ess/ESS.git /path/to/ESS
 </pre></div>
-<p>to <samp>~/.emacs</samp> and restart Emacs.
-</p>
-</li><li> If you see a buffer named <samp>*ESS*</samp>, then the simple instructions
-were most likely successful.  If not, then read further.
 
-</li><li> It could be that you have an older version of Emacs, some other problem
-with your installation or you are not a sysadmin.  Whatever the case,
-you may need to edit <samp>ess-site.el</samp> manually.  If that is the case,
-then you should create a directory just for <acronym>ESS</acronym> like <samp>~/ess</samp>
-or <samp>/usr/local/ess</samp> and unpack <acronym>ESS</acronym> there.  That way, your changes to
-<samp>ess-site.el</samp> will not be lost if you update Emacs later.
-
-</li><li> Replace the line above with
+</li><li> <b>Optionally</b>, compile elisp files and build the documentation with:
 <div class="example">
-<pre class="example">(load &quot;~/ess/ess-VERSION/lisp/ess-site&quot;)
+<pre class="example">cd /path/to/ESS/
+make
 </pre></div>
-<p>in <samp>~/.emacs</samp> and restart Emacs.
+<p>Without this step, info, pdf and html documentation and reference card
+will not be available.
 </p>
-</li><li> If you see a buffer named <samp>*ESS*</samp>, then the manual instructions
-were most likely successful.  If not, then send a query to
-<a href="mailto:ess-help@r-project.org">ess-help@r-project.org</a>
-explicitly describing your problem and your environment
-including operating system, Emacs version, <acronym>ESS</acronym> version, etc.
-</li></ol>
+</li><li> <b>Optionally</b>, install into your local machine with
+<code>make install</code>. You might need administrative privileges:
 
-<p><b>Due to XEmacs lacking some features that ESS requires, ESS support of XEmacs
-ends with ESS 12.04-4.  This decision will be re-visited in the future as
-XEmacs continues to sync with GNU Emacs.</b>
-</p>
-<p><em>XEmacs Simple Instructions:</em> for recent versions of XEmacs (21.4.x or higher)
-and ESS, the installation process is simple.
-</p>
-<ol>
-<li> Extract all the files from <samp>ess-VERSION.tgz</samp> when you are in
-the current working directory of <samp>/usr/local/LOCATION/xemacs/site-packages</samp>
-which exists for packages like <acronym>ESS</acronym>
-where <samp>LOCATION</samp> is <samp>lib</samp> for legacy installations and <samp>share</samp>
-now (and for Mac OS X create a link to it from the directory
-<samp>/Applications/XEmacs.app/Contents/Resources/site-lisp</samp>):
 <div class="example">
-<pre class="example">%prompt gtar zxf ess-VERSION.tgz            # for GNU tar
-%prompt gunzip &lt; ess-VERSION.tgz | tar xf - # for Unix tar
-</pre></div>
-
-</li><li> Then, add the line
-<div class="example">
-<pre class="example">(require 'ess-site)
-</pre></div>
-<p>to <samp>~/.xemacs/init.el</samp> and restart XEmacs.
-</p>
-</li><li> If you see a buffer named <samp>*ESS*</samp>, then the simple instructions
-were most likely successful.  If not, then read further.
-
-</li><li> It could be that you have an older version of XEmacs, some other problem
-with your installation or you are not a sysadmin.  Whatever the case,
-you may need to edit <samp>ess-site.el</samp> manually.  If that is the case,
-then you should create a directory just for <acronym>ESS</acronym> like <samp>~/ess</samp>
-or <samp>/usr/local/ess</samp> and unpack <acronym>ESS</acronym> there.  That way, your changes to
-<samp>ess-site.el</samp> will not be lost if you update XEmacs later.
-
-</li><li> Replace the line above with
-<div class="example">
-<pre class="example">(load &quot;~/ess/ess-VERSION/lisp/ess-site&quot;)
-</pre></div>
-<p>in <samp>~/.xemacs/init.el</samp> and restart XEmacs.
-</p>
-</li><li> If you see a buffer named <samp>*ESS*</samp>, then the manual instructions
-were most likely successful.  If not, then send a query to
-<a href="mailto:ess-help@r-project.org">ess-help@r-project.org</a>
-explicitly describing your problem and your environment
-including operating system, XEmacs version, <acronym>ESS</acronym> version, etc.
-</li></ol>
-
-<ol>
-<li> <b>(OPTIONAL) COMPILING E-LISP</b>:
-
-<p>Edit the default locations of <code>LISPDIR</code>, <code>INFODIR</code> and
-<code>ETCDIR</code> in Section 1 of <samp>Makeconf</samp> (if you are
-using XEmacs, then edit the XEmacs subsection in Section 1).
-</p>
-<p>You can compile those files by:
-</p><div class="example">
-<pre class="example">make all
-</pre></div>
-
-<p>When that completes successfully, install the compiled files:
-</p><div class="example">
 <pre class="example">make install
 </pre></div>
 
-</li></ol>
-
-<hr>
-<a name="Microsoft-Windows-installation"></a>
-<div class="header">
-<p>
-Next: <a href="#Starting-up" accesskey="n" rel="next">Starting up</a>, Previous: <a href="#Unix-installation" accesskey="p" rel="previous">Unix installation</a>, Up: <a href="#General-Information" accesskey="u" rel="up">General Information</a> &nbsp; </p>
-</div>
-<a name="Microsoft-Windows-installation-1"></a>
-<h3 class="section">1.7 Microsoft Windows installation</h3>
-
-<p>For <b>Microsoft Windows installation</b>, please follow the next steps.
-Retrieve the latest zip file (<samp>ess-VERSION.zip</samp>) from
-<a href="http://ess.r-project.org/index.php?Section=download">ESS downloads area</a>.
+<p>The files are installed into <code>/usr/share/emacs</code> directory. For this step to
+run correctly on Mac OS X, you will need to adjust the <samp>PREFIX</samp>
+path in <samp>Makeconf</samp>. The necessary code and instructions are
+commented in that file.
 </p>
-<p><em>GNU Emacs Simple Instructions:</em> for recent versions of Emacs (23.x or higher)
-and ESS, the installation process is simple.
-</p>
-<ol>
-<li> Extract all the files from <samp>ess-VERSION.zip</samp> (by
-double clicking on it and selecting &ldquo;Extract all files&rdquo;
-which launches the Folders Extraction Wizard)
-into an <samp>ESS</samp> sub-directory of the <samp>site-lisp</samp> directory that exists for packages like <acronym>ESS</acronym>.
-If GNU Emacs was installed in the default location, then this
-directory can be found somewhere like
-<samp>C:\Program Files\GNU Emacs\emacs-24.x\site-lisp</samp>
+</li><li> If you have performed the <code>make install</code> step from above, just add
 
-</li><li> Add the line
 <div class="example">
 <pre class="example">(require 'ess-site)
 </pre></div>
-<p>to <samp>~/.emacs</samp> and restart Emacs.
+
+<p>to your <samp>~/.emacs</samp> file. Otherwise, you should add
+<samp>/path/to/ESS/lisp/</samp> to your emacs load path and then load ESS with
+the following lines in your <samp>~/.emacs</samp>:
 </p>
-</li><li> If you see a buffer named <samp>*ESS*</samp>, then the simple instructions
-were most likely successful.  If not, then read further.
-
-</li><li> It could be you have an older version of Emacs or some other problem
-with your installation.  Either way, you may need to edit
-<samp>C:\ess\ess-VERSION\lisp\ess-site.el</samp> manually.  If that is the case,
-then you should create a directory just for <acronym>ESS</acronym> like <samp>C:\ess</samp> and
-unpack <acronym>ESS</acronym> there.  That way, your changes to
-<samp>C:\ess\ess-VERSION\lisp\ess-site.el</samp>
-will not be lost if you update Emacs later.
-
-</li><li> Replace the line above with
 <div class="example">
-<pre class="example">(load &quot;C:/ess/ess-VERSION/lisp/ess-site&quot;)
+<pre class="example">(add-to-list 'load-path &quot;/path/to/ESS/lisp/&quot;)
+(load &quot;ess-site&quot;)
 </pre></div>
-<p>in <samp>~/.emacs</samp> and restart Emacs.
-</p>
-</li><li> If you see a buffer named <samp>*ESS*</samp>, then the manual instructions
-were most likely successful.  If not, then send a query to
-<a href="mailto:ess-help@r-project.org">ess-help@r-project.org</a>
-explicitly describing your problem and your environment
-including operating system, Emacs version, <acronym>ESS</acronym> version, etc.
+
+</li><li> Restart your Emacs and check that ESS was loaded from a correct
+location with <code>M-x ess-version</code>.
 </li></ol>
 
-<p><b>Due to XEmacs lacking some features that ESS requires, ESS support of XEmacs
-ends with ESS 12.04-4.  This decision will be re-visited in the future as
-XEmacs continues to sync with GNU Emacs.</b>
-</p>
-<p><em>XEmacs Simple Instructions:</em> for recent versions of XEmacs (21.x or higher),
-the installation process is much simpler.  Hopefully, these
-simple instructions will work for you.  If not, then more
-detailed, manual instructions follow.
-</p>
-<ol>
-<li> Extract all the files from <samp>ess-VERSION.zip</samp> (by
-double clicking on it and selecting &ldquo;Extract all files&rdquo;
-which launches the Folders Extraction Wizard)
-into the <samp>site-packages</samp> directory that exists for packages like <acronym>ESS</acronym>.
-If XEmacs was installed in the default location, then this
-directory can be found at
-<samp>C:\Program Files\XEmacs\site-packages</samp>.
 
-</li><li> XEmacs requires the <code>HOME</code> environment variable to be defined.  You can
-create it by visiting the following dialog:
-<code>My Computer-&gt;Control Panel-&gt;System-&gt;Advanced-&gt;Environment Variables</code>
-In the User variables window, press New.  And create a variable
-named <code>HOME</code> with a value something like (you must
-use forward slashes <code>/</code> rather than backslashes <code>\</code>)
-<code>c:/Documents and Settings/%USERNAME%/Application Data</code>.  Then press OK for that
-window and press OK for the main window.  <em>If you also have GNU Emacs
-installed, GNU Emacs will recognize <code>HOME</code> and expand <code>~</code> accordingly.</em>
+<p><em>Note for Windows and Mac OS X users:</em> The most straightforward
+way to install Emacs on your machine is by downloading
+<a href="http://vgoulet.act.ulaval.ca/en/emacs/">all-in-one</a> Emacs binary
+by Vincent Goulet.
+</p>
 
-</li><li> Now launch XEmacs and do a <code>C-x C-f</code> followed by a <code>~</code>.
-From the Subdir menu, select Create Directory, and enter <code>.xemacs</code>
-
-</li><li> Add the line
-<div class="example">
-<pre class="example">(require 'ess-site)
-</pre></div>
-<p>to <samp>~/.xemacs/init.el</samp> and restart XEmacs.
+<p><em>Note for XEmacs users:</em> Due to XEmacs lacking some features
+that ESS requires, ESS support of XEmacs ends with ESS 12.04-4.  This
+decision will be re-visited in the future as XEmacs continues to sync
+with GNU Emacs.
 </p>
-</li><li> If you see a buffer named <samp>*ESS*</samp>, then the simple instructions
-were most likely successful.  If not, then read further.
-
-</li><li> It could be you have an older version of XEmacs or some other problem
-with your installation.  Either way, you may need to edit
-<samp>C:\ess\ess-VERSION\lisp\ess-site.el</samp> manually.  If that is the case,
-then you should create a directory just for <acronym>ESS</acronym> like <samp>C:\ess</samp> and
-unpack <acronym>ESS</acronym> there.  That way, your changes to
-<samp>C:\ess\ess-VERSION\lisp\ess-site.el</samp>
-will not be lost if you update XEmacs later.
-
-</li><li> Replace the line above with
-<div class="example">
-<pre class="example">(load &quot;C:/ess/ess-VERSION/lisp/ess-site&quot;)
-</pre></div>
-<p>in <samp>~/.xemacs/init.el</samp> and restart XEmacs.
-</p>
-</li><li> If you see a buffer named <samp>*ESS*</samp>, then the manual instructions
-were most likely successful.  If not, then send a query to
-<a href="mailto:ess-help@r-project.org">ess-help@r-project.org</a>
-explicitly describing your problem and your environment
-including operating system, XEmacs version, <acronym>ESS</acronym> version, etc.
-</li></ol>
-
-<p>Now, you should be ready to use <acronym>ESS</acronym>.  For example, to edit
-statistical programs, load the files with the requisite extensions
-(&quot;.sas&quot; for SAS, &quot;.S&quot; or &quot;s&quot; or &quot;q&quot; or &quot;Q&quot; for S-PLUS, &quot;.r&quot; or &quot;.R&quot; for
-R, and &quot;.lsp&quot; for XLispStat).  One further step is needed if you wish to
-run statistical processes, see below.
-</p>
-<p>To run statistical processes under <acronym>ESS</acronym>, Windows users will need to make
-sure that the directories for the software they will be using is in the
-PATH environment variable.
-</p>
-<p>On Windows NT/2000/XP, add the directories to the PATH using the
-<code>My Computer-&gt;Control Panel-&gt;System-&gt;Advanced-&gt;Environment Variables</code> menu.
-Note that the directory containing the program is
-added to the PATH, not the program itself.  One such line is needed
-for each software program.  Be sure to use the abbreviation
-<code>progra~1</code> and not the long version with embedded blanks as
-this may cause problems.  Also, make sure to use backslashes <code>\</code>
-since Windows requires them.
-</p>
-<p>An alternative, for R users, is that rather than adjusting the PATH
-variable, you can add the following to your emacs initialization file
-(and restart emacs):
-</p><div class="example">
-<pre class="example">(setq inferior-R-program-name &quot;c:/progra~1/R/R-2.15.1/bin/Rterm.exe&quot;)
-</pre></div>
-<p>This assumes that you have installed R-2.15.1 in the default location.
-Change the path otherwise to point to other locations.
-</p>
-<p>Windows users who place S-PLUS anywhere other than the default
-location will also need to add the following three lines (properly
-adjusted for their location):
-</p><div class="example">
-<pre class="example">(setq-default inferior-S+6-program-name
-    &quot;c:/progra~1/Insightful/SPLUS70/cmd/Splus&quot;)
-(setq-default inferior-Sqpe+6-SHOME-name
-    &quot;c:/progra~1/Insightful/SPLUS70&quot;)
-(setq-default inferior-Sqpe+6-program-name
-    &quot;c:/progra~1/Insightful/SPLUS70/cmd/Sqpe.exe&quot;)
-</pre></div>
-<p>The above example uses the default location of S-PLUS in
-<code>c:\progra~1\Insightful</code>.  Please note that <acronym>ESS</acronym>
-considers S-PLUS 6, 7, and 8 to be variants of S+6.
-</p>
-<p>These users may also need to modify the emacs variable <code>ess-SHOME-versions</code>
-to match their installation in order to get the full set of S-PLUS versions
-on their machine into the <acronym>ESS</acronym> menu.
-</p>
-<p>To start the S-PLUS [678].x GUI from ESS under emacs:
-</p><ol>
-<li> If you use Cygwin bash as your primary shell, then
-<div class="example">
-<pre class="example">M-x S
-(or <code>M-x S+6</code>).
-</pre></div>
-</li><li> If you use the MSDOS prompt window as your primary shell, then
-<div class="example">
-<pre class="example">M-x S+6-msdos
-</pre></div>
-</li></ol>
-<p>You will then be
-asked for a pathname (&quot;S starting data directory?&quot;), from which to
-start the process.  The prompt will propose your current directory
-as the default.  ESS will start the S-PLUS GUI.  There will be
-slight delay during which emacs is temporarily frozen.  ESS will arrange for
-communication with the S-PLUS GUI using the DDE protocol.
-Send lines or regions
-from the emacs buffer containing your S program (for example,
-<samp>myfile.s</samp>) to the S-PLUS Commands Window with the
-<code>C-c C-n</code> or <code>C-c C-r</code> keys.
-(If you are still using S-PLUS 4.x or 2000,\
-then use <code>M-x S+4</code> or <code>M-x S+4-msdos</code>.)
-</p>
-<p>To start an S-PLUS [678].x session inside an emacs buffer&mdash;and
-without the S-PLUS GUI:
-</p><div class="example">
-<pre class="example">M-x Sqpe
-(or <code>M-x Sqpe+6</code>).
-</pre></div>
-<p>This works with both the bash and msdos shells.
-You will then be asked for a pathname (&quot;S starting data
-directory?&quot;), from which to start the process.  The prompt will
-propose your current directory as the default.
-You get Unix-like behavior, in particular the entire
-transcript is available for emacs-style search commands.
-Send lines or regions from the emacs buffer containing your S
-program (for example, <samp>myfile.s</samp>) to the *S+6* buffer with the
-<code>C-c C-n</code> or <code>C-c C-r</code> keys.
-Interactive graphics are available with Sqpe by using the java
-library supplied with S-PLUS 6.1 and newer releases.
-Enter the commands:
-</p><div class="example">
-<pre class="example">library(winjava)
-java.graph()
-</pre></div>
-<p>Graphs can be saved from the <code>java.graph</code> device
-in several formats, but not PostScript.   If you
-need a PostScript file you will need to open a separate
-<code>postscript</code> device.
-(If you are still using S-PLUS 4.x or 2000, then use <code>M-x Sqpe+4</code>.)
-</p>
-<p>To connect to an already running S-PLUS GUI (started, for example,
-from the S-PLUS icon):
-</p><div class="example">
-<pre class="example">M-x S+6-existing
-</pre></div>
-<p>or
-</p><div class="example">
-<pre class="example">M-x S+6-msdos-existing
-</pre></div>
-<p>You will then be
-asked for a pathname (&quot;S starting data directory?&quot;), from which to
-start the process.  The prompt will propose your current directory
-as the default.  ESS will arrange for
-communication with the already running S-PLUS GUI using the DDE protocol.
-Send lines or regions
-from the emacs buffer containing your S program (for example,
-<samp>myfile.s</samp>) to the S-PLUS Commands Window with the
-<code>C-c C-n</code> or <code>C-c C-r</code> keys.
-(If you are still using S-PLUS 4.x or 2000,
- then use <code>M-x S+4-existing</code> or <code>M-x S+4-msdos-existing</code>.)
-</p>
-<p>If you wish to run R, you can start it with:
-</p><div class="example">
-<pre class="example">M-x R
-</pre></div>
-
-
 
 <hr>
 <a name="Starting-up"></a>
 <div class="header">
 <p>
-Next: <a href="#Current-Features" accesskey="n" rel="next">Current Features</a>, Previous: <a href="#Microsoft-Windows-installation" accesskey="p" rel="previous">Microsoft Windows installation</a>, Up: <a href="#General-Information" accesskey="u" rel="up">General Information</a> &nbsp; </p>
+Next: <a href="#Current-Features" accesskey="n" rel="next">Current Features</a>, Previous: <a href="#Installation" accesskey="p" rel="previous">Installation</a>, Up: <a href="#General-Information" accesskey="u" rel="up">General Information</a> &nbsp; </p>
 </div>
 <a name="Starting-an-ESS-process"></a>
-<h3 class="section">1.8 Starting an ESS process</h3>
+<h3 class="section">1.6 Starting an ESS process</h3>
 <p>To start an S session on Unix or on Windows when you
 use the Cygwin bash shell, simply type <kbd>M-x S RET</kbd>.
 </p>
@@ -905,7 +602,7 @@ use the MSDOS prompt shell, simply type <kbd>M-x S+6-msdos RET</kbd>.
 Next: <a href="#New-Features" accesskey="n" rel="next">New Features</a>, Previous: <a href="#Starting-up" accesskey="p" rel="previous">Starting up</a>, Up: <a href="#General-Information" accesskey="u" rel="up">General Information</a> &nbsp; </p>
 </div>
 <a name="Current-Features-1"></a>
-<h3 class="section">1.9 Current Features</h3>
+<h3 class="section">1.7 Current Features</h3>
 
 <ul>
 <li> Languages Supported:
@@ -962,8 +659,44 @@ Next: <a href="#New-Features" accesskey="n" rel="next">New Features</a>, Previou
 Next: <a href="#Reporting-Bugs" accesskey="n" rel="next">Reporting Bugs</a>, Previous: <a href="#Current-Features" accesskey="p" rel="previous">Current Features</a>, Up: <a href="#General-Information" accesskey="u" rel="up">General Information</a> &nbsp; </p>
 </div>
 <a name="New-Features-1"></a>
-<h3 class="section">1.10 New Features</h3>
+<h3 class="section">1.8 New Features</h3>
 
+
+<p>Changes / Selected Bug Fixes in 13.09-1:
+</p><ul>
+<li> ess-remote and TRAMP: R support code is now downloaded in binary form instead
+of being injected from local machine. The R code is stored in
+<code>~/.config/ESSR/</code> directory on the remote machine
+</li><li> TRAMP: PAGER environment variable is now correctly set to <code>inferior-ess-pager</code>
+</li><li> retrieval of help topics on remote machines is fixed
+</li><li> org-babel: source references of R code executed from org files correctly point
+to source references in original org files (version 8.2.1 or higher of
+org-mode is required for this feature)
+</li><li> <code>ess-execute</code> is now bound to <kbd>C-c C-e C-e</kbd> in <code>ess-extra-map</code>.
+</li><li> completion works again in <code>ess-execute</code>
+</li><li> <acronym>ESS[R]</acronym>: <code>head</code> and <code>tail</code> methods were replaced by <code>htsummary</code> in
+<code>ess-R-describe-object-at-point-commands</code>
+</li><li> <acronym>ESS[roxygen]</acronym>: evaluation commands now work in roxygen blocks.
+Leading comments are automatically removed before the evaluation
+</li><li> <acronym>ESS[transcript]</acronym>: &rsquo;Clean Region&rsquo; now works with multiline statements;
+ <code>ess-transcript-clean-region</code> etc. correctly treat
+ multiline statements, i.e., no longer forgets the lines typically
+ preceded by &rsquo;+&rsquo;
+</li><li> <acronym>ESS[SAS]</acronym>: Three features/fixes with special thanks to Matthew Fidler
+<a href="https://github.com/emacs-ess/ESS/pulls/mlf176f2">https://github.com/emacs-ess/ESS/pulls/mlf176f2</a>. Turn on SAS log mode
+when appropriate.  Indent comments and CARDS statement more appropriately. 
+</li><li> <acronym>ESS[SAS]</acronym>: <code>ess-sas-edit-keys-toggle</code> default returns to <code>nil</code>
+</li><li> <acronym>ESS[R]</acronym>: support for <code>prettify-symbols-mode</code>: 
+contribution from Rudiger Sonderfeld <a href="https://github.com/emacs-ess/ESS/pull/65">https://github.com/emacs-ess/ESS/pull/65</a>
+</li><li> <acronym>ESS[SWV]</acronym>: knitr now evaluates in the current frame
+</li><li> <acronym>ESS[developer]</acronym>: ess-developer doesn&rsquo;t kill open DESCRIPTION files anymore
+</li><li> <acronym>ESS[roxygen]</acronym>: <code>ess-roxy-preview-HTML</code> is now on <kbd>C-c C-o C-w</kbd> and
+ <code>ess-roxy-preview-text</code> is now on <code>C-c C-o C-t</code>
+</li><li> <acronym>ESS</acronym>: installation with <code>make install</code> was simplified and should work 
+out of the box on most *nix systems
+</li><li> <acronym>ESS</acronym> installation instructions simplified
+</li><li> fixed font-lock bug introduced in 13.09 that was causing very slow process output
+</li></ul>
 
 <p>Changes/New Features in 13.09:
 </p><ul>
@@ -1434,7 +1167,7 @@ ESS doesn&rsquo;t bind <kbd>M-TAB</kbd> for emacs 24 or higher. <kbd>M-TAB</kbd>
 default <code>complete-symbol</code>.
 
 </li><li> <acronym>ESS[R]</acronym>: Out of the box integration with <code>Auto
-Completion</code> mode (http://cx4a.org/software/auto-complete/). Three AC
+Completion</code> mode <a href="http://cx4a.org/software/auto-complete">http://cx4a.org/software/auto-complete</a> . Three AC
 sources <code>ac-source-R-args</code>, <code>ac-source-R-objects</code> and
 <code>ac-source-R</code> are provided. The last one combines the previous two
 and makes them play nicely together. Set <code>ess-use-auto-complete</code> to
@@ -1631,7 +1364,7 @@ fixed in <code>ess-get-words-from-vector</code> and <code>ess-command</code>.
 Next: <a href="#Mailing-Lists" accesskey="n" rel="next">Mailing Lists</a>, Previous: <a href="#New-Features" accesskey="p" rel="previous">New Features</a>, Up: <a href="#General-Information" accesskey="u" rel="up">General Information</a> &nbsp; </p>
 </div>
 <a name="Reporting-Bugs-1"></a>
-<h3 class="section">1.11 Reporting Bugs</h3>
+<h3 class="section">1.9 Reporting Bugs</h3>
 
 <p>Please send bug reports, suggestions etc. to
 <a href="mailto:ESS-bugs@stat.math.ethz.ch">ESS-bugs@stat.math.ethz.ch</a>
@@ -1658,7 +1391,7 @@ donations are also more than welcome.
 Next: <a href="#Authors" accesskey="n" rel="next">Authors</a>, Previous: <a href="#Reporting-Bugs" accesskey="p" rel="previous">Reporting Bugs</a>, Up: <a href="#General-Information" accesskey="u" rel="up">General Information</a> &nbsp; </p>
 </div>
 <a name="Mailing-Lists-1"></a>
-<h3 class="section">1.12 Mailing Lists</h3>
+<h3 class="section">1.10 Mailing Lists</h3>
 
 
 <p>There is a mailing list for discussions and announcements relating to
@@ -1685,7 +1418,7 @@ low-volume mailing list.
 Previous: <a href="#Mailing-Lists" accesskey="p" rel="previous">Mailing Lists</a>, Up: <a href="#General-Information" accesskey="u" rel="up">General Information</a> &nbsp; </p>
 </div>
 <a name="Authors-1"></a>
-<h3 class="section">1.13 Authors</h3>
+<h3 class="section">1.11 Authors</h3>
 
 <ul>
 <li> <a href="mailto:blindglobe@gmail.com">A.J. Rossini</a>

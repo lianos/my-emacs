@@ -221,11 +221,10 @@ otherwise call devSource."
       (ess-developer-devSource beg end package message))))
 
 (defun ess-developer-devSource (beg end package &optional message)
-  (let* ((ess-load-command
-          (format ".essDev_source(source='%s',package='%s')" "%s" package))
-         (ess-load-visibly-noecho-command ess-load-command)
-         ;; don't want string evaluation
-         ess-eval-command ess-eval-visibly-noecho-command)
+  (let* ((ess-eval-command
+          (format ".essDev.eval('%s', package='%s', file='%s')" "%s" package "%f"))
+         (ess-eval-visibly-command ess-eval-command)
+         (ess-eval-visibly-noecho-command ess-eval-command))
     (if message (message message))
     (ess-developer--command (ess--make-source-refd-command beg end)
                             'ess-developer--propertize-output)))
@@ -238,7 +237,6 @@ PROPERTIZE-FUNC is a function called with the output buffer being
 current. usually used to manipulate the output, for example to
 propertize output text.
 "
-  (ess-developer--inject-source-maybe) ; first time only
   (setq comm (format "eval({cat('\\n')\n%s\ncat('!@OK@!')})\n" comm))
   (let ((buff (get-buffer-create " *ess-command-output*"))
         out)
@@ -307,14 +305,13 @@ found, return nil."
 specific so far). PATH defaults to `default-directory'"
   (when (setq path (or path (ess-developer--get-package-path)))
     (let ((file (expand-file-name ess-developer-root-file path))
-          (case-fold-search t)
-          (find-file-literally t))
+          (case-fold-search t))
       (when (file-exists-p file)
-        (with-current-buffer (find-file-noselect file t t)
+        (with-temp-buffer
+          (insert-file-contents file)
           (goto-char (point-min))
           (re-search-forward "package: \\(.*\\)")
-          (prog1 (match-string 1)
-            (kill-this-buffer)))))))
+          (match-string 1))))))
 
 (defun ess-developer-activate-in-package (&optional package all)
   "Activate developer if current file is part of a package which
@@ -361,6 +358,7 @@ If ALL is non-nil, deactivate in all open R buffers."
 (defun ess-developer-load-package ()
   "Interface to load_all function from devtools package."
   (interactive)
+  (ess-force-buffer-current)
   (let ((package (ess-developer--get-package-path)))
     (unless (and package ess-developer)
       ;; ask only when not obvious
@@ -377,19 +375,20 @@ If ALL is non-nil, deactivate in all open R buffers."
   "Non nil in buffers where developer mode is active")
 (make-variable-buffer-local 'ess-developer)
 
-(defun ess-developer--inject-source-maybe ()
-  ;; puting this into ESSR.R makes loading very slow
-  ;; when ESSR is a package, this should go away
-  (let ((devR-file (concat (file-name-directory ess-etc-directory)
-                           "ess-developer.R")))
-    (unless (ess-boolean-command
-             "exists('.essDev_source', envir = .ESSR_Env)\n")
-      (unless (file-exists-p devR-file)
-        (error "Cannot locate 'ess-developer.R' file"))
-      (message "Injecting ess-developer code ...")
-      (ess--inject-code-from-file devR-file)
-      (unless (ess-boolean-command "exists('.essDev_source', envir = .ESSR_Env)\n")
-        (error "Could not source ess-developer.R. Please investigate the output of *ess-command-output* buffer for errors")))))
+;; Since the ESSR package, this one is not needed:
+;; (defun ess-developer--inject-source-maybe ()
+;;   ;; puting this into ESSR.R makes loading very slow
+;;   ;; when ESSR is a package, this should go away
+;;   (let ((devR-file (concat (file-name-directory ess-etc-directory)
+;;                            "ess-developer.R")))
+;;     (unless (ess-boolean-command
+;;              "exists('.essDev_source', envir = .ESSR_Env)\n")
+;;       (unless (file-exists-p devR-file)
+;;         (error "Cannot locate 'ess-developer.R' file"))
+;;       (message "Injecting ess-developer code ...")
+;;       (ess--inject-code-from-file devR-file)
+;;       (unless (ess-boolean-command "exists('.essDev_source', envir = .ESSR_Env)\n")
+;;         (error "Could not source ess-developer.R. Please investigate the output of *ess-command-output* buffer for errors")))))
 
 (defun ess-developer (&optional val)
   "Toggle on/off ess-developer functionality.

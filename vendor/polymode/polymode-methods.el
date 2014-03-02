@@ -181,18 +181,18 @@ slot :buffer of SUBMODE. Create this buffer if does not exist."
 
 
 ;;; FACES
-(defgeneric pm/get-adj-face (submode &optional type))
-(defmethod pm/get-adj-face ((submode pm-submode) &optional type)
-  (oref submode :adj-face))
-(defmethod pm/get-adj-face ((submode pm-inner-submode) &optional type)
+(defgeneric pm/get-adjust-face (submode &optional type))
+(defmethod pm/get-adjust-face ((submode pm-submode) &optional type)
+  (oref submode :adjust-face))
+(defmethod pm/get-adjust-face ((submode pm-inner-submode) &optional type)
   (setq type (or type pm/type))
   (cond ((eq type 'head)
-         (oref submode :head-adj-face))
+         (oref submode :head-adjust-face))
         ((eq type 'tail)
-         (if (eq 'head (oref pm/submode :tail-adj-face))
-             (oref pm/submode :head-adj-face)
-           (oref pm/submode :tail-adj-face)))
-        (t (oref pm/submode :adj-face))))
+         (if (eq 'head (oref pm/submode :tail-adjust-face))
+             (oref pm/submode :head-adjust-face)
+           (oref pm/submode :tail-adjust-face)))
+        (t (oref pm/submode :adjust-face))))
 
 
 ;;; SPAN MANIPULATION
@@ -216,15 +216,19 @@ Should return nil if there is no SUBMODE specific span around POS.")
 Return a cons (submode . span), for which START is closest to
 POS (and before it); i.e. the innermost span.  POS defaults to
 point."
-    ;; fixme: base should be last, to take advantage of the submodes computation
-    (let ((smodes (cons (oref config :base-submode) 
-                        (oref config :inner-submodes)))
-          (start (point-min))
-          (end (point-max))
-          (pos (or pos (point)))
-          span val)
-      (save-restriction
-        (widen)
+    (save-restriction
+      (widen)
+      ;; fixme: base should be last, to take advantage of the submodes computation
+      (let* ((smodes (cons (oref config :base-submode)
+                           (oref config :inner-submodes)))
+             (start (point-min))
+             (end (point-max))
+             (pos (or pos (point)))
+             (span (list nil start end nil))
+             val)
+        ;; (save-restriction
+        ;;   (widen)
+
         (dolist (sm smodes)
           (setq val (pm/get-span sm pos))
           (when (and val
@@ -244,17 +248,14 @@ point."
                              (nth 2 span)))
               (setcar (cdr span) start)
               (setcar (cddr span) end)
-              ))))
-      (unless (and (<= start end) (<= pos end) (>= pos start))
-        (error "Bad polymode selection: %s, %s"
-               (list start end) pos))
-      ;; fixme: why is this here?
-      ;; (if (= start end)
-      ;;     (setq end (1+ end)))
-      (when (and span
-                 (null (car span))) ; submodes can compute the base span by returning nil
-        (setcar (last span) (oref config :base-submode)))
-      span))
+              )))
+        ;; )
+        (unless (and (<= start end) (<= pos end) (>= pos start))
+          (error "Bad polymode selection: %s, %s"
+                 (list start end) pos))
+        (when (null (car span)) ; submodes can compute the base span by returning nil
+          (setcar (last span) (oref config :base-submode)))
+        span)))
 
 ;; No need for this one so far. Basic method iterates through :inner-submodes
 ;; anyhow.
@@ -427,6 +428,7 @@ the submode.")
       (pm--uncomment-region 1 (nth 1 span))))
 
 (defmethod pm/indent-line ()
+  "Indent line dispatcher"
   (let ((span (pm/get-innermost-span)))
     (pm/indent-line (car (last span)) span)))
 
@@ -437,14 +439,14 @@ the submode.")
   "Indent line in inner submodes.
 When point is at the beginning of head or tail, use parent chunk
 to indent."
-  ;; sloppy work,
-  ;; assumes multiline chunks and single-line head/tail
-  ;; assumes current buffer is the correct buffer
+  ;; sloppy work:
+  ;; Assumes multiline chunks and single-line head/tail.
+  ;; Assumes current buffer is the correct buffer.
   (let ((pos (point))
         shift delta)
     (cond ((or (eq 'head (car span))
                (eq 'tail (car span)))
-            ;; use parent's indentation function
+            ;; use parent's indentation function in head and tail
            (back-to-indentation)
            (setq delta (- pos (point)))
            (backward-char)
@@ -460,11 +462,14 @@ to indent."
            (t
             (setq shift (pm--get-head-shift span))
             (pm--indent-line span)
+            (when (= (current-column) 0)
+              (setq shift (+ shift (oref submode :indent-offset))))
             (setq delta (- (point) (point-at-bol)))
             (beginning-of-line)
             (indent-to shift)
             (goto-char (+ (point) delta))))))
 
+;; fixme: This one is nowhere used?
 (defmethod pm/indent-line ((submode pm-config-multi-auto) &optional span)
   (pm/select-buffer submode span)
   (pm/indent-line pm/submode span))

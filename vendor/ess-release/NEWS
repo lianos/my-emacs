@@ -1,4 +1,43 @@
-Changes/New Features in 13.09:
+Changes / Selected Bug Fixes in 13.09-1:
+   * ess-remote and TRAMP: R support code is now downloaded in binary
+     form instead of being injected from local machine.  The R code is
+     stored in '~/.config/ESSR/' directory on the remote machine
+   * TRAMP: PAGER environment variable is now correctly set to
+     'inferior-ess-pager'
+   * retrieval of help topics on remote machines is fixed
+   * org-babel: source references of R code executed from org files
+     correctly point to source references in original org files (version
+     8.2.1 or higher of org-mode is required for this feature)
+   * 'ess-execute' is now bound to 'C-c C-e C-e' in 'ess-extra-map'.
+   * completion works again in 'ess-execute'
+   * ESS[R]: 'head' and 'tail' methods were replaced by 'htsummary' in
+     'ess-R-describe-object-at-point-commands'
+   * ESS[roxygen]: evaluation commands now work in roxygen blocks.
+     Leading comments are automatically removed before the evaluation
+   * ESS[transcript]: 'Clean Region' now works with multiline
+     statements; 'ess-transcript-clean-region' etc.  correctly treat
+     multiline statements, i.e., no longer forgets the lines typically
+     preceded by '+'
+   * ESS[SAS]: Three features/fixes with special thanks to Matthew
+     Fidler https://github.com/emacs-ess/ESS/pulls/mlf176f2
+     (https://github.com/emacs-ess/ESS/pulls/mlf176f2).  Turn on SAS log
+     mode when appropriate.  Indent comments and CARDS statement more
+     appropriately.
+   * ESS[SAS]: 'ess-sas-edit-keys-toggle' default returns to 'nil'
+   * ESS[R]: support for 'prettify-symbols-mode': contribution from
+     Rudiger Sonderfeld <https://github.com/emacs-ess/ESS/pull/65>
+   * ESS[SWV]: knitr now evaluates in the current frame
+   * ESS[developer]: ess-developer doesn't kill open DESCRIPTION files
+     anymore
+   * ESS[roxygen]: 'ess-roxy-preview-HTML' is now on 'C-c C-o C-w' and
+     'ess-roxy-preview-text' is now on 'C-c C-o C-t'
+   * ESS: installation with 'make install' was simplified and should
+     work out of the box on most *nix systems
+   * ESS installation instructions simplified
+   * fixed font-lock bug introduced in 13.09 that was causing very slow
+     process output
+
+   Changes/New Features in 13.09:
    * font-lock in process buffers doesn't "spill" over prompts.  Missing
      closing string delimiters should not cause wrong fontification of
      the following command input.
@@ -442,7 +481,8 @@ Changes/New Features in 13.09:
      default 'complete-symbol'.
 
    * ESS[R]: Out of the box integration with 'Auto Completion' mode
-     (http://cx4a.org/software/auto-complete/).  Three AC sources
+     http://cx4a.org/software/auto-complete
+     (http://cx4a.org/software/auto-complete) .  Three AC sources
      'ac-source-R-args', 'ac-source-R-objects' and 'ac-source-R' are
      provided.  The last one combines the previous two and makes them
      play nicely together.  Set 'ess-use-auto-complete' to 't' to start

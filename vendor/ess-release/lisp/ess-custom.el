@@ -133,7 +133,7 @@
   :prefix "ess-")
 ;; Variables (not user-changeable)
 
-(defvar ess-version "13.09" ;; updated by 'make'
+(defvar ess-version "13.09-1" ;; updated by 'make'
   "Version of ESS currently loaded.")
 
 (defvar ess-revision nil ;; set
@@ -226,9 +226,8 @@ See also `tooltip-hide-delay' and `tooltip-delay'.
 
 (defcustom ess-R-describe-object-at-point-commands
   '(("str(%s)")
-    ("head(%s, n = 40)")
-    ("tail(%s, n = 40)")
-    ("summary(%s)"))
+    ("htsummary(%s, hlength = 20, tlength = 20)")
+    ("summary(%s, maxsum = 20)"))
   "A list of commands cycled by `ess-describe-object-at-point'.
 %s is substituted with the name at point.
 
@@ -472,7 +471,6 @@ to install your custom sources.
   :group 'ess-extras
   :type '(choice (const t) (const script-only) (const nil)))
 
-
 (defcustom ess-ac-R-argument-suffix " = "
   "Suffix appended by `ac-source-R' and `ac-source-R-args' to candidates."
   :group 'R
@@ -491,6 +489,10 @@ might want to set this to nil.
 "
   :group 'ess
   :type 'boolean)
+
+
+(defvar ess-ac-sources nil
+  "Dialect specific, ESS specific list of ac-sources")
 
 (defvar ess--completing-hist nil
   "Variable to store completion history.
@@ -963,7 +965,7 @@ If nil, ESS will try finding one from a list."
   :group 'ess-roxy
   :type 'string)
 
-(defcustom ess-roxy-tags-noparam '("export" "nord")
+(defcustom ess-roxy-tags-noparam '("export" "noRd")
   "The tags used in roxygen fields that can be used alone.  Used
 to decide highlighting and tag completion."
   :group 'ess-roxy
@@ -1680,7 +1682,7 @@ If you wish to pass arguments to a process, see e.g. `inferior-R-args'.")
 
 (defvar inferior-ess-secondary-prompt nil
   "Regular expression used by ess-mode to detect the secondary prompt.
-(This is issued by S to continue an incomplete expression).
+This is issued by S to continue an incomplete expression.
 Set to nil if language doesn't support secondary prompt.")
 ;; :group 'ess-proc
 ;; :type 'string)
@@ -1876,7 +1878,7 @@ This format string should use %s to substitute an object name.")
 (setq-default inferior-ess-help-command "help(\"%s\")\n")
 
 
-(defcustom inferior-ess-r-help-command ".ess_help(\"%s\", help_type=\"text\")\n"
+(defcustom inferior-ess-r-help-command ".ess.help(\"%s\", help.type=\"text\")\n"
   "Format-string for building the R command to ask for help on an object.
 
 This format string should use %s to substitute an object name.
@@ -1993,7 +1995,7 @@ session.")
 
 (defvar ess-sp-change nil
   "Variable not used. Use (ess-process-get 'sp-for-help-changed?) instead.")
-(make-obsolete-variable 'ess-sp-change nil "ESS 12.09")
+(make-obsolete-variable 'ess-sp-change nil "ESS[12.09]")
 ;; (make-variable-buffer-local 'ess-sp-change)
 
 (defvar ess-prev-load-dir/file nil
@@ -2396,8 +2398,8 @@ default."
 
 (defcustom ess-help-pop-to-buffer t
   "If non-nil ess-help buffers are given focus during the display.
-The default is t.
-"
+The default is t (except when `focus-follows-mouse' and
+`mouse-autoselect-window' are both t)."
   :group 'ess-help
   :type 'boolean)
 

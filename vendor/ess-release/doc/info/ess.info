@@ -14,7 +14,7 @@ File: ess.info,  Node: Top,  Next: Introduction,  Up: (dir)
 ESS: Emacs Speaks Statistics
 ****************************
 
-ESS version 13.09
+ESS version 13.09-1
 
      by  A.J. Rossini,
          R.M. Heiberger,
@@ -245,7 +245,46 @@ File: ess.info,  Node: New features,  Next: Credits,  Prev: Features,  Up: Intro
 1.2 New features in ESS
 =======================
 
-Changes/New Features in 13.09:
+Changes / Selected Bug Fixes in 13.09-1:
+   * ess-remote and TRAMP: R support code is now downloaded in binary
+     form instead of being injected from local machine.  The R code is
+     stored in '~/.config/ESSR/' directory on the remote machine
+   * TRAMP: PAGER environment variable is now correctly set to
+     'inferior-ess-pager'
+   * retrieval of help topics on remote machines is fixed
+   * org-babel: source references of R code executed from org files
+     correctly point to source references in original org files (version
+     8.2.1 or higher of org-mode is required for this feature)
+   * 'ess-execute' is now bound to 'C-c C-e C-e' in 'ess-extra-map'.
+   * completion works again in 'ess-execute'
+   * ESS[R]: 'head' and 'tail' methods were replaced by 'htsummary' in
+     'ess-R-describe-object-at-point-commands'
+   * ESS[roxygen]: evaluation commands now work in roxygen blocks.
+     Leading comments are automatically removed before the evaluation
+   * ESS[transcript]: 'Clean Region' now works with multiline
+     statements; 'ess-transcript-clean-region' etc.  correctly treat
+     multiline statements, i.e., no longer forgets the lines typically
+     preceded by '+'
+   * ESS[SAS]: Three features/fixes with special thanks to Matthew
+     Fidler https://github.com/emacs-ess/ESS/pulls/mlf176f2
+     (https://github.com/emacs-ess/ESS/pulls/mlf176f2).  Turn on SAS log
+     mode when appropriate.  Indent comments and CARDS statement more
+     appropriately.
+   * ESS[SAS]: 'ess-sas-edit-keys-toggle' default returns to 'nil'
+   * ESS[R]: support for 'prettify-symbols-mode': contribution from
+     Rudiger Sonderfeld <https://github.com/emacs-ess/ESS/pull/65>
+   * ESS[SWV]: knitr now evaluates in the current frame
+   * ESS[developer]: ess-developer doesn't kill open DESCRIPTION files
+     anymore
+   * ESS[roxygen]: 'ess-roxy-preview-HTML' is now on 'C-c C-o C-w' and
+     'ess-roxy-preview-text' is now on 'C-c C-o C-t'
+   * ESS: installation with 'make install' was simplified and should
+     work out of the box on most *nix systems
+   * ESS installation instructions simplified
+   * fixed font-lock bug introduced in 13.09 that was causing very slow
+     process output
+
+   Changes/New Features in 13.09:
    * font-lock in process buffers doesn't "spill" over prompts.  Missing
      closing string delimiters should not cause wrong fontification of
      the following command input.
@@ -689,7 +728,8 @@ Changes/New Features in 13.09:
      default 'complete-symbol'.
 
    * ESS[R]: Out of the box integration with 'Auto Completion' mode
-     (http://cx4a.org/software/auto-complete/).  Three AC sources
+     http://cx4a.org/software/auto-complete
+     (http://cx4a.org/software/auto-complete) .  Three AC sources
      'ac-source-R-args', 'ac-source-R-objects' and 'ac-source-R' are
      provided.  The last one combines the previous two and makes them
      play nicely together.  Set 'ess-use-auto-complete' to 't' to start
@@ -1054,311 +1094,74 @@ on your system.
 
 * Menu:
 
-* Unix installation::           Installing ESS on your Unix (Linux/Mac OS X/etc.) system
-* Microsoft Windows installation::  Installing ESS on your MS Windows system
+* Step by step instructions::
 * License::
 * Stability::
-* Requirements::                Emacs, Operating Systems and Statistical Packages
+* Requirements::
 
 
-File: ess.info,  Node: Unix installation,  Next: Microsoft Windows installation,  Up: Installation
+File: ess.info,  Node: Step by step instructions,  Next: License,  Up: Installation
 
-2.1 Unix (Linux/Mac OS X/Solaris/etc.) Installation
-===================================================
+2.1 Step by step instructions
+=============================
 
-For a Unix or Unix-like installation, please follow the next steps.
-Retrieve the latest tgz file ('ess-VERSION.tgz') from ESS downloads area
-(http://ess.r-project.org/index.php?Section=download).
+  1. Download the latest zip or tgz archive from ESS downloads area
+     (http://ess.r-project.org/index.php?Section=download) and unpack it
+     into a directory where you would like ESS to reside.  We will
+     denote this directory as '/path/to/ESS/' hereafter.
 
-   _GNU Emacs Simple Instructions:_ for recent versions of Emacs (23.x
-or higher) and ESS, the installation process is simple.
+     Alternatively you can use 'svn' or 'git' to fetch the most recent
+     development version to your local machine with:
 
-  1. Extract all the files from 'ess-VERSION.tgz' into the directory
-     'PREFIX/site-lisp' where 'PREFIX' is appropriate for GNU Emacs on
-     your system; 'PREFIX' will most likely be either '/usr/share/emacs'
-     or '/usr/local/share/emacs' (on Mac OS X, 'PREFIX' will most likely
-     be something like '/Applications/Emacs.app/Contents/Resources'):
-          GNU tar  % gtar zxf ess-VERSION.tgz -C PREFIX/site-lisp
-          Unix tar % gunzip < ess-VERSION.tgz | tar xf - -C PREFIX/site-lisp
+          svn checkout https://svn.r-project.org/ESS/trunk /path/to/ESS
 
-  2. Then, add the line
-          (require 'ess-site)
-     to '~/.emacs' and restart Emacs.
+     or
 
-  3. If you see a buffer named '*ESS*', then the simple instructions
-     were most likely successful.  If not, then read further.
+          git clone https://github.com/emacs-ess/ESS.git /path/to/ESS
 
-  4. It could be that you have an older version of Emacs, some other
-     problem with your installation or you are not a sysadmin.  Whatever
-     the case, you may need to edit 'ess-site.el' manually.  If that is
-     the case, then you should create a directory just for ESS like
-     '~/ess' or '/usr/local/ess' and unpack ESS there.  That way, your
-     changes to 'ess-site.el' will not be lost if you update Emacs
-     later.
+  2. Optionally, compile elisp files and build the documentation with:
+          cd /path/to/ESS/
+          make
+     Without this step, info, pdf and html documentation and reference
+     card will not be available.
 
-  5. Replace the line above with
-          (load "~/ess/ess-VERSION/lisp/ess-site")
-     in '~/.emacs' and restart Emacs.
+  3. Optionally, install into your local machine with 'make install'.
+     You might need administrative privileges:
 
-  6. If you see a buffer named '*ESS*', then the manual instructions
-     were most likely successful.  If not, then send a query to
-     <ess-help@r-project.org> explicitly describing your problem and
-     your environment including operating system, Emacs version, ESS
-     version, etc.
-
-   Due to XEmacs lacking some features that ESS requires, ESS support of
-XEmacs ends with ESS 12.04-4.  This decision will be re-visited in the
-future as XEmacs continues to sync with GNU Emacs.
-
-   _XEmacs Simple Instructions:_ for recent versions of XEmacs (21.4.x
-or higher) and ESS, the installation process is simple.
-
-  1. Extract all the files from 'ess-VERSION.tgz' when you are in the
-     current working directory of
-     '/usr/local/LOCATION/xemacs/site-packages' which exists for
-     packages like ESS where 'LOCATION' is 'lib' for legacy
-     installations and 'share' now (and for Mac OS X create a link to it
-     from the directory
-     '/Applications/XEmacs.app/Contents/Resources/site-lisp'):
-          %prompt gtar zxf ess-VERSION.tgz            # for GNU tar
-          %prompt gunzip < ess-VERSION.tgz | tar xf - # for Unix tar
-
-  2. Then, add the line
-          (require 'ess-site)
-     to '~/.xemacs/init.el' and restart XEmacs.
-
-  3. If you see a buffer named '*ESS*', then the simple instructions
-     were most likely successful.  If not, then read further.
-
-  4. It could be that you have an older version of XEmacs, some other
-     problem with your installation or you are not a sysadmin.  Whatever
-     the case, you may need to edit 'ess-site.el' manually.  If that is
-     the case, then you should create a directory just for ESS like
-     '~/ess' or '/usr/local/ess' and unpack ESS there.  That way, your
-     changes to 'ess-site.el' will not be lost if you update XEmacs
-     later.
-
-  5. Replace the line above with
-          (load "~/ess/ess-VERSION/lisp/ess-site")
-     in '~/.xemacs/init.el' and restart XEmacs.
-
-  6. If you see a buffer named '*ESS*', then the manual instructions
-     were most likely successful.  If not, then send a query to
-     <ess-help@r-project.org> explicitly describing your problem and
-     your environment including operating system, XEmacs version, ESS
-     version, etc.
-
-  1. (OPTIONAL) COMPILING E-LISP:
-
-     Edit the default locations of 'LISPDIR', 'INFODIR' and 'ETCDIR' in
-     Section 1 of 'Makeconf' (if you are using XEmacs, then edit the
-     XEmacs subsection in Section 1).
-
-     You can compile those files by:
-          make all
-
-     When that completes successfully, install the compiled files:
           make install
 
-
-File: ess.info,  Node: Microsoft Windows installation,  Next: License,  Prev: Unix installation,  Up: Installation
+     The files are installed into '/usr/share/emacs' directory.  For
+     this step to run correctly on Mac OS X, you will need to adjust the
+     'PREFIX' path in 'Makeconf'.  The necessary code and instructions
+     are commented in that file.
 
-2.2 Microsoft Windows installation
-==================================
+  4. If you have performed the 'make install' step from above, just add
 
-For Microsoft Windows installation, please follow the next steps.
-Retrieve the latest zip file ('ess-VERSION.zip') from ESS downloads area
-(http://ess.r-project.org/index.php?Section=download).
-
-   _GNU Emacs Simple Instructions:_ for recent versions of Emacs (23.x
-or higher) and ESS, the installation process is simple.
-
-  1. Extract all the files from 'ess-VERSION.zip' (by double clicking on
-     it and selecting "Extract all files" which launches the Folders
-     Extraction Wizard) into an 'ESS' sub-directory of the 'site-lisp'
-     directory that exists for packages like ESS.  If GNU Emacs was
-     installed in the default location, then this directory can be found
-     somewhere like 'C:\Program Files\GNU Emacs\emacs-24.x\site-lisp'
-
-  2. Add the line
           (require 'ess-site)
-     to '~/.emacs' and restart Emacs.
 
-  3. If you see a buffer named '*ESS*', then the simple instructions
-     were most likely successful.  If not, then read further.
+     to your '~/.emacs' file.  Otherwise, you should add
+     '/path/to/ESS/lisp/' to your emacs load path and then load ESS with
+     the following lines in your '~/.emacs':
 
-  4. It could be you have an older version of Emacs or some other
-     problem with your installation.  Either way, you may need to edit
-     'C:\ess\ess-VERSION\lisp\ess-site.el' manually.  If that is the
-     case, then you should create a directory just for ESS like 'C:\ess'
-     and unpack ESS there.  That way, your changes to
-     'C:\ess\ess-VERSION\lisp\ess-site.el' will not be lost if you
-     update Emacs later.
+          (add-to-list 'load-path "/path/to/ESS/lisp/")
+          (load "ess-site")
 
-  5. Replace the line above with
-          (load "C:/ess/ess-VERSION/lisp/ess-site")
-     in '~/.emacs' and restart Emacs.
+  5. Restart your Emacs and check that ESS was loaded from a correct
+     location with 'M-x ess-version'.
 
-  6. If you see a buffer named '*ESS*', then the manual instructions
-     were most likely successful.  If not, then send a query to
-     <ess-help@r-project.org> explicitly describing your problem and
-     your environment including operating system, Emacs version, ESS
-     version, etc.
+   _Note for Windows and Mac OS X users:_ The most straightforward way
+to install Emacs on your machine is by downloading all-in-one
+(http://vgoulet.act.ulaval.ca/en/emacs/) Emacs binary by Vincent Goulet.
 
-   Due to XEmacs lacking some features that ESS requires, ESS support of
-XEmacs ends with ESS 12.04-4.  This decision will be re-visited in the
-future as XEmacs continues to sync with GNU Emacs.
-
-   _XEmacs Simple Instructions:_ for recent versions of XEmacs (21.x or
-higher), the installation process is much simpler.  Hopefully, these
-simple instructions will work for you.  If not, then more detailed,
-manual instructions follow.
-
-  1. Extract all the files from 'ess-VERSION.zip' (by double clicking on
-     it and selecting "Extract all files" which launches the Folders
-     Extraction Wizard) into the 'site-packages' directory that exists
-     for packages like ESS.  If XEmacs was installed in the default
-     location, then this directory can be found at 'C:\Program
-     Files\XEmacs\site-packages'.
-
-  2. XEmacs requires the 'HOME' environment variable to be defined.  You
-     can create it by visiting the following dialog: 'My
-     Computer->Control Panel->System->Advanced->Environment Variables'
-     In the User variables window, press New.  And create a variable
-     named 'HOME' with a value something like (you must use forward
-     slashes '/' rather than backslashes '\') 'c:/Documents and
-     Settings/%USERNAME%/Application Data'.  Then press OK for that
-     window and press OK for the main window.  _If you also have GNU
-     Emacs installed, GNU Emacs will recognize 'HOME' and expand '~'
-     accordingly._
-
-  3. Now launch XEmacs and do a 'C-x C-f' followed by a '~'.  From the
-     Subdir menu, select Create Directory, and enter '.xemacs'
-
-  4. Add the line
-          (require 'ess-site)
-     to '~/.xemacs/init.el' and restart XEmacs.
-
-  5. If you see a buffer named '*ESS*', then the simple instructions
-     were most likely successful.  If not, then read further.
-
-  6. It could be you have an older version of XEmacs or some other
-     problem with your installation.  Either way, you may need to edit
-     'C:\ess\ess-VERSION\lisp\ess-site.el' manually.  If that is the
-     case, then you should create a directory just for ESS like 'C:\ess'
-     and unpack ESS there.  That way, your changes to
-     'C:\ess\ess-VERSION\lisp\ess-site.el' will not be lost if you
-     update XEmacs later.
-
-  7. Replace the line above with
-          (load "C:/ess/ess-VERSION/lisp/ess-site")
-     in '~/.xemacs/init.el' and restart XEmacs.
-
-  8. If you see a buffer named '*ESS*', then the manual instructions
-     were most likely successful.  If not, then send a query to
-     <ess-help@r-project.org> explicitly describing your problem and
-     your environment including operating system, XEmacs version, ESS
-     version, etc.
-
-   Now, you should be ready to use ESS.  For example, to edit
-statistical programs, load the files with the requisite extensions
-(".sas" for SAS, ".S" or "s" or "q" or "Q" for S-PLUS, ".r" or ".R" for
-R, and ".lsp" for XLispStat).  One further step is needed if you wish to
-run statistical processes, see below.
-
-   To run statistical processes under ESS, Windows users will need to
-make sure that the directories for the software they will be using is in
-the PATH environment variable.
-
-   On Windows NT/2000/XP, add the directories to the PATH using the 'My
-Computer->Control Panel->System->Advanced->Environment Variables' menu.
-Note that the directory containing the program is added to the PATH, not
-the program itself.  One such line is needed for each software program.
-Be sure to use the abbreviation 'progra~1' and not the long version with
-embedded blanks as this may cause problems.  Also, make sure to use
-backslashes '\' since Windows requires them.
-
-   An alternative, for R users, is that rather than adjusting the PATH
-variable, you can add the following to your emacs initialization file
-(and restart emacs):
-     (setq inferior-R-program-name "c:/progra~1/R/R-2.15.1/bin/Rterm.exe")
-   This assumes that you have installed R-2.15.1 in the default
-location.  Change the path otherwise to point to other locations.
-
-   Windows users who place S-PLUS anywhere other than the default
-location will also need to add the following three lines (properly
-adjusted for their location):
-     (setq-default inferior-S+6-program-name
-         "c:/progra~1/Insightful/SPLUS70/cmd/Splus")
-     (setq-default inferior-Sqpe+6-SHOME-name
-         "c:/progra~1/Insightful/SPLUS70")
-     (setq-default inferior-Sqpe+6-program-name
-         "c:/progra~1/Insightful/SPLUS70/cmd/Sqpe.exe")
-   The above example uses the default location of S-PLUS in
-'c:\progra~1\Insightful'.  Please note that ESS considers S-PLUS 6, 7,
-and 8 to be variants of S+6.
-
-   These users may also need to modify the emacs variable
-'ess-SHOME-versions' to match their installation in order to get the
-full set of S-PLUS versions on their machine into the ESS menu.
-
-   To start the S-PLUS [678].x GUI from ESS under emacs:
-  1. If you use Cygwin bash as your primary shell, then
-          M-x S
-          (or M-x S+6).
-  2. If you use the MSDOS prompt window as your primary shell, then
-          M-x S+6-msdos
-   You will then be asked for a pathname ("S starting data directory?"),
-from which to start the process.  The prompt will propose your current
-directory as the default.  ESS will start the S-PLUS GUI. There will be
-slight delay during which emacs is temporarily frozen.  ESS will arrange
-for communication with the S-PLUS GUI using the DDE protocol.  Send
-lines or regions from the emacs buffer containing your S program (for
-example, 'myfile.s') to the S-PLUS Commands Window with the 'C-c C-n' or
-'C-c C-r' keys.  (If you are still using S-PLUS 4.x or 2000,\ then use
-'M-x S+4' or 'M-x S+4-msdos'.)
-
-   To start an S-PLUS [678].x session inside an emacs buffer--and
-without the S-PLUS GUI:
-     M-x Sqpe
-     (or M-x Sqpe+6).
-   This works with both the bash and msdos shells.  You will then be
-asked for a pathname ("S starting data directory?"), from which to start
-the process.  The prompt will propose your current directory as the
-default.  You get Unix-like behavior, in particular the entire
-transcript is available for emacs-style search commands.  Send lines or
-regions from the emacs buffer containing your S program (for example,
-'myfile.s') to the *S+6* buffer with the 'C-c C-n' or 'C-c C-r' keys.
-Interactive graphics are available with Sqpe by using the java library
-supplied with S-PLUS 6.1 and newer releases.  Enter the commands:
-     library(winjava)
-     java.graph()
-   Graphs can be saved from the 'java.graph' device in several formats,
-but not PostScript.  If you need a PostScript file you will need to open
-a separate 'postscript' device.  (If you are still using S-PLUS 4.x or
-2000, then use 'M-x Sqpe+4'.)
-
-   To connect to an already running S-PLUS GUI (started, for example,
-from the S-PLUS icon):
-     M-x S+6-existing
-   or
-     M-x S+6-msdos-existing
-   You will then be asked for a pathname ("S starting data directory?"),
-from which to start the process.  The prompt will propose your current
-directory as the default.  ESS will arrange for communication with the
-already running S-PLUS GUI using the DDE protocol.  Send lines or
-regions from the emacs buffer containing your S program (for example,
-'myfile.s') to the S-PLUS Commands Window with the 'C-c C-n' or 'C-c
-C-r' keys.  (If you are still using S-PLUS 4.x or 2000, then use 'M-x
-S+4-existing' or 'M-x S+4-msdos-existing'.)
-
-   If you wish to run R, you can start it with:
-     M-x R
+   _Note for XEmacs users:_ Due to XEmacs lacking some features that ESS
+requires, ESS support of XEmacs ends with ESS 12.04-4.  This decision
+will be re-visited in the future as XEmacs continues to sync with GNU
+Emacs.
 
 
-File: ess.info,  Node: License,  Next: Stability,  Prev: Microsoft Windows installation,  Up: Installation
+File: ess.info,  Node: License,  Next: Stability,  Prev: Step by step instructions,  Up: Installation
 
-2.3 License
+2.2 License
 ===========
 
 The source and documentation of ESS is free software.  You can
@@ -1374,7 +1177,7 @@ the file COPYING in the same directory as this file for more details.
 
 File: ess.info,  Node: Stability,  Next: Requirements,  Prev: License,  Up: Installation
 
-2.4 Stability
+2.3 Stability
 =============
 
 All recent released versions are meant to be release-quality versions.
@@ -1387,7 +1190,7 @@ reports are much appreciated!
 
 File: ess.info,  Node: Requirements,  Prev: Stability,  Up: Installation
 
-2.5 Requirements
+2.4 Requirements
 ================
 
 ESS is most likely to work with current/recent versions of the following
@@ -1488,9 +1291,13 @@ your .emacs file:
    '(require 'tramp)'
 
    Now start an ssh session with 'C-x f /ssh:user@host: RET'.  Tramp
-shoul open a dired buffer in your remote home directory.  Now call your
+should open a dired buffer in your remote home directory.  Now call your
 favorite ESS process ('R', 'Julia', 'stata' etc) as you would usually do
 on local machine: 'M-x R'.
+
+   Alternatively you can start your process normally ('M-x R').  After
+you are asked for starting directory, simply type '/ssh:user@host: RET'.
+R process will be started on the remote machine.
 
    To simplify the process even further create a "config" file in your
 '.ssh/' folder and add an account.  For example if you use amazon EC2,
@@ -1500,34 +1307,33 @@ it might look like following:
       Hostname ec2-54-215-203-181.us-west-1.compute.amazonaws.com
       User ubuntu
       IdentityFile ~/.ssh/my_amazon_key.pem
+      ForwardX11 yes
 
-   With this configuration, a simple 'C-x f /ssh:amazon:' is enough to
-start a connection.
+   With this configuration '/ssh:amazon:' is enough to start a
+connection.  The ForwardX11 is needed if you want to see R graphic
+device showing on the current machine
 
-   Older ways to setup a remote ESS connection are through 'ess-remote'.
+   Other ways to setup a remote ESS connection are through 'ess-remote'.
 
-   Note: _Unfortunately, ess-remote doesn't work with the recent ESS. We
-are working to correct this._
-
-  1. Start a new telnet or ssh buffer and connect to the remote computer
-     (e.g.  use 'M-x telnet' or 'M-x ssh'; ssh.el is available at
+  1. Start a new shell, telnet or ssh buffer and connect to the remote
+     computer (e.g.  use, 'M-x shell', 'M-x telnet' or 'M-x ssh'; ssh.el
+     is available at
      <http://www.splode.com/~friedman/software/emacs-lisp/src/ssh.el>).
 
   2. Start the ESS process on the remote machine, for example with one
      of the commands 'Splus', or 'R', or 'sas -stdio'.
 
-  3. Enter the ESS command 'M-x ess-remote'.  You will be prompted for a
-     program name.  Enter 'sp6' or 'r' or 'sas' or another valid name.
-     Your telnet process is now known to ESS. All the usual ESS commands
-     ('C-c C-n' and its relatives) now work with the S language
-     processes.  For SAS you need to use a different command 'C-c i'
-     (that is a regular 'i', not a 'C-i') to send lines from your
-     'myfile.sas' to the remote SAS process.  'C-c i' sends lines over
-     invisibly.  With ess-remote you get teletype behavior--the data
-     input, the log, and the listing all appear in the same buffer.  To
-     make this work, you need to end every PROC and DATA step with a
-     "RUN;" statement.  The "RUN;" statement is what tells SAS that it
-     should process the preceding input statements.
+  3. Start 'M-x ess-remote'.  You will be prompted for a program name
+     with completion.  Choose one.  Your process is now known to ESS.
+     All the usual ESS commands ('C-c C-n' and its relatives) now work
+     with the S language processes.  For SAS you need to use a different
+     command 'C-c i' (that is a regular 'i', not a 'C-i') to send lines
+     from your 'myfile.sas' to the remote SAS process.  'C-c i' sends
+     lines over invisibly.  With ess-remote you get teletype
+     behavior--the data input, the log, and the listing all appear in
+     the same buffer.  To make this work, you need to end every PROC and
+     DATA step with a "RUN;" statement.  The "RUN;" statement is what
+     tells SAS that it should process the preceding input statements.
 
   4. Graphics (interactive) on the remote machine.  If you run X11
      (*Note X11::, X Windows) on both the local and remote machines then
@@ -1597,8 +1403,8 @@ stable.
      start the ESS process by entering 'Splus' or 'R' or 'sas -stdio' as
      appropriate.  If you can login remotely to your Windows 2000, then
      you should be able to run 'Sqpe' on the Windows machine.  I haven't
-     tested this and noone has reported their tests to me.  You will not
-     be able to run the GUI through this text-only connection.
+     tested this and no-one has reported their tests to me.  You will
+     not be able to run the GUI through this text-only connection.
 
   6. Once you get the S or R or SAS prompt, then you are completely
      connected.  All the 'C-c C-n' and related commands work correctly
@@ -1789,7 +1595,7 @@ visible.  To make this happen automatically for all inputs, set the
 variable 'comint-scroll-to-bottom-on-input' to 't' or ''this'.  If the
 first part of the output is still not visible, use 'C-c C-r'
 ('comint-show-output'), which moves cursor to the previous command line
-and and places it at the top of the window.
+and places it at the top of the window.
 
    Finally, if you want to discard the last command output altogether,
 use 'C-c C-o' ('comint-kill-output'), which deletes everything from the
@@ -2166,7 +1972,7 @@ process buffer or in a separate buffer, as indicated:
 
  -- Command: ess-display-help-on-object OBJECT COMMAND
      'C-c C-v' Pops up a help buffer for an S OBJECT or function.  If
-     COMMAND is suplied, it is used instead of
+     COMMAND is supplied, it is used instead of
      'inferior-ess-help-command'.  See *note Help:: for more details.
 
  -- Command: ess-quit
@@ -3503,48 +3309,47 @@ File: ess.info,  Node: ESS developer,  Prev: Editing documentation,  Up: Develop
 ==================
 
 Usual ESS evaluation commands, *Note Evaluating code::, send portions of
-the current buffer for evaluation in current environment (commonly
-'R_GlobalEnv').  Often, in process of the developing packages with
-namespaces, it is necessary to evaluate code directly in the package's
-environment or it's namespace.  The 'ess-developer' utility provides
-such a functionality with minimal disruption of the usual ESS work-flow.
+the current buffer for the evaluation in the current environment
+(usually 'R_GlobalEnv').  Often, in process of the developing packages
+with namespaces, it is necessary to evaluate code directly in the
+package's environment or its namespace.  The 'ess-developer' utility
+provides such a functionality with minimal disruption of the usual ESS
+work-flow.
 
    To understand how ess-developer works you must be familiar with
-namespace system in R.
-
-   In a nutshell, all objects defined in a package 'foo' are stored in
-an environment called 'namespace:foo'.  Parent environment of
-'namespace:foo' is an environment 'imports:foo' which contains copies of
-all objects from other packages which 'foo' imports.  Parent environment
-of 'imports:foo' is the 'namespace:base'.  Parent environment of
-'namespace:base' is .GlobalEnv.  Thus functions and methods stored in
-'namespace:foo' see all the objects in .GlobalEnv unless shadowed by
-objects in 'imports:foo', 'namespace:base', or 'namespace:foo' itself.
-There is another environment associated with 'foo' - 'package:foo'.
-This environment stores *copies* of exported objects from
-'namespace:foo' and is placed on the search() path, i.e.  if 'foo' is
-loaded and if you start with .GlobalEnv and iteratively call
+namespace system in R. In a nutshell, all objects defined in a package
+'foo' are stored in an environment called 'namespace:foo'.  Parent
+environment of 'namespace:foo' is an environment 'imports:foo' which
+contains copies of all objects from other packages which 'foo' imports.
+Parent environment of 'imports:foo' is the 'namespace:base'.  Parent
+environment of 'namespace:base' is .GlobalEnv.  Thus functions and
+methods stored in 'namespace:foo' see all the objects in .GlobalEnv
+unless shadowed by objects in 'imports:foo', 'namespace:base', or
+'namespace:foo' itself.  There is another environment associated with
+'foo' - 'package:foo'.  This environment stores *copies* of exported
+objects from 'namespace:foo' and is placed on the search() path, i.e.
+if 'foo' is loaded and if you start with .GlobalEnv and iteratively call
 parent.env() you will get eventually to 'package:foo'.  Thus all methods
-and functions defined in .GlobalEnv can see the objects in
-'package:foo'.  See also
+and functions defined in .GlobalEnv can "see" objects in 'package:foo'
+environment.  See also
 <http://cran.r-project.org/doc/manuals/R-ints.html#Namespaces>.
 
-   In order to use ess-developer, add names of the packages you are
-developing to 'ess-developer-packages'.  You can do that interactively
-with 'C-c C-t C-a'.  To remove packages use 'C-c C-t C-r'.  When
-developer mode is on, the process mode line indicator features a small
-or capital letter "d", highlighted with 'ess-developer-indicator-face'.
+   In order to use ess-developer you must add names of the packages that
+you are developing to 'ess-developer-packages'.  You can also do that
+interactively with 'C-c C-t C-a'.  To remove packages from
+'ess-developer-packages' use 'C-c C-t C-r'.  When developer mode is on,
+the process mode line indicator displays a small or capital letter "d".
 
-   If variable 'ess-developer-activate-in-package' is 't' (the default),
-R mode will check on startup if the file is part of the package.  If so,
-developer mode is activated automatically.  This takes place only when
-the parent package has been already added to 'ess-developer-packages'.
+   If variable 'ess-developer-activate-in-package' is 't' (the default)
+'R-mode' will check after visiting the file whether or not the file is
+part of the package.  If visited file is part of a package listed in
+'ess-developer-packages', developer mode is activated automatically.
 
-   Developer mode is usually activated on per-file basis.  When so, a
-small "d" appears in the modeline.  You can also activate ess-developer
-on per process basis.  Then all the buffers associated with the process
-are put into developer mode, regardless of whether they are part of a
-package or not.  In this case a big "D" appears in the modeline.
+   Developer mode is usually activated on per-file basis and a small "d"
+appears in the modeline.  You can also activate ess-developer for all
+buffers connected to current process.  This is done by toggling
+'ess-developer' in subprocess buffer.  In this case a big "D" will
+appear in the modeline.
 
  -- Command: ess-developer VAL
      'C-c C-t C-t' Toggle developer mode on and off.  If called from
@@ -3560,9 +3365,9 @@ package or not.  In this case a big "D" appears in the modeline.
 
    When you add a package to 'ess-developer-packages', ESS will ask for
 loading command.  By default there are two options 'library' and
-'load_all' from 'devtools' package.  You can configure this list in
-'ess-developer-load-on-add-commands'.  At any time you can explicitly
-load the package containing current file with 'C-c C-t l'.
+'load_all' from 'devtools' package.  You can configure this behavior in
+'ess-developer-load-on-add-commands'.  To explisitely load the package
+containing current file use 'C-c C-t l'.
 
  -- Command: ess-developer-load-package
      'C-c C-t l' Load package with 'load_all' utility from 'devtools'
@@ -3598,16 +3403,26 @@ differently:
 
           You can safely ignore this warnings.
 
-        - METHODS:
+        - S4 METHODS:
           Similarly to function definitions modified methods are
           assigned in the local method table in the namespace:foo.  New
           methods are assigned into .GlobalEnv, but with the environment
           pointing to namespace:foo.  There is a suttle catch with
-          method caching in R though.  See ess-developer.R for more
-          detailed comments.
+          method caching in R though.  See the code in
+          etc/ESSR/developer.R for more details.
 
-          Note that if method or generic is exported the *same* table
-          (which is an environment) is present in package:foo.
+        - S3 METHODS:
+          S3 methods are not automatically registered.  You can register
+          them manually after you have inserted method_name.my_class
+          into your package environment using ess-developer, like
+          follows:
+
+          registerS3method("method_name", "my_class",
+          my_package:::method_name.my_class)
+
+          If you don't register your S3 method, R will call the
+          registered (aka cached) S3 method instead of the new method
+          that ess-developer inserted in the package environment.
 
    * 'C-c C-r'('ess-eval-region' and functions that depend on it
      ('ess-eval-paragraph', 'ess-eval-buffer' etc., behave as
@@ -5285,10 +5100,10 @@ Key index
 * C-c C-q:                               Hot keys.             (line 72)
 * C-C C-r:                               Evaluating code.      (line 57)
 * C-c C-s:                               Hot keys.             (line 34)
-* C-c C-t C-a:                           ESS developer.        (line 56)
-* C-c C-t C-r:                           ESS developer.        (line 60)
-* C-c C-t C-t:                           ESS developer.        (line 51)
-* C-c C-t l:                             ESS developer.        (line 69)
+* C-c C-t C-a:                           ESS developer.        (line 55)
+* C-c C-t C-r:                           ESS developer.        (line 59)
+* C-c C-t C-t:                           ESS developer.        (line 50)
+* C-c C-t l:                             ESS developer.        (line 68)
 * C-c C-v:                               Hot keys.             (line 67)
 * C-c C-w:                               Clean.                (line 11)
 * C-c C-x:                               Hot keys.             (line 24)
@@ -5366,10 +5181,10 @@ Function and program index
 * ess-cleanup:                           Hot keys.            (line  72)
 * ess-cleanup <1>:                       Help.                (line 172)
 * ess-describe-help-mode:                Help.                (line  21)
-* ess-developer:                         ESS developer.       (line  50)
-* ess-developer-add-package:             ESS developer.       (line  55)
-* ess-developer-load-package:            ESS developer.       (line  68)
-* ess-developer-remove-package:          ESS developer.       (line  59)
+* ess-developer:                         ESS developer.       (line  49)
+* ess-developer-add-package:             ESS developer.       (line  54)
+* ess-developer-load-package:            ESS developer.       (line  67)
+* ess-developer-remove-package:          ESS developer.       (line  58)
 * ess-display-help-on-object:            Hot keys.            (line  66)
 * ess-display-help-on-object <1>:        Help.                (line   8)
 * ess-display-help-on-object <2>:        Help.                (line  25)
@@ -5652,116 +5467,115 @@ Concept Index
 
 Tag Table:
 Node: Top268
-Node: Introduction2283
-Node: Features5244
-Node: Current Features5877
-Node: New features10149
-Node: Credits40477
-Node: Latest version43996
-Node: Manual46033
-Node: Installation48578
-Node: Unix installation49109
-Node: Microsoft Windows installation53522
-Node: License62944
-Node: Stability63612
-Node: Requirements64109
-Node: Interactive ESS65142
-Node: Starting up65996
-Node: Multiple ESS processes66779
-Node: ESS processes on Remote Computers67813
-Node: S+elsewhere and ESS-elsewhere71802
-Node: Customizing startup74576
-Node: Entering commands77256
-Node: Command-line editing78414
-Node: Transcript79651
-Node: Last command81428
-Node: Process buffer motion82866
-Node: Transcript resubmit84369
-Node: Saving transcripts86343
-Node: Command History88196
-Node: Saving History91646
-Node: History expansion92442
-Node: Hot keys95653
-Node: Statistical Process running in ESS?99727
-Node: Emacsclient101006
-Node: Other101813
-Node: Evaluating code102865
-Node: Transcript Mode106414
-Node: Resubmit107563
-Node: Clean108626
-Node: Editing objects109622
-Node: Edit buffer110740
-Node: Loading112789
-Node: Error Checking113816
-Node: Indenting114865
-Node: Styles118126
-Node: Other edit buffer commands120320
-Node: Source Files121976
-Node: Source Directories126586
-Node: Help129728
-Node: Completion134023
-Node: Object names134244
-Node: Function arguments137102
-Node: Minibuffer completion137641
-Node: Auto-complete138140
-Node: Icicles139687
-Node: Developing with ESS141053
-Node: ESS tracebug141491
-Node: Editing documentation144513
-Node: R documentation files145055
-Node: Roxygen148975
-Node: ESS developer153310
-Node: Extras159446
-Node: ESS ElDoc160429
-Node: Handy commands161952
-Node: Highlighting163147
-Node: Parens164476
-Node: Graphics165057
-Node: printer165566
-Node: X11166322
-Node: winjava166661
-Node: Imenu167073
-Node: Toolbar167914
-Node: TAGS168322
-Node: Rdired169674
-Node: Rutils170726
-Node: Org173102
-Node: Sweave and AUCTeX174044
-Node: ESS for S176168
-Node: ESS(S)--Editing files176603
-Node: iESS(S)--Inferior ESS processes177720
-Node: ESS-help--assistance with viewing help183387
-Node: Philosophies for using ESS(S)183707
-Node: Scenarios for use (possibilities--based on actual usage)184826
-Node: Customization Examples and Solutions to Problems189509
-Node: ESS for SAS191246
-Node: ESS(SAS)--Design philosophy191969
-Node: ESS(SAS)--Editing files192922
-Node: ESS(SAS)--TAB key194776
-Node: ESS(SAS)--Batch SAS processes196142
-Node: ESS(SAS)--Function keys for batch processing201171
-Node: iESS(SAS)--Interactive SAS processes210657
-Node: iESS(SAS)--Common problems214411
-Node: ESS(SAS)--Graphics215935
-Node: ESS(SAS)--Windows216718
-Node: ESS for BUGS217296
-Node: ESS(BUGS)--Model files218311
-Node: ESS(BUGS)--Command files219091
-Node: ESS(BUGS)--Log files219636
-Node: ESS for JAGS219973
-Node: ESS(JAGS)--Model files220961
-Node: ESS(JAGS)--Command files223395
-Node: ESS(JAGS)--Log files224170
-Node: Mailing lists/bug reports224466
-Node: Bugs224730
-Node: Reporting Bugs226355
-Node: Mailing Lists227168
-Node: Help with emacs227922
-Node: Customization228477
-Node: Indices229240
-Node: Key index229415
-Node: Function and program index234848
-Node: Variable index244424
-Node: Concept index247555
+Node: Introduction2285
+Node: Features5246
+Node: Current Features5879
+Node: New features10151
+Node: Credits42726
+Node: Latest version46245
+Node: Manual48282
+Node: Installation50827
+Node: Step by step instructions51157
+Node: License53357
+Node: Stability54020
+Node: Requirements54517
+Node: Interactive ESS55550
+Node: Starting up56404
+Node: Multiple ESS processes57187
+Node: ESS processes on Remote Computers58221
+Node: S+elsewhere and ESS-elsewhere62375
+Node: Customizing startup65150
+Node: Entering commands67830
+Node: Command-line editing68988
+Node: Transcript70225
+Node: Last command72002
+Node: Process buffer motion73436
+Node: Transcript resubmit74939
+Node: Saving transcripts76913
+Node: Command History78766
+Node: Saving History82216
+Node: History expansion83012
+Node: Hot keys86223
+Node: Statistical Process running in ESS?90298
+Node: Emacsclient91577
+Node: Other92384
+Node: Evaluating code93436
+Node: Transcript Mode96985
+Node: Resubmit98134
+Node: Clean99197
+Node: Editing objects100193
+Node: Edit buffer101311
+Node: Loading103360
+Node: Error Checking104387
+Node: Indenting105436
+Node: Styles108697
+Node: Other edit buffer commands110891
+Node: Source Files112547
+Node: Source Directories117157
+Node: Help120299
+Node: Completion124594
+Node: Object names124815
+Node: Function arguments127673
+Node: Minibuffer completion128212
+Node: Auto-complete128711
+Node: Icicles130258
+Node: Developing with ESS131624
+Node: ESS tracebug132062
+Node: Editing documentation135084
+Node: R documentation files135626
+Node: Roxygen139546
+Node: ESS developer143881
+Node: Extras150384
+Node: ESS ElDoc151367
+Node: Handy commands152890
+Node: Highlighting154085
+Node: Parens155414
+Node: Graphics155995
+Node: printer156504
+Node: X11157260
+Node: winjava157599
+Node: Imenu158011
+Node: Toolbar158852
+Node: TAGS159260
+Node: Rdired160612
+Node: Rutils161664
+Node: Org164040
+Node: Sweave and AUCTeX164982
+Node: ESS for S167106
+Node: ESS(S)--Editing files167541
+Node: iESS(S)--Inferior ESS processes168658
+Node: ESS-help--assistance with viewing help174325
+Node: Philosophies for using ESS(S)174645
+Node: Scenarios for use (possibilities--based on actual usage)175764
+Node: Customization Examples and Solutions to Problems180447
+Node: ESS for SAS182184
+Node: ESS(SAS)--Design philosophy182907
+Node: ESS(SAS)--Editing files183860
+Node: ESS(SAS)--TAB key185714
+Node: ESS(SAS)--Batch SAS processes187080
+Node: ESS(SAS)--Function keys for batch processing192109
+Node: iESS(SAS)--Interactive SAS processes201595
+Node: iESS(SAS)--Common problems205349
+Node: ESS(SAS)--Graphics206873
+Node: ESS(SAS)--Windows207656
+Node: ESS for BUGS208234
+Node: ESS(BUGS)--Model files209249
+Node: ESS(BUGS)--Command files210029
+Node: ESS(BUGS)--Log files210574
+Node: ESS for JAGS210911
+Node: ESS(JAGS)--Model files211899
+Node: ESS(JAGS)--Command files214333
+Node: ESS(JAGS)--Log files215108
+Node: Mailing lists/bug reports215404
+Node: Bugs215668
+Node: Reporting Bugs217293
+Node: Mailing Lists218106
+Node: Help with emacs218860
+Node: Customization219415
+Node: Indices220178
+Node: Key index220353
+Node: Function and program index225786
+Node: Variable index235362
+Node: Concept index238493
 
 End Tag Table
