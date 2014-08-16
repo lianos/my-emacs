@@ -1,44 +1,79 @@
-;;; polymode.el --- support for multiple major modes
-;; Author: Vitalie Spinu
+;;; polymode.el --- Versatile multiple modes with extensive literate programming support 
+;;
+;; Filename: polymode.el
+;; Author: Spinu Vitalie
+;; Maintainer: Spinu Vitalie
+;; Copyright (C) 2013-2014, Spinu Vitalie, all rights reserved.
+;; Version: 1.0
+;; Package-Requires: ((emacs "24"))
+;; URL: https://github.com/vitoshka/polymode
+;; Keywords: emacs
+;;
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; This file is *NOT* part of GNU Emacs.
+;;
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 3, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+;; Floor, Boston, MA 02110-1301, USA.
+;;
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; Commentary:
+;;
+;;  Extensible, fast, objected-oriented multimode specifically designed for
+;;  literate programming. Extensible support for weaving, tangling and export.
+;; 
+;;   Usage: https://github.com/vitoshka/polymode
+;;   
+;;   Design new polymodes: https://github.com/vitoshka/polymode/tree/master/modes
+;;
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; Code:
 
-(eval-when-compile
-  (require 'cl))
-(require 'font-lock)
-(require 'eieio)
-(require 'color)
-(require 'eieio-base)
-(require 'eieio-custom)
+(require 'polymode-common)
 (require 'polymode-classes)
 (require 'polymode-methods)
+(require 'polymode-export)
+(require 'polymode-weave)
+;; load all core polymode and host objects
+(require 'poly-base)
 
 (defgroup polymode nil
   "Object oriented framework for multiple modes based on indirect buffers"
   :link '(emacs-commentary-link "polymode")
   :group 'tools)
 
-(defgroup base-submodes nil
-  "Base Submodes"
+(defgroup polymodes nil
+  "Polymode Configuration Objects"
   :group 'polymode)
 
-(defgroup submodes nil
-  "Children Submodes"
+(defgroup hostmodes nil
+  "Polymode Host Chunkmode Objects"
   :group 'polymode)
 
-(defvar polymode-select-mode-hook nil
+(defgroup innermodes nil
+  "Polymode Chunkmode Objects"
+  :group 'polymode)
+
+(defvar polymode-select-mode-hook nil ;; not used yet
   "Hook run after a different mode is selected.")
 
-(defvar polymode-indirect-buffer-hook nil
+(defvar polymode-indirect-buffer-hook nil ;; not used yet
   "Hook run by `pm/install-mode' in each indirect buffer.
 It is run after all the indirect buffers have been set up.")
-
-(defvar pm/config nil)
-(make-variable-buffer-local 'pm/config)
-
-(defvar pm/submode nil)
-(make-variable-buffer-local 'pm/submode)
-
-(defvar pm/type nil)
-(make-variable-buffer-local 'pm/type)
 
 (defcustom polymode-prefix-key "\M-n"
   "Prefix key for the polymode mode keymap.
@@ -50,14 +85,25 @@ Not effective after loading the polymode library."
   (let ((map (make-sparse-keymap)))
     (define-key map polymode-prefix-key
       (let ((map (make-sparse-keymap)))
+        ;; navigation
 	(define-key map "\C-n" 'polymode-next-chunk)
 	(define-key map "\C-p" 'polymode-previous-chunk)
         (define-key map "\C-\M-n" 'polymode-next-chunk-same-type)
 	(define-key map "\C-\M-p" 'polymode-previous-chunk-same-type)
+        ;; chunk manipulation
         (define-key map "\M-k" 'polymode-kill-chunk)
         (define-key map "\M-m" 'polymode-mark-or-extend-chunk)
         (define-key map "\C-t" 'polymode-toggle-chunk-narrowing)
 	(define-key map "\M-i" 'polymode-insert-new-chunk)
+        ;; backends
+        (define-key map "e" 'polymode-export)
+        (define-key map "E" 'polymode-set-exporter)
+        (define-key map "w" 'polymode-weave)
+        (define-key map "W" 'polymode-set-weaver)
+        (define-key map "t" 'polymode-tangle)
+        (define-key map "T" 'polymode-set-tangler)
+        (define-key map "$" 'polymode-show-process-buffer)
+        ;; todo: add polymode-goto-process-buffer
 	map))
     (define-key map [menu-bar Polymode]
       (cons "Polymode"
@@ -83,6 +129,7 @@ Not effective after loading the polymode library."
 
 
 ;;; COMMANDS
+(defvar *span*)
 (defun polymode-next-chunk (&optional N)
   "Go COUNT chunks forwards.
 Return, how many chucks actually jumped over."
@@ -126,11 +173,12 @@ Return, how many chucks actually jumped over."
         (pm/map-over-spans
          (lambda ()
            (unless (memq (car *span*) '(head tail))
-             (when (and (equal this-class (object-name (car (last *span*))))
+             (when (and (equal this-class
+                               (pm--object-name (car (last *span*))))
                         (eq this-type (car *span*)))
                (setq sofar (1+ sofar)))
              (unless this-class
-               (setq this-class (object-name (car (last *span*)))
+               (setq this-class (pm--object-name (car (last *span*)))
                      this-type (car *span*)))
              (when (>= sofar N)
                (signal 'quit nil))))
@@ -154,7 +202,7 @@ Return, how many chucks actually jumped over."
   "Kill current chunk"
   (interactive)
   (pcase (pm/get-innermost-span)
-    (`(,(or `nil `base) ,beg ,end ,_) (delete-region beg end))
+    (`(,(or `nil `host) ,beg ,end ,_) (delete-region beg end))
     (`(body ,beg ,end ,_)
      (goto-char beg)
      (pm--kill-span '(body))
@@ -169,27 +217,6 @@ Return, how many chucks actually jumped over."
      (goto-char end)
      (polymode-kill-chunk))
     (_ (error "canoot find chunk to kill"))))
-
-(defun polymode-kill-chunk ()
-  "Kill current chunk"
-  (interactive)
-  (pcase (pm/get-innermost-span)
-    (`(,(or `nil `base) ,beg ,end ,_) (delete-region beg end))
-    (`(body ,beg ,end ,_)
-     (goto-char beg)
-     (pm--kill-span '(body))
-     (pm--kill-span '(head tail))
-     (pm--kill-span '(head tail)))
-    (`(tail ,beg ,end ,_)
-     (if (eq beg (point-min))
-         (delete-region beg end)
-       (goto-char (1- beg))
-       (polymode-kill-chunk)))
-    (`(head ,_ ,end ,_)
-     (goto-char end)
-     (polymode-kill-chunk))
-    (_ (error "canoot find chunk to kill"))))
-
 
 (defun polymode-toggle-chunk-narrowing ()
   "Toggle narrowing of the current chunk."
@@ -215,6 +242,15 @@ Return, how many chucks actually jumped over."
   (interactive)
   (error "Not implemented yet"))
 
+(defun polymode-show-process-buffer ()
+  (interactive)
+  (let ((buf (cl-loop for b being the buffers
+                      if (buffer-local-value 'pm--process-buffer b)
+                      return b)))
+    (if buf
+        (pop-to-buffer buf)
+      (message "No polymode process buffers found."))))
+
 
 ;;; CORE
 (defsubst pm/base-buffer ()
@@ -223,26 +259,22 @@ Return, how many chucks actually jumped over."
   (or (buffer-base-buffer (current-buffer))
       (current-buffer)))
 
-;; ;; VS[26-08-2012]: Dave's comment:
-;; ;; It would be nice to cache the results of this on text properties,
-;; ;; but that probably won't work well if chunks can be nested.  In that
-;; ;; case, you can't just mark everything between delimiters -- you have
-;; ;; to consider other possible regions between them.  For now, we do
-;; ;; the calculation each time, scanning outwards from point.
+;; VS[26-08-2012]: Dave's original comment: It would be nice to cache the
+;; results of this on text properties, but that probably won't work well if
+;; chunks can be nested.  In that case, you can't just mark everything between
+;; delimiters -- you have to consider other possible regions between them.  For
+;; now, we do the calculation each time, scanning outwards from point.
 (defun pm/get-innermost-span (&optional pos)
-  (pm/get-span pm/config pos))
-
-(defvar pm--ignore-post-command-hook nil)
-(defun pm--restore-ignore ()
-  (setq pm--ignore-post-command-hook nil))
+  (pm-get-span pm/polymode pos))
 
 ;; This function is for debug convenience only in order to avoid limited debug
 ;; context in polymode-select-buffer
+(defvar pm--ignore-post-command-hook nil)
 (defun pm--sel-buf ()
   (unless pm--ignore-post-command-hook
     (let ((*span* (pm/get-innermost-span))
           (pm--can-move-overlays t))
-      (pm/select-buffer (car (last *span*)) *span*))))
+      (pm-select-buffer (car (last *span*)) *span*))))
 
 (defun polymode-select-buffer ()
   "Select the appropriate (indirect) buffer corresponding to point's context.
@@ -251,8 +283,6 @@ This funciton is placed in local post-command hook."
       (pm--sel-buf)
     (error (message "polymode error: %s"
                     (error-message-string error)))))
-
-(defvar pm--can-narrow? t)
 
 (defun pm/map-over-spans (fun beg end &optional count backward?)
   "For all spans between BEG and END, execute FUN.
@@ -275,7 +305,7 @@ the current innermost span."
                     (< nr count)))
       (setq *span* (pm/get-innermost-span)
             nr (1+ nr))
-      (pm/select-buffer (car (last *span*)) *span*) ;; object and type
+      (pm-select-buffer (car (last *span*)) *span*) ;; object and type
       (goto-char (nth 1 *span*))
       (funcall fun)
       (if backward?
@@ -298,23 +328,10 @@ the current innermost span."
             (narrow-to-region min max))
         (error "No span found")))))
 
-(defvar pm--fontify-region-original nil
-  "Fontification function normally used by the buffer's major mode.
-Used internaly to cahce font-lock-fontify-region-function.  Buffer local.")
-(make-variable-buffer-local 'pm--fontify-region-original)
-
-(defvar pm--indent-line-function-original nil
-  "Used internally toprotect buffer's `indent-line-function'.")
-(make-variable-buffer-local 'pm--indent-line-function-original)
-
-(defvar pm--syntax-begin-function-original nil)
-(make-variable-buffer-local 'pm--syntax-begin-function-original)
-
-
 (defun pm/fontify-region (beg end &optional verbose)
   "Polymode font-lock fontification function.
-Fontifies chunk-by chunk within the region.
-Assigned to `font-lock-fontify-region-function'.
+Fontifies chunk-by chunk within the region. Assigned to
+`font-lock-fontify-region-function'.
 
 A fontification mechanism should call
 `font-lock-fontify-region-function' (`jit-lock-function' does
@@ -336,7 +353,7 @@ in polymode buffers."
                  (when parse-sexp-lookup-properties
                    (pm--comment-region 1 sbeg))
                  (condition-case err
-                     (if (oref pm/submode :font-lock-narrow)
+                     (if (oref pm/chunkmode :font-lock-narrow)
                          (save-restriction
                            ;; fixme: optimization oportunity: Cache chunk state
                            ;; in text properties. For big chunks font-lock
@@ -352,11 +369,11 @@ in polymode buffers."
                                    (error-message-string err) beg end)))
                  (when parse-sexp-lookup-properties
                    (pm--uncomment-region 1 sbeg)))
-               (pm--adjust-chunk-face sbeg send (pm/get-adjust-face pm/submode))
+               (pm--adjust-chunk-face sbeg send (pm-get-adjust-face pm/chunkmode))
                ;; might be needed by external applications like flyspell
-               ;; fixme: this should be in a more generic place like pm/get-span
-               (put-text-property sbeg send 'inner-submode
-                                  (object-of-class-p pm/submode 'pm-inner-submode))
+               ;; fixme: this should be in a more generic place like pm-get-span
+               (put-text-property sbeg send 'chunkmode
+                                  (object-of-class-p pm/chunkmode 'pm-hbtchunkmode))
                ;; even if failed, set to t to avoid infloop
                (put-text-property beg end 'fontified t)))
            beg end)
@@ -372,367 +389,9 @@ in polymode buffers."
               (point))
           (point-min)))))
 
-
-;;; INTERNALS
-(defun pm--get-available-mode (mode)
-  "Check if MODE symbol is defined and is a valid function.
-If so, return it, otherwise return 'fundamental-mode with a
-warnign."
-  (if (fboundp mode)
-      mode
-    (message "Cannot find " mode " function, using 'fundamental-mode instead")
-    'fundamental-mode))
-
-(defun pm--lighten-background (prop)
-  ;; if > lighten on dark backgroun. Oposite on light.
-  (color-lighten-name (face-background 'default) 
-                      (if (eq (frame-parameter nil 'background-mode) 'light)
-                          (- prop) ;; darken
-                        prop)))
-
-(defun pm--adjust-chunk-face (beg end face)
-  ;; propertize 'face of the region by adding chunk specific configuration
-  (interactive "r")
-  (when face
-    (with-current-buffer (current-buffer)
-      (let ((face (or (and (numberp face)
-                           (cons 'background-color
-                                 (pm--lighten-background face)))
-                      face))
-            (pchange nil))
-        (while (not (eq pchange end))
-          (setq pchange (next-single-property-change beg 'face nil end))
-          (put-text-property beg pchange 'face
-                             `(,face ,@(get-text-property beg 'face)))
-          (setq beg pchange))))))
-
-;; (defun pm--adjust-chunk-overlay (beg end &optional buffer)
-;;   ;; super duper internal function
-;;   ;; should be used only after pm/select-buffer
-;;   (when (eq pm/type 'body)
-;;     (let ((background (oref pm/submode :background))) ;; in Current buffer !!
-;;       (with-current-buffer (or buffer (current-buffer))
-;;         (when background
-;;           (let* ((OS (overlays-in  beg end))
-;;                  (o (some (lambda (o) (and (overlay-get o 'polymode) o))
-;;                           OS)))
-;;             (if o
-;;                 (move-overlay o  beg end )
-;;               (let ((o (make-overlay beg end nil nil t))
-;;                     (face (or (and (numberp background)
-;;                                    (cons 'background-color
-;;                                          (pm--lighten-background background)))
-;;                               background)))
-;;                 (overlay-put o 'polymode 'polymode-major-mode)
-;;                 (overlay-put o 'face face)
-;;                 (overlay-put o 'evaporate t)))))))))
-
-(defun pm--adjust-visual-line-mode (new-vlm)
-  (when (not (eq visual-line-mode vlm))
-    (if (null vlm)
-        (visual-line-mode -1)
-      (visual-line-mode 1))))
-
-;; move only in post-command hook, after buffer selection
-(defvar pm--can-move-overlays nil)
-(defun pm--move-overlays-to (new-buff)
-  (when pm--can-move-overlays 
-    (mapc (lambda (o)
-            (move-overlay o (overlay-start o) (overlay-end o) new-buff))
-          (overlays-in 1 (1+ (buffer-size))))))
-
-(defun pm--select-buffer (buffer)
-  (when (and (not (eq buffer (current-buffer)))
-             (buffer-live-p buffer))
-    (let ((point (point))
-          (window-start (window-start))
-          (visible (pos-visible-in-window-p))
-          (oldbuf (current-buffer))
-          (vlm visual-line-mode)
-          (ractive (region-active-p))
-          (mkt (mark t))
-          (bis buffer-invisibility-spec))
-      (pm--move-overlays-to buffer)
-      (switch-to-buffer buffer)
-      (setq buffer-invisibility-spec bis)
-      (pm--adjust-visual-line-mode vlm)
-      (bury-buffer oldbuf)
-      ;; fixme: wha tis the right way to do this ... activate-mark-hook?
-      (if (not ractive)
-          (deactivate-mark)
-        (set-mark mkt)
-        (activate-mark))
-      (goto-char point)
-      ;; Avoid the display jumping around.
-      (when visible
-        (set-window-start (get-buffer-window buffer t) window-start)))))
-
-(defun pm--transfer-vars-from-base ()
-  (let ((bb (pm/base-buffer)))
-    (dolist (var '(buffer-file-name))
-      (set var (buffer-local-value var bb)))))
-
-(defun pm--setup-buffer (&optional buffer)
-  ;; General buffer setup, should work for indirect and base buffers
-  ;; alike. Assumes pm/config and pm/submode is already in place. Return buffer.
-  (let ((buff (or buffer (current-buffer))))
-    (with-current-buffer buff
-      ;; Don't let parse-partial-sexp get fooled by syntax outside
-      ;; the chunk being fontified.
-
-      ;; font-lock, forward-sexp etc should see syntactic comments
-      ;; (set (make-local-variable 'parse-sexp-lookup-properties) t)
-
-      (set (make-local-variable 'font-lock-dont-widen) t)
-      
-      (when pm--dbg-fontlock 
-        (setq pm--fontify-region-original
-              font-lock-fontify-region-function)
-        (set (make-local-variable 'font-lock-fontify-region-function)
-             #'pm/fontify-region)
-        (setq pm--syntax-begin-function-original
-              (or syntax-begin-function ;; Emacs > 23.3
-                  font-lock-beginning-of-syntax-function))
-        (set (make-local-variable 'syntax-begin-function)
-             #'pm/syntax-begin-function))
-
-      (set (make-local-variable 'polymode-mode) t)
-
-      ;; Indentation should first narrow to the chunk.  Modes
-      ;; should normally just bind `indent-line-function' to
-      ;; handle indentation.
-      (when (and indent-line-function ; not that it should ever be nil...
-                 (oref pm/submode :protect-indent-line))
-        (setq pm--indent-line-function-original indent-line-function)
-        (set (make-local-variable 'indent-line-function) 'pm/indent-line))
-
-      ;; Kill the base buffer along with the indirect one; careful not
-      ;; to infloop.
-      ;; (add-hook 'kill-buffer-hook
-      ;;           '(lambda ()
-      ;;              ;; (setq kill-buffer-hook nil) :emacs 24 bug (killing
-      ;;              ;; dead buffer triggers an error)
-      ;;              (let ((base (buffer-base-buffer)))
-      ;;                (if  base
-      ;;                    (unless (buffer-local-value 'pm--killed-once base)
-      ;;                      (kill-buffer base))
-      ;;                  (setq pm--killed-once t))))
-      ;;           t t)
-      
-      (when pm--dbg-hook
-        (add-hook 'post-command-hook 'polymode-select-buffer nil t))
-      (object-add-to-list pm/config :buffers (current-buffer)))
-    buff))
-
-(defvar pm--killed-once nil)
-(make-variable-buffer-local 'pm--killed-once)
-(defvar polymode-mode nil)
-
-(defun pm--create-indirect-buffer (mode)
-  "Create indirect buffer with major MODE and initialize appropriately.
-
-This is a low lever function which must be called, one way or
-another from `pm/install' method. Among other things store
-`pm/config' from the base buffer (must always exist!) in
-the newly created buffer.
-
-Return newlly created buffer."
-  (unless   (buffer-local-value 'pm/config (pm/base-buffer))
-    (error "`pm/config' not found in the base buffer %s" (pm/base-buffer)))
-  
-  (setq mode (pm--get-available-mode mode))
-
-  (with-current-buffer (pm/base-buffer)
-    (let* ((config (buffer-local-value 'pm/config (current-buffer)))
-           (new-name
-            (generate-new-buffer-name 
-             (format "%s[%s]" (buffer-name)
-                     (replace-regexp-in-string "-mode" "" (symbol-name mode)))))
-           (new-buffer (make-indirect-buffer (current-buffer)  new-name))
-           ;; (hook pm/indirect-buffer-hook)
-           (file (buffer-file-name))
-           (base-name (buffer-name))
-           (jit-lock-mode nil)
-           (coding buffer-file-coding-system))
-
-      ;; (dbg (current-buffer) file)
-      ;; (backtrace)
-
-      (with-current-buffer new-buffer
-        (let ((polymode-mode t)) ;;major-modes might check it
-          (funcall mode))
-        (setq polymode-major-mode mode)
-        
-        ;; Avoid the uniqified name for the indirect buffer in the mode line.
-        (when pm--dbg-mode-line
-          (setq mode-line-buffer-identification
-                (propertized-buffer-identification base-name)))
-        (setq pm/config config)
-        (setq buffer-file-coding-system coding)
-        (setq buffer-file-name file)
-        (vc-find-file-hook))
-      new-buffer)))
-
-
-(defvar polymode-major-mode nil)
-(make-variable-buffer-local 'polymode-major-mode)
-
-(defun pm--get-indirect-buffer-of-mode (mode)
-  (loop for bf in (oref pm/config :buffers)
-        when (and (buffer-live-p bf)
-                  (eq mode (buffer-local-value 'polymode-major-mode bf)))
-        return bf))
-
-;; ;; This doesn't work in 24.2, pcase bug ((void-variable xcar))
-;; ;; Other pcases in this file don't throw this error
-;; (defun pm--set-submode-buffer (obj type buff)
-;;   (with-slots (buffer head-mode head-buffer tail-mode tail-buffer) obj
-;;     (pcase (list type head-mode tail-mode)
-;;       (`(body body ,(or `nil `body))
-;;        (setq buffer buff
-;;              head-buffer buff
-;;              tail-buffer buff))
-;;       (`(body ,_ body)
-;;        (setq buffer buff
-;;              tail-buffer buff))
-;;       (`(body ,_ ,_ )
-;;        (setq buffer buff))
-;;       (`(head ,_ ,(or `nil `head))
-;;        (setq head-buffer buff
-;;              tail-buffer buff))
-;;       (`(head ,_ ,_)
-;;        (setq head-buffer buff))
-;;       (`(tail ,_ ,(or `nil `head))
-;;        (setq tail-buffer buff
-;;              head-buffer buff))
-;;       (`(tail ,_ ,_)
-;;        (setq tail-buffer buff))
-;;       (_ (error "type must be one of 'body 'head and 'tail")))))
-
-;; this is a literal transcript of the pcase above
-(defun pm--set-submode-buffer (obj type buff)
-  (with-slots (buffer head-mode head-buffer tail-mode tail-buffer) obj
-    (cond
-     ((and (eq type 'body)
-           (eq head-mode 'body)
-           (or (null tail-mode)
-               (eq tail-mode 'body)))
-      (setq buffer buff
-            head-buffer buff
-            tail-buffer buff))
-     ((and (eq type 'body)
-           (eq tail-mode 'body))
-       (setq buffer buff
-             tail-buffer buff))
-     ((eq type 'body)
-      (setq buffer buff))
-     ((and (eq type 'head)
-           (or (null tail-mode)
-               (eq tail-mode 'head)))
-      (setq head-buffer buff
-            tail-buffer buff))
-     ((eq type 'head)
-      (setq head-buffer buff))
-     ((and (eq type 'tail)
-           (or (null tail-mode)
-               (eq tail-mode 'head)))
-      (setq tail-buffer buff
-            head-buffer buff))
-     ((eq type 'tail)
-      (setq tail-buffer buff))
-     (t (error "type must be one of 'body 'head and 'tail")))))
-
-(defun pm--get-submode-mode (obj type)
-  (with-slots (mode head-mode tail-mode) obj
-    (cond ((or (eq type 'body)
-               (and (eq type 'head)
-                    (eq head-mode 'body))
-               (and (eq type 'tail)
-                    (or (eq tail-mode 'body)
-                        (and (null tail-mode)
-                             (eq head-mode 'body)))))
-           (oref obj :mode))
-          ((or (and (eq type 'head)
-                    (eq head-mode 'base))
-               (and (eq type 'tail)
-                    (or (eq tail-mode 'base)
-                        (and (null tail-mode)
-                             (eq head-mode 'base)))))
-           (oref (oref pm/config :base-submode) :mode))
-          ((eq type 'head)
-           (oref obj :head-mode))
-          ((eq type 'tail)
-           (oref obj :tail-mode))
-          (t (error "type must be one of 'head 'tail 'body")))))
-
-;; (oref pm-submode/noweb-R :tail-mode)
-;; (oref pm-submode/noweb-R :buffer)
-;; (progn
-;;   (pm--set-submode-buffer pm-submode/noweb-R 'tail (current-buffer))
-;;   (oref pm-submode/noweb-R :head-buffer))
-
-(define-minor-mode polymode-minor-mode
-  "Polymode minor mode, used to make everything work."
-  nil " PM" polymode-mode-map)
-
-(defun pm--map-over-spans-highlight ()
-  (interactive)
-  (pm/map-over-spans (lambda ()
-                       (let ((start (nth 1 *span*))
-                             (end (nth 2 *span*)))
-                         (ess-blink-region start end)
-                         (sit-for 1)))
-                     (point-min) (point-max)))
-
-(defun pm--highlight-span (&optional hd-matcher tl-matcher)
-  (interactive)
-  (let* ((hd-matcher (or hd-matcher (oref pm/submode :head-reg)))
-         (tl-matcher (or tl-matcher (oref pm/submode :tail-reg)))
-         (span (pm--span-at-point hd-matcher tl-matcher)))
-    (ess-blink-region (nth 1 span) (nth 2 span))
-    (message "%s" span)))
-
-(defun pm--run-over-check ()
-  (interactive)
-  (goto-char (point-min))
-  (let ((start (current-time))
-        (count 1))
-    (polymode-select-buffer)
-    (while (< (point) (point-max))
-      (setq count (1+ count))
-      (forward-char)
-      (polymode-select-buffer))
-    (let ((elapsed  (time-to-seconds (time-subtract (current-time) start))))
-      (message "elapsed: %s  per-char: %s" elapsed (/ elapsed count)))))
-
-(defun pm--comment-region (beg end)
-  ;; mark as syntactic comment
-  (when (> end 1)
-    (with-silent-modifications
-      (let ((beg (or beg (region-beginning)))
-            (end (or end (region-end))))
-        (let ((ch-beg (char-after beg))
-              (ch-end (char-before end)))
-          (add-text-properties beg (1+ beg)
-                               (list 'syntax-table (cons 11 ch-beg)
-                                     'rear-nonsticky t
-                                     'polymode-comment 'start))
-          (add-text-properties (1- end) end
-                               (list 'syntax-table (cons 12 ch-end)
-                                     'rear-nonsticky t
-                                     'polymode-comment 'end)))))))
-
-(defun pm--uncomment-region (beg end)
-  ;; remove all syntax-table properties. Should not cause any problem as it is
-  ;; always used before font locking
-  (when (> end 1)
-    (with-silent-modifications
-      (let ((props '(syntax-table nil rear-nonsticky nil polymode-comment nil)))
-        (remove-text-properties beg end props)
-        ;; (remove-text-properties beg (1+ beg) props)
-        ;; (remove-text-properties end (1- end) props)
-        ))))
-
+
+;;; DEFINE
+;;;###autoload
 (defmacro define-polymode (mode config &optional keymap &rest body)
   "Define a new polymode MODE.
 This macro defines command MODE and an indicator variable MODE
@@ -752,7 +411,7 @@ is not reinitialized if it coincides with the :mode slot of
 CONFIG object or if the :mode slot is nil.
 
 BODY contains code to be executed after the complete
-  initialization of the polymode (`pm/initialize') and before
+  initialization of the polymode (`pm-initialize') and before
   running MODE-hook. Before the actual body code, you can write
   keyword arguments, i.e. alternating keywords and values.  The
   following special keywords are supported:
@@ -784,112 +443,105 @@ BODY contains code to be executed after the complete
                    [&rest [keywordp sexp]]
                    def-body)))
 
+  
   (when (keywordp keymap)
-    (push keymap body) (setq keymap nil))
+    (push keymap body)
+    (setq keymap nil))
 
   (let* ((last-message (make-symbol "last-message"))
          (mode-name (symbol-name mode))
          (pretty-name (concat
                        (replace-regexp-in-string "poly-\\|-mode" "" mode-name)
                        " polymode"))
-	 (group nil)
-         (lighter (oref (symbol-value config) :lighter))
+         (keymap-sym (intern (concat mode-name "-map")))
+         (hook (intern (concat mode-name "-hook")))
 	 (extra-keywords nil)
-         (modefun mode)          ;The minor mode function name we're defining.
 	 (after-hook nil)
-	 (hook (intern (concat mode-name "-hook")))
-	 keyw keymap-sym key-alist tmp)
+	 keyw lighter)
 
     ;; Check keys.
     (while (keywordp (setq keyw (car body)))
       (setq body (cdr body))
       (pcase keyw
 	(`:lighter (setq lighter (purecopy (pop body))))
-	;; (`:group (setq group (nconc group (list :group (pop body)))))
 	(`:keymap (setq keymap (pop body)))
 	(`:after-hook (setq after-hook (pop body)))
 	(_ (push keyw extra-keywords) (push (pop body) extra-keywords))))
 
-    ;; (unless group
-    ;;   ;; We might as well provide a best-guess default group.
-    ;;   (setq group
-    ;;         `(:group ',(intern (replace-regexp-in-string
-    ;;     			"-mode\\'" "" mode-name)))))
-    (unless (keymapp keymap)
-      ;; keymap is either nil or list
-      (setq key-alist keymap)
-      (let* ((pi (symbol-value config))
-             map mm-name)
-        (while pi
-          (setq map (and (slot-boundp pi :map)
-                         (oref pi :map)))
-          (if (and (symbolp map)
-                   (keymapp (symbol-value map)))
-              (setq keymap  (symbol-value map)
-                    pi nil)
-            ;; go down to next parent
-            (setq pi (and (slot-boundp pi :parent-instance)
-                          (oref pi :parent-instance))
-                  key-alist (append key-alist map))))))
-
-    (unless keymap
-      (setq keymap polymode-mode-map))
-    (setq keymap-sym (intern (concat mode-name "-map")))
-
     `(progn
-       ;; Define the variable to enable or disable the mode.
        :autoload-end
-       (defvar ,mode nil ,(format "Non-nil if %s is enabled." pretty-name))
+
+       ;; Define the variable to enable or disable the mode.
+       (defvar ,mode nil ,(format "Non-nil if %s mode is enabled." pretty-name))
        (make-variable-buffer-local ',mode)
 
-       ;; The actual function:
-       (defun ,mode (&optional arg) ,(format "%s\n\n\\{%s}"
-                                             (concat pretty-name ".")
-                                             (or keymap-sym
-                                                 (and (null keymap)
-                                                      'polymode-mode-map)
-                                                 (and (symbolp keymap)
-                                                      keymap)))
-	 (interactive)
-         (unless ,mode
-           (let ((,last-message (current-message)))
-             (unless pm/config ;; don't reinstall for time being
-               (let ((config (clone ,config)))
-                 (oset config :minor-mode-name ',mode)
-                 (pm/initialize config)))
-             ;; set our "minor" mode
-             (setq ,mode t)
-             ,@body
-             (run-hooks ',hook)
-             ;; Avoid overwriting a message shown by the body,
-             ;; but do overwrite previous messages.
-             (when (and (called-interactively-p 'any)
-                        (or (null (current-message))
-                            (not (equal ,last-message
-                                        (current-message)))))
-               (message ,(format "%s enabled" pretty-name)))
-             ,@(when after-hook `(,after-hook))
-             (force-mode-line-update)))
-         ;; Return the new setting.
-         ,mode)
+       (let* ((keymap ,keymap)
+              (config ',config)
+              (lighter (or ,lighter
+                           (oref (symbol-value config) :lighter)))
+              key-alist)
 
-       ;;  autoloads everything up-to-here.
-       :autoload-end
-       
-       ;; Define the minor-mode keymap.
-       (defvar ,keymap-sym
-         (easy-mmode-define-keymap ',key-alist nil nil '(:inherit ,keymap))
-         ,(format "Keymap for %s." pretty-name))
-       
-       (add-minor-mode ',mode ',lighter ,(or keymap-sym keymap)))))
+         (unless (keymapp keymap)
+           ;; keymap is either nil or list. Iterate through parents' :map slot
+           ;; and gather keys.
+           (setq key-alist keymap)
+           (let* ((pi (symbol-value config))
+                  map mm-name)
+             (while pi
+               (setq map (and (slot-boundp pi :map)
+                              (oref pi :map)))
+               (if (and (symbolp map)
+                        (keymapp (symbol-value map)))
+                   ;; If one of the parent's :map is a keymap, use it as our
+                   ;; keymap and stop further descent.
+                   (setq keymap  (symbol-value map)
+                         pi nil)
+                 ;; Descend to next parent and append the key list to key-alist
+                 (setq pi (and (slot-boundp pi :parent-instance)
+                               (oref pi :parent-instance))
+                       key-alist (append key-alist map))))))
+
+         (unless keymap
+           ;; If we couldn't figure out the original keymap:
+           (setq keymap polymode-mode-map))
+
+         ;; Define the minor-mode keymap:
+         (defvar ,keymap-sym
+           (easy-mmode-define-keymap key-alist nil nil `(:inherit ,keymap))
+           ,(format "Keymap for %s." pretty-name))
+
+         
+         ;; The actual mode function:
+         (defun ,mode (&optional arg) ,(format "%s.\n\n\\{%s}" pretty-name keymap-sym)
+                (interactive)
+                (unless ,mode
+                  (let ((,last-message (current-message)))
+                    (unless pm/polymode ;; don't reinstall for time being
+                      (let ((config (clone ,config)))
+                        (oset config :minor-mode ',mode)
+                        (pm-initialize config)))
+                    ;; set our "minor" mode
+                    (setq ,mode t)
+                    ,@body
+                    (run-hooks ',hook)
+                    ;; Avoid overwriting a message shown by the body,
+                    ;; but do overwrite previous messages.
+                    (when (and (called-interactively-p 'any)
+                               (or (null (current-message))
+                                   (not (equal ,last-message
+                                               (current-message)))))
+                      (message ,(format "%s enabled" pretty-name)))
+                    ,@(when after-hook `(,after-hook))
+                    (force-mode-line-update)))
+                ;; Return the new setting.
+                ,mode)
+         
+         (add-minor-mode ',mode lighter ,keymap-sym)))))
 
 
-
-;;; COMPATIBILITY
-
-(defun pm--flyspel-dont-highlight-in-submodes (beg end poss)
-  (or (get-text-property beg 'inner-submode)
-      (get-text-property beg 'inner-submode)))
+(define-minor-mode polymode-minor-mode
+  "Polymode minor mode, used to make everything work."
+  nil " PM" polymode-mode-map)
 
 
 ;;; FONT-LOCK
@@ -900,9 +552,5 @@ BODY contains code to be executed after the complete
    '(("(\\(define-polymode\\)\\s +\\(\\(\\w\\|\\s_\\)+\\)"
       (1 font-lock-keyword-face)
       (2 font-lock-variable-name-face)))))
-
-(setq pm--dbg-mode-line t
-      pm--dbg-fontlock t
-      pm--dbg-hook t)
 
 (provide 'polymode)

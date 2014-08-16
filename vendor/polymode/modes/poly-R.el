@@ -1,132 +1,172 @@
-(require 'poly-base)
+;;; poly-R.el --- Popymodes for R
+;;
+;; Filename: poly-R.el
+;; Author: Spinu Vitalie
+;; Maintainer: Spinu Vitalie
+;; Copyright (C) 2013-2014, Spinu Vitalie, all rights reserved.
+;; Version: 1.0
+;; URL: https://github.com/vitoshka/polymode
+;; Keywords: emacs
+;;
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; This file is *NOT* part of GNU Emacs.
+;;
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 3, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+;; Floor, Boston, MA 02110-1301, USA.
+;;
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defcustom pm-config/R
-  (pm-config-one "R"
-                 :base-submode-name 'pm-base/R
-                 :inner-submode-name 'pm-submode/fundamental)
-  "HTML typical configuration"
-  :group 'polymode :type 'object)
+(require 'polymode)
+
+(defcustom pm-poly/R
+  (pm-polymode-one "R"
+                   :hostmode 'pm-host/R
+                   :innermode 'pm-inner/fundamental)
+  "R root polymode. Not intended to be used directly."
+  :group 'polymodes
+  :type 'object)
 
 ;; NOWEB
 (require 'poly-noweb)
-(defcustom pm-config/noweb+R
-  (clone pm-config/noweb
-         :inner-submode-name 'pm-submode/noweb+R)
+(defcustom pm-poly/noweb+R
+  (clone pm-poly/noweb
+         :innermode 'pm-inner/noweb+R)
   "Noweb for R configuration"
-  :group 'polymode :type 'object)
+  :group 'polymodes
+  :type 'object)
 
-(defcustom pm-submode/noweb+R
-  (clone pm-submode/noweb
+(defcustom pm-inner/noweb+R
+  (clone pm-inner/noweb
          :mode 'R-mode)
   "Noweb for R"
-  :group 'polymode :type 'object)
+  :group 'innermodes
+  :type 'object)
 
-(define-polymode poly-noweb+r-mode pm-config/noweb+R)
-(add-to-list 'auto-mode-alist '("\\.Snw" . poly-noweb+r-mode))
-(add-to-list 'auto-mode-alist '("\\.Rnw" . poly-noweb+r-mode))
+;;;###autoload (autoload 'poly-noweb+r-mode "poly-R")
+(define-polymode poly-noweb+r-mode pm-poly/noweb+R :lighter " PM-Rnw")
 
 
 
 ;; MARKDOWN
 (require 'poly-markdown)
-(define-polymode poly-markdown+r-mode pm-config/markdown :lighter " Rmd")
-(add-to-list 'auto-mode-alist '("\\.Rmd" . poly-markdown+r-mode))
+;;;###autoload (autoload 'poly-markdown+r-mode "poly-R")
+(define-polymode poly-markdown+r-mode pm-poly/markdown :lighter " PM-Rmd")
 
 
 
 ;; RAPPORT
-(defcustom pm-config/rapport
-  (clone pm-config/markdown "rapport"
-         :inner-submode-names '(pm-submode/brew+R
-                                pm-submode/rapport+YAML))
+(defcustom pm-poly/rapport
+  (clone pm-poly/markdown "rapport"
+         :innermodes '(pm-inner/brew+R
+                       pm-inner/rapport+YAML))
   "Rapport template configuration"
-  :group 'polymode  :type 'object)
+  :group 'polymodes
+  :type 'object)
 
-(defcustom  pm-submode/rapport+YAML
-  (pm-inner-submode "rapport+YAML"
-                    :mode 'yaml-mode
-                    :head-reg "<!--head"
-                    :tail-reg "head-->")
+(defcustom  pm-inner/rapport+YAML
+  (pm-hbtchunkmode "rapport+YAML"
+                   :mode 'yaml-mode
+                   :head-reg "<!--head"
+                   :tail-reg "head-->")
   "YAML header in Rapport files"
-  :group 'polymode  :type 'object)
+  :group 'innermodes
+  :type 'object)
 
-(define-polymode poly-rapport-mode pm-config/rapport nil)
-
-(add-to-list 'auto-mode-alist '("\\.rapport" . poly-rapport-mode))
+;;;###autoload (autoload 'poly-rapport-mode "poly-R")
+(define-polymode poly-rapport-mode pm-poly/rapport nil)
 
 
 
 ;; HTML
-(defcustom pm-config/html+R
-  (clone pm-config/html "html+R" :inner-submode-name 'pm-submode/html+R)
+(defcustom pm-poly/html+R
+  (clone pm-poly/html "html+R" :innermode 'pm-inner/html+R)
   "HTML + R configuration"
-  :group 'polymode  :type 'object)
+  :group 'polymodes
+  :type 'object)
 
-(defcustom  pm-submode/html+R
-  (pm-inner-submode "html+R"
-                    :mode 'R-mode
-                    :head-reg "<!--[ \t]*begin.rcode"
-                    :tail-reg "end.rcode[ \t]*-->")
-  "HTML KnitR submode."
-  :group 'polymode  :type 'object)
+(defcustom  pm-inner/html+R
+  (pm-hbtchunkmode "html+R"
+                   :mode 'R-mode
+                   :head-reg "<!--[ \t]*begin.rcode"
+                   :tail-reg "end.rcode[ \t]*-->")
+  "HTML KnitR innermode."
+  :group 'innermodes
+  :type 'object)
 
-(define-polymode poly-html+r-mode pm-config/html+R)
-(add-to-list 'auto-mode-alist '("\\.Rhtml" . poly-html+r-mode))
+;;;###autoload (autoload 'poly-html+r-mode "poly-R")
+(define-polymode poly-html+r-mode pm-poly/html+R)
 
 
 
 ;;; R-brew
-(defcustom pm-config/brew+R
-  (clone pm-config/brew "brew+R"
-         :inner-submode-name 'pm-submode/brew+R)
+(defcustom pm-poly/brew+R
+  (clone pm-poly/brew "brew+R"
+         :innermode 'pm-inner/brew+R)
   "Brew + R configuration"
-  :group 'polymode  :type 'object)
+  :group 'polymodes
+  :type 'object)
 
-(defcustom  pm-submode/brew+R
-  (pm-inner-submode "brew+R"
-                    :mode 'R-mode
-                    :head-reg "<%[=%]?"
-                    :tail-reg "[#=%=-]?%>")
+(defcustom  pm-inner/brew+R
+  (pm-hbtchunkmode "brew+R"
+                   :mode 'R-mode
+                   :head-reg "<%[=%]?"
+                   :tail-reg "[#=%=-]?%>")
   "Brew R chunk."
-  :group 'polymode  :type 'object)
+  :group 'innermodes
+  :type 'object)
 
-(define-polymode poly-brew+r-mode pm-config/brew+R)
-(add-to-list 'auto-mode-alist '("\\.Rbrew" . poly-brew+r-mode))
-
+;;;###autoload (autoload 'poly-brew+r-mode "poly-R")
+(define-polymode poly-brew+r-mode pm-poly/brew+R)
 
 
 
 ;;; R+C++
 ;; todo: move into :matcher-subexp functionality?
 (defun pm--R+C++-head-matcher (ahead)
-  (when (re-search-forward "cppFunction *( *\\(['\"]\n\\)"
+  (when (re-search-forward "cppFunction(\\(['\"]\n\\)"
                            nil t ahead)
     (cons (match-beginning 1) (match-end 1))))
 
 (defun pm--R+C++-tail-matcher (ahead)
   (when (< ahead 0)
     (goto-char (car (pm--R+C++-head-matcher -1))))
+  (goto-char (max 1 (1- (point))))
   (let ((end (or (ignore-errors (scan-sexps (point) 1))
                  (buffer-end 1))))
-    (cons (max 1 (- end 1)) end)))
+    (cons (max 1 (1- end)) end)))
 
-(defcustom pm-config/R+C++
-  (clone pm-config/R "R+C++" :inner-submode-name 'pm-submode/R+C++)
+(defcustom pm-poly/R+C++
+  (clone pm-poly/R "R+C++" :innermode 'pm-inner/R+C++)
   "R + C++ configuration"
-  :group 'polymode  :type 'object)
+  :group 'polymodes
+  :type 'object)
 
-(defcustom  pm-submode/R+C++
-  (pm-inner-submode "R+C++"
-                    :mode 'c++-mode
-                    :head-mode 'base
-                    :head-reg 'pm--R+C++-head-matcher
-                    :tail-reg 'pm--R+C++-tail-matcher
-                    :font-lock-narrow nil)
+(defcustom  pm-inner/R+C++
+  (pm-hbtchunkmode "R+C++"
+                   :mode 'c++-mode
+                   :head-mode 'host
+                   :head-reg 'pm--R+C++-head-matcher
+                   :tail-reg 'pm--R+C++-tail-matcher
+                   :font-lock-narrow nil)
   "HTML KnitR chunk."
-  :group 'polymode  :type 'object)
+  :group 'innermodes
+  :type 'object)
 
-(define-polymode poly-r+c++-mode pm-config/R+C++)
-(add-to-list 'auto-mode-alist '("\\.Rcpp" . poly-r+c++-mode))
+;;;###autoload (autoload 'poly-r+c++-mode "poly-R")
+(define-polymode poly-r+c++-mode pm-poly/R+C++)
 
 
 
@@ -142,39 +182,46 @@
   (when (re-search-forward "^[ \t]*\\*/")
     (cons (match-beginning 0) (match-end 0))))
 
-(defcustom pm-config/C++R
-  (clone pm-config/C++ "C++R" :inner-submode-name 'pm-submode/C++R)
+(defcustom pm-poly/C++R
+  (clone pm-poly/C++ "C++R" :innermode 'pm-inner/C++R)
   "R + C++ configuration"
-  :group 'polymode  :type 'object)
+  :group 'polymodes
+  :type 'object)
 
-(defcustom  pm-submode/C++R
-  (pm-inner-submode "C++R"
-                    :mode 'R-mode
-                    :head-reg 'pm--C++R-head-matcher
-                    :tail-reg 'pm--C++R-tail-matcher)
+(defcustom  pm-inner/C++R
+  (pm-hbtchunkmode "C++R"
+                   :mode 'R-mode
+                   :head-reg 'pm--C++R-head-matcher
+                   :tail-reg 'pm--C++R-tail-matcher)
   "HTML KnitR chunk."
-  :group 'polymode  :type 'object)
+  :group 'polymodes
+  :type 'object)
 
-(define-polymode poly-c++r-mode pm-config/C++R)
-(add-to-list 'auto-mode-alist '("\\.cppR" . poly-c++r-mode))
+;;;###autoload (autoload 'poly-c++r-mode "poly-R")
+(define-polymode poly-c++r-mode pm-poly/C++R)
 
 
 
 ;;; R help
-(defvar pm-config/ess-help+R
-  (pm-config-one "ess-R-help"
-                 :inner-submode-name 'pm-submode/ess-help+R)
-  "ess-R-help")
+(defcustom pm-poly/ess-help+R
+  (pm-polymode-one "ess-R-help"
+                   :innermode 'pm-inner/ess-help+R)
+  "ess-R-help"
+  :group 'polymodes
+  :type 'object)
 
-(defvar  pm-submode/ess-help+R
-  (pm-inner-submode "ess-help+R"
-                    :mode 'R-mode
-                    :head-reg "^Examples:"
-                    :tail-reg "\\'"
-                    :indent-offset 5)
-  "Ess help R chunk")
+(defcustom  pm-inner/ess-help+R
+  (pm-hbtchunkmode "ess-help+R"
+                   :mode 'R-mode
+                   :head-reg "^Examples:"
+                   :tail-reg "\\'"
+                   :indent-offset 5)
+  "Ess help R chunk"
+  :group 'innermodes
+  :type 'object)
 
-(define-polymode poly-ess-help+r-mode pm-config/ess-help+R)
+;;;###autoload (autoload 'poly-ess-help+r-mode "poly-R")
+(define-polymode poly-ess-help+r-mode pm-poly/ess-help+R)
 (add-hook 'ess-help-mode-hook '(lambda ()
                                  (when (string= ess-dialect "R")
                                    (poly-ess-help+r-mode))))
@@ -191,20 +238,123 @@
                  (buffer-end 1))))
     (cons (max 1 (- end 1)) end)))
 
-(defvar pm-config/Rd
-  (pm-config-one "R-documentation"
-                 :inner-submode-name 'pm-submode/Rd)
-  "R submode for Rd files")
+(defcustom pm-poly/Rd
+  (pm-polymode-one "R-documentation"
+                   :innermode 'pm-inner/Rd)
+  "R polymode for Rd files"
+  :group 'polymodes
+  :type 'object)
 
-(defvar  pm-submode/Rd
-  (pm-inner-submode "R+C++"
-                    :mode 'R-mode
-                    :head-mode 'base
-                    :head-reg 'pm--Rd-examples-head-matcher
-                    :tail-reg 'pm--Rd-examples-tail-matcher)
-  "Rd examples chunk.")
+(defcustom pm-inner/Rd
+  (pm-hbtchunkmode "R+C++"
+                   :mode 'R-mode
+                   :head-mode 'host
+                   :head-reg 'pm--Rd-examples-head-matcher
+                   :tail-reg 'pm--Rd-examples-tail-matcher)
+  "Rd examples chunk."
+  :group 'innermodes
+  :type 'object)
 
-(define-polymode poly-Rd-mode pm-config/Rd)
+;;;###autoload (autoload 'poly-Rd-mode "poly-R")
+(define-polymode poly-Rd-mode pm-poly/Rd)
 (add-hook 'Rd-mode-hook 'poly-Rd-mode)
+
+
+
+;; R SHELL WEAVERS
+(defcustom pm-weaver/knitR
+  (pm-shell-weaver "knitr"
+                   :from-to
+                   '(("latex" "\\.\\(tex\\|rnw\\)\\'" "tex" "LaTeX" "Rscript -e \"library(knitr); knit('%i', output='%o')\"")
+                     ("html" "\\.x?html?\\'" "html" "HTML" "Rscript -e \"library(knitr); knit('%i', output='%o')\"")
+                     ("markdown" "\\.r?md\\'" "md" "Markdown" "Rscript -e \"library(knitr); knit('%i', output='%o')\"")
+                     ("rst" "\\.rst" "rst" "ReStructuredText" "Rscript -e \"library(knitr); knit('%i', output='%o')\"")
+                     ("brew" "\\.r?brew\\'" "brew" "Brew" "Rscript -e \"library(knitr); knit('%i', output='%o')\"")
+                     ("asciidoc" "\\.asciidoc\\'" "txt" "AsciiDoc" "Rscript -e \"library(knitr); knit('%i', output='%o')\"")
+                     ("textile" "\\.textile\\'" "textile" "Textile" "Rscript -e \"library(knitr); knit('%i', output='%o')\"")))
+  "Shell knitR weaver."
+  :group 'polymode-weave
+  :type 'object)
+
+(polymode-register-weaver pm-weaver/knitR nil
+                          pm-poly/noweb+R pm-poly/markdown
+                          pm-poly/rapport pm-poly/html+R)
+
+(defcustom pm-weaver/Sweave
+  (pm-shell-weaver "sweave"
+                   :from-to
+                   '(("latex" "\\.\\(tex\\|r?s?nw\\)\\'"
+                      "tex" "LaTeX" "R CMD Sweave %i --options=\"output='%o'\"")))
+  "Shell 'Sweave' weaver."
+  :group 'polymode-weave
+  :type 'object)
+
+(polymode-register-weaver pm-weaver/Sweave nil
+                          pm-poly/noweb+R)
+
+;; (oref pm-poly/rapport :weavers)
+;; (oref pm-poly/noweb+R :weavers)
+
+
+
+;; R ESS WEAVERS
+(defcustom pm-weaver/knitR-ESS
+  (pm-callback-weaver "knitR-ESS"
+                      :from-to
+                      '(("latex" "\\.\\(tex\\|rnw\\)\\'" "tex" "LaTeX" "library(knitr); knit('%i', output='%o')")
+                        ("html" "\\.x?html?\\'" "html" "HTML" "library(knitr); knit('%i', output='%o')")
+                        ("markdown" "\\.r?md\\'" "md" "Markdown" "library(knitr); knit('%i', output='%o')")
+                        ("rst" "\\.rst\\'" "rst" "ReStructuredText" "library(knitr); knit('%i', output='%o')")
+                        ("brew" "\\.r?brew\\'" "brew" "Brew" "library(knitr); knit('%i', output='%o')")
+                        ("asciidoc" "\\.asciidoc\\'" "txt" "AsciiDoc" "library(knitr); knit('%i', output='%o')")
+                        ("textile" "\\.textile\\'" "textile" "Textile" "library(knitr); knit('%i', output='%o')"))
+                      :function 'pm--run-command-in-ESS
+                      :callback 'pm--ESS-callback)
+  "ESS knitR weaver."
+  :group 'polymode-weave
+  :type 'object)
+
+(polymode-register-weaver pm-weaver/knitR-ESS nil
+                          pm-poly/noweb+R pm-poly/markdown
+                          pm-poly/rapport pm-poly/html+R)
+
+(defcustom pm-weaver/Sweave-ESS
+  (pm-callback-weaver "ESS-Sweave"
+                      :from-to '(("latex" "\\.\\(tex\\|r?s?nw\\)\\'" "tex"
+                                  "LaTeX" "Sweave('%i', output='%o')"))
+                      :function 'pm--run-command-in-ESS
+                      :callback 'pm--ESS-callback)
+  "ESS 'Sweave' weaver."
+  :group 'polymode-weave
+  :type 'object)
+
+(polymode-register-weaver pm-weaver/Sweave-ESS nil
+                          pm-poly/noweb+R)
+
+(declare-function ess-async-command nil)
+(declare-function ess-force-buffer-current nil)
+(declare-function ess-process-get nil)
+(declare-function ess-process-put nil)
+(declare-function comint-next-prompt nil)
+
+(defun pm--ESS-callback (proc string)
+  (let ((ofile (process-get proc 'pm-output-file)))
+    (with-current-buffer (process-buffer proc)
+      (when (string-match-p "Error\\(:\\| +in\\)" string)
+        (error "Errors durring weaving.")))
+    ofile))
+
+(defun pm--run-command-in-ESS (command &optional from to)
+  (require 'ess)
+  (let ((ess-eval-visibly t)
+        ;; R specific, should change eventually
+        (ess-dialect "R")
+        (weaver (symbol-value (oref pm/polymode :weaver))))
+    (ess-force-buffer-current)
+    (ess-process-put 'pm-output-file pm--output-file)
+    (ess-process-put 'callbacks (list (oref weaver :callback)))
+    (ess-process-put 'interruptable? t)
+    (ess-process-put 'running-async? t)
+    (ess-eval-linewise command)))
 
 (provide 'poly-R)

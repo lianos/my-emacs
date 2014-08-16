@@ -1,27 +1,65 @@
-(require 'polymode)
+;;; poly-markdown.el
+;;
+;; Filename: poly-markdown.el
+;; Author: Spinu Vitalie
+;; Maintainer: Spinu Vitalie
+;; Copyright (C) 2013-2014, Spinu Vitalie, all rights reserved.
+;; Version: 1.0
+;; URL: https://github.com/vitoshka/polymode
+;; Keywords: emacs
+;;
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; This file is *NOT* part of GNU Emacs.
+;;
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 3, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+;; Floor, Boston, MA 02110-1301, USA.
+;;
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defcustom pm-config/markdown
-  (pm-config-multi-auto "markdown"
-                        :base-submode-name 'pm-base/markdown
-                        :auto-submode-name 'pm-submode/markdown
+(require 'polymode)
+(require 'markdown-mode)
+
+(defcustom pm-host/markdown
+  (pm-bchunkmode "Markdown"
+               :mode 'markdown-mode)
+  "Markdown host chunkmode"
+  :group 'hostmodes
+  :type 'object)
+
+(defcustom  pm-inner/markdown
+  (pm-hbtchunkmode-auto "markdown"
+                     :head-reg "^[ \t]*```[{ \t]*\\w.*$"
+                     :tail-reg "^[ \t]*```[ \t]*$"
+                     :retriever-regexp "```[ \t]*{?\\(\\(\\w\\|\\s_\\)*\\)"
+                     :font-lock-narrow t)
+  "Markdown typical chunk."
+  :group 'innermodes
+  :type 'object)
+
+(defcustom pm-poly/markdown
+  (pm-polymode-multi-auto "markdown"
+                        :hostmode 'pm-host/markdown
+                        :auto-innermode 'pm-inner/markdown
                         :init-functions '(poly-markdown-remove-markdown-hooks))
   "Markdown typical configuration"
-  :group 'polymode
+  :group 'polymodes
   :type 'object)
 
-(defcustom  pm-submode/markdown
-  (pm-inner-submode-auto "markdown"
-                         :head-reg "^[ \t]*```[{ \t]*\\w.*$"
-                         :tail-reg "^[ \t]*```[ \t]*$"
-                         :retriever-regexp "```[ \t]*{?\\(\\w+\\)"
-                         :font-lock-narrow t)
-  "Noweb typical chunk."
-  :group 'polymode
-  :type 'object)
-
-(define-polymode poly-markdown-mode pm-config/markdown)
-(add-to-list 'auto-mode-alist '("\\.md" . poly-markdown-mode))
-
+;;;###autoload  (autoload 'poly-markdown-mode "poly-markdown")
+(define-polymode poly-markdown-mode pm-poly/markdown)
 
 ;;; FIXES:
 (defun poly-markdown-remove-markdown-hooks ()

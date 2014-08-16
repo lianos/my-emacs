@@ -1,94 +1,95 @@
-(require 'polymode)
+;;; CORE POLYMODE AND HOST OBJECTS
 
-;; BASE MODES
-(defcustom pm-base/blank
-  (pm-submode "blank")
-  "Blank submode. This is the default :base-submode for all pm-config objects.
-On initalisation this submode sets :mode to whatever major-mode
-is in place at that time."
-  :group 'base-submodes
-  :type 'object)
-
-(defcustom pm-base/fundamental
-  (pm-submode "fundamental"
-              :mode 'fundamental-mode)
-  "Fundamental base mode"
-  :group 'base-submodes
-  :type 'object)
-
-(defcustom pm-base/latex
-  (pm-submode "latex"
-              :mode 'latex-mode)
-  "Latex base submode"
-  :group 'base-submodes
-  :type 'object)
-
-(defcustom pm-base/markdown
-  (pm-submode "Markdown"
-              :mode 'markdown-mode)
-  "Markdown base submode"
-  :group 'base-submodes
-  :type 'object)
-
-(defcustom pm-base/html
-  (pm-submode "html"
-              :mode 'html-mode)
-  "HTML base submode"
-  :group 'base-submodes
-  :type 'object)
-
-(defcustom pm-base/R
-  (pm-submode "R"
-              :mode 'R-mode)
-  "R base submode"
-  :group 'base-submodes
-  :type 'object)
-
-(defcustom pm-base/C++
-  (pm-submode "C++"
-              :mode 'c++-mode
-              :font-lock-narrow nil)
-  "C++ base submode"
-  :group 'base-submodes
-  :type 'object)
-
-(defcustom pm-base/text
-  (pm-submode "text"
-              :mode 'text-mode)
-  "Text base submode"
-  :group 'base-submodes
-  :type 'object)
-
-(defcustom pm-base/yaml
-  (pm-submode "YAML"
-              :mode 'yaml-mode)
-  "YAML submode"
-  :group 'base-submodes
-  :type 'object)
-
-;;; CONFIG objects
-;; These are generic configuration objects. More specialized configuration
-;; objects are defined in corresponding mode-specific files (e.g. poly-R.el).
-(defcustom pm-config/brew
-  (pm-config-one "brew"
-                 :base-submode-name 'pm-base/text
-                 :inner-submode-name 'pm-submode/fundamental)
+
+;;; POLYMODE objects
+;; These are simple generic configuration objects. More specialized
+;; configuration objects are defined in language-specific files (e.g. poly-R.el,
+;; poly-markdown.el etc).
+(defcustom pm-poly/brew
+  (pm-polymode-one "brew"
+                 :hostmode 'pm-host/text
+                 :innermode 'pm-inner/fundamental)
   "Typical Brew configuration"
-  :group 'polymode :type 'object)
+  :group 'polymodes
+  :type 'object)
 
-(defcustom pm-config/html
-  (pm-config-one "html"
-                 :base-submode-name 'pm-base/html
-                 :inner-submode-name 'pm-submode/fundamental)
+(defcustom pm-poly/html
+  ;; fixme: should probably be pm-polymode-multi
+  (pm-polymode-one "html"
+                 :hostmode 'pm-host/html
+                 :innermode 'pm-inner/fundamental)
   "HTML typical configuration"
-  :group 'polymode :type 'object)
+  :group 'polymodes
+  :type 'object)
 
-(defcustom pm-config/C++
-  (pm-config-one "C++"
-                 :base-submode-name 'pm-base/C++
-                 :inner-submode-name 'pm-submode/fundamental)
+(defcustom pm-poly/C++
+  (pm-polymode-one "C++"
+                 :hostmode 'pm-host/C++
+                 :innermode 'pm-inner/fundamental)
   "C++ typical configuration"
-  :group 'polymode :type 'object)
+  :group 'polymodes
+  :type 'object)
+
+
+
+;; HOST MODES
+(defcustom pm-host/blank
+  (pm-bchunkmode "blank")
+  "Blank chunkmode. This is the default :hostmode for all pm-polymode objects.
+On initalisation this chunkmode sets :mode to whatever major-mode
+is in place at that time."
+  :group 'hostmodes
+  :type 'object)
+
+(defcustom pm-host/fundamental
+  (pm-bchunkmode "fundamental"
+                 :mode 'fundamental-mode)
+  "Fundamental host mode"
+  :group 'hostmodes
+  :type 'object)
+
+(defcustom pm-host/latex
+  (pm-bchunkmode "latex"
+                 :mode 'latex-mode)
+  "Latex host chunkmode"
+  :group 'hostmodes
+  :type 'object)
+
+(defcustom pm-host/html
+  (pm-bchunkmode "html"
+                 :mode 'html-mode)
+  "HTML host chunkmode"
+  :group 'hostmodes
+  :type 'object)
+
+(defcustom pm-host/R
+  (pm-bchunkmode "R"
+                 :mode 'R-mode)
+  "R host chunkmode"
+  :group 'hostmodes
+  :type 'object)
+
+(defcustom pm-host/C++
+  (pm-bchunkmode "C++"
+                 :mode 'c++-mode
+                 :font-lock-narrow nil)
+  "C++ host chunkmode"
+  :group 'hostmodes
+  :type 'object)
+
+(defcustom pm-host/text
+  (pm-bchunkmode "text"
+                 :mode 'text-mode)
+  "Text host chunkmode"
+  :group 'hostmodes
+  :type 'object)
+
+(defcustom pm-host/yaml
+  (pm-bchunkmode "YAML"
+                 :mode 'yaml-mode)
+  "YAML chunkmode"
+  :group 'hostmodes
+  :type 'object)
 
 
 (provide 'poly-base)

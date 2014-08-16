@@ -1,22 +1,27 @@
-
 ## Overview
 
-Polymode is an emacs package that offers support for multiple major modes inside
-a single emacs buffer. It is lightweight and fully object oriented, specifically
-designed for quick addition of new polymodes.
+Polymode is an emacs package that offers generic support for multiple major
+modes inside a single emacs buffer. It is lightweight, object oriented and
+highly extensible. Creating new polymodes typically takes a
+[few](modes#multiple-automatically-detected-innermodes) lines of code.
 
-Technically speaking, polymode doesn't keep its modes in a single emacs buffer
-but in several indirect buffers, actually as many as different modes are there
-in a file. Consequently, polymode is as fast as switching buffers because it
-never re-installs major modes. I am very much indebted to Dave Love's
-[multi-mode.el](http://www.loveshack.ukfsn.org/emacs/multi-mode.el) for this
-awesome idea.
+Polymode also provides extensible facilities for external literate programming
+tools for exporting, weaving and tangling.
 
+- [Instalation](#intstalation)
+- [Polymodes Activation](#activation-of-polymodes)
+- [Basic Usage](#basic-usage)
+- [Warnings](#warning)
+- [Development](modes)
+- [Screenshots](#Screenshots)
 
-## Installation 
+## Installation
 
-The project is in an alpha stage and it is not, as yet, available in melpa
-repo. You will have to install it manually:
+### From [MELPA](https://github.com/milkypostman/melpa)
+
+<kbd>M-x</kbd> `package-install` `polymode`.
+
+### Manually
 
 ```sh
 git clone https://github.com/vitoshka/polymode.git
@@ -37,72 +42,114 @@ Require any polymode bundles that you are interested in. For example:
 (require 'poly-markdown)
 ```
 
-Note that for the full use of poly-markdown modes you will need
-[markdown-mode.el](http://jblevins.org/projects/markdown-mode/). It is also
-available from MELPA repository.
+## Activation of Polymodes
 
+Polymodes are functions, just like ordinary emacs modes. The can be used in
+place of emacs major or minor modes alike. There are two main ways to
+automatically activate emacs (poly)modes:
 
-## Polymodes activation
+ 1. _By registering a file extension by adding modes to `auto-mode-alist`_:
 
-Polymode defines emacs major and minor modes that you can use in full compliance
-with emacs usual conventions.
+    ```lisp
+    ;;; MARKDOWN
+    (add-to-list 'auto-mode-alist '("\\.md" . poly-markdown-mode))
 
-There are two main ways to activate emacs mode. 
+    ;;; R modes
+    (add-to-list 'auto-mode-alist '("\\.Snw" . poly-noweb+r-mode))
+    (add-to-list 'auto-mode-alist '("\\.Rnw" . poly-noweb+r-mode))
+    (add-to-list 'auto-mode-alist '("\\.Rmd" . poly-markdown+r-mode))
+    ```
+    See [polymode-configuration.el](polymode-configuration.el) for more
+    examples.
 
-   1. _By registering a file extension_. Some of the file extensions are already
-defined for you "Rmd", "Snw", "Rcpp", "cppR", "Rhtml" etc. You can find some
-examples in `tests` sub-directory. Of course you can always set your own
-extensions by adding them to `auto-mode-alist`.
-
-   1. By setting local mode variable in you file. This is how you would activate C++R mode:
+ 2. _By setting local mode variable in you file_:
    
    ```c++
    // -*- mode: poly-C++R -*-
    ```
-   or 
+    or
+
    ```sh
    ## -*- mode: poly-brew+R; -*-
    ```
 
+## Basic Usage
 
-<!-- ## Naming conventions  -->
+All polymode keys start with the prefix defined by `polymode-prefix-key`,
+default is <kbd>M-n</kbd>. The `polymode-mode-map` is the parent of all
+polymodes' maps:
 
-<!-- The core polymode object and modes are usually named as "engine+submode", or -->
-<!-- "base_mode+submode" like "noweb+R", "markdown+R", "C++R" and "R++C".  -->
+* BACKENDS
 
-<!-- todo: more to come on this ... need to define object hierarchy for the full story. -->
+     <kbd>e</kbd> `polymode-export`
+
+     <kbd>E</kbd> `polymode-set-exporter`
+
+     <kbd>w</kbd> `polymode-weave`
+
+     <kbd>W</kbd> `polymode-set-weaver`
+
+     <kbd>t</kbd> `polymode-tangle` ;; not implemented yet
+
+     <kbd>T</kbd> `polymode-set-tangler` ;; not implemented yet
+
+     <kbd>$</kbd> `polymode-show-process-buffer`
+
+* NAVIGATION
+
+    <kbd>C-n</kbd> `polymode-next-chunk`
+     
+    <kbd>C-p</kbd> `polymode-previous-chunk`
+     
+    <kbd>C-M-n</kbd> `polymode-next-chunk-same-type`
+     
+    <kbd>C-M-p</kbd> `polymode-previous-chunk-same-type`
+
+* MANIPULATION
+
+    <kbd>M-k</kbd> `polymode-kill-chunk`
+
+    <kbd>M-m</kbd> `polymode-mark-or-extend-chunk`
+
+    <kbd>C-t</kbd> `polymode-toggle-chunk-narrowing`
+
+    <kbd>M-i</kbd> `polymode-insert-new-chunk`
 
 
-## Warning
+## Warnings
 
-   * Tested with Emacs 24.3.1 and unlikely to work with Emacses older
-     than 24.2 because of the heavy use of pattern matching and eieio.
-   
+  * Tested with Emacs 24.3.1 and 24.4.5.
+
 Some things still don't work as expected. For example:
     
-   * To kill a polymode buffer you will have position the cursor in the base mode buffer. 
+   * To kill a polymode buffer you will have position the cursor in the host mode buffer.  
    * Customization interface is not working as expected (an eieio bug) and is
-     not tested. 
-   * No literate programming backends (in the sense of weavers, tanglers and
-     exporters).
-   * Occasional problems with font-lock. Messages like `Error during
-     redisplay: (jit-lock-function 163) signaled (args-out-of-range 1
-     142)` are posible.
-     
-     
+     not even tested.
+   * Indentation and font-lock is not always right and requires some more
+     tweaking. This is especially true for complex modes like `c-mode`.
+
+## Developing with Polymode
+
+For the relevant terminology and development info see these [docs](modes).
+
 ## Screenshots
-
-### Ess-help buffer
-
-<img src="img/ess-help.png" width="350px"/>
-
-### C++R
-<img src="img/cppR.png" width="350px"/>
 
 ### markdown+R
 
-<img src="img/Rmd.png" width="350px"/>
+<img src="img/Rmd.png" width="400px"/>
 
 ### markdown+R+YAML
 
-<img src="img/rapport.png" width="350px"/>
+<img src="img/rapport.png" width="400px"/>
+
+### org mode
+
+<img src="img/org.png" width="400px"/>
+
+### Ess-help buffer
+
+<img src="img/ess-help.png" width="400px"/>
+
+### C++R
+<img src="img/cppR.png" width="400px"/>
+

@@ -13,9 +13,10 @@
 ;; hunted for, which was not helpful to setup new ones.
 ;; This has to be defined before (require 'ess-site). :
 
-(defun Rbioc214 ()
+;; This need to run on R-3.0.3
+(defun Rbioc213 ()
   (interactive)
-  (let ((inferior-R-program-name "~/sw/bin/R-bioc214"))
+  (let ((inferior-R-program-name "~/sw/bin/R-bioc213"))
     (R)))
 
 (setq ess-default-style 'DEFAULT)
