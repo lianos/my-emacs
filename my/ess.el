@@ -19,6 +19,12 @@
   (let ((inferior-R-program-name "~/sw/bin/R-bioc213"))
     (R)))
 
+;;
+(defun Rbioc300 ()
+  (interactive)
+  (let ((inferior-R-program-name "~/sw/bin/R-bioc300"))
+    (R)))
+
 (setq ess-default-style 'DEFAULT)
 (load (expand-file-name "~/.emacs.d/vendor/ess-release/lisp/ess-site"))
 (require 'ess-site)

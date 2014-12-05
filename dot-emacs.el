@@ -26,7 +26,7 @@
 (vendor 'ido)
 (vendor 'ibuffer)
 (vendor 'ssh)
-(vendor 'yasnippet)
+; (vendor 'yasnippet)
 ; (vendor 'magit)
 ; (vendor 'minimap)
 (vendor 'expand-region)
