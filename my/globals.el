@@ -37,19 +37,13 @@
 ;; use * to begin paragraphs -- for when you are enumerated lists
 (setq paragraph-start "\\*\\|$" paragraph-separate "$")
 
-;; Scrolling
-;; http://zhangda.wordpress.com/2009/05/21
-;; (setq-default scroll-up-aggressively 0.01
-;;               scroll-down-aggressively 0.01
-;;               scroll-margin 1
-;;               scroll-conservatively 0)
 ;; From: http://www.djcbsoftware.nl/dot-emacs.html
-;; (setq
-;;   scroll-margin 0                        ;; do smooth scrolling, ...
-;;   scroll-conservatively 100000           ;; ... the defaults ...
-;;   scroll-up-aggressively 0               ;; ... are very ...
-;;   scroll-down-aggressively 0             ;; ... annoying
-;;   scroll-preserve-screen-position t)     ;; preserve screen pos with C-v/M-v
+ (setq
+   scroll-margin 0                        ;; do smooth scrolling, ...
+   scroll-conservatively 100000           ;; ... the defaults ...
+   scroll-up-aggressively nil               ;; ... are very ...
+   scroll-down-aggressively nil             ;; ... annoying
+   scroll-preserve-screen-position t)     ;; preserve screen pos with C-v/M-v
 
 ;; http://stackoverflow.com/questions/445873/emacs-mouse-scrolling
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil)))
