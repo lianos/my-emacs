@@ -23,7 +23,7 @@ ESS version @ESSVER
 @c @end ifhtml
 @c
 @author Current Documentation by The ESS Developers
-@author Copyright @copyright{} 2002--2013 The ESS Developers
+@author Copyright @copyright{} 2002--2014 The ESS Developers
 @author Copyright @copyright{} 1996--2001 A.J. Rossini
 @author Original Documentation by David M. Smith
 @author Copyright @copyright{} 1992--1995 David M. Smith
@@ -521,7 +521,7 @@ Other ways to setup a remote ESS connection are through @code{ess-remote}.
 @item Start the ESS process on the remote machine, for example with one of
 the commands @samp{Splus}, or @samp{R}, or @samp{sas -stdio}.
 
-@item Start @samp{M-x ess-remote}.  
+@item Start @samp{M-x ess-remote}.
 You will be prompted for a program name with completion.  Choose
 one. Your process is now known to ESS.  All the usual ESS commands
 (@samp{C-c C-n} and its relatives) now work with the S language
@@ -2540,8 +2540,8 @@ activation of @code{ess-tracebug} set @code{ess-use-tracebug} to nil.
 
 Tracebug functionality can be found on @code{ess-dev-map}, bound to
 @kbd{C-c C-t}. Additionally, when subprocess is in a debugging state
-@code{ess-debug-minor-mode} is active and the following shortcuts are
-available:
+@code{ess-debug-minor-mode} is active and the following additional
+shortcuts are available:
 
 @verbatim
 * Interactive Debugging (`ess-debug-minor-mode-map'):
@@ -2556,7 +2556,7 @@ available:
 @end verbatim
 
 
-Here are all the tracebug commands defined in @code{ess-dev-map}
+These are all the tracebug commands defined in @code{ess-dev-map}
 (@kbd{C-c C-t ?} to show this table):
 
 @verbatim
@@ -2595,10 +2595,15 @@ Here are all the tracebug commands defined in @code{ess-dev-map}
 
 @end verbatim
 
+To configure how electric watch window splits the display see
+@code{ess-watch-width-threshold} and @code{ess-watch-height-threshold}
+variables.
+
 A more detailed ess-tracebug documentation with screenshots is available
 at @uref{http://code.google.com/p/ess-tracebug/}.
 
 A short tutorial is at @uref{http://code.google.com/p/ess-tracebug/wiki/GettingStarted}.
+
 
 @emph{Note:} Currently, ess-tracebug does not detect some of R's debug
 related messages in non-English locales. To set your R messages to
@@ -2966,7 +2971,7 @@ something like:
     @code{
        Warning: Class "boo" is defined (with package slot ‘foo’) but no
        metadata object found to revise subclass information---not exported?
-       }      
+       }
 
 You can safely ignore this warnings.
 

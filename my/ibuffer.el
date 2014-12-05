@@ -13,21 +13,34 @@
            ;;    ;; etc.; all your mail related modes
            ;;    ))
            ;; ======================================================== Genentech
-           ("ngs340" (filename . "ngs340/"))
+           ;; Rpkgs
+           ("multiGSEA" (filename . "multiGSEA/"))
+           ("rmd.plugins" (filename . "rmd.plugins/"))
            ("c3po" (filename . "c3po"))
-           ;; ===================================================== cBio @ MSKCC
-           ("ApAcalypse" (filename . "ApAcalypse/"))
-           ("TagSeqAnalysis" (filename . "TagSeqAnalysis/"))
-           ("TagSeq" (filename . "TagSeq/"))
-           ("SeqStore" (filename . "SeqStore/"))
-           ("SeqTools" (filename . "seqtools/"))
-           ("biosignals" (filename . "biosignals/"))
-           ("GenomicCache" (filename . "GenomicCache/"))
-           ("ARE.utils" (filename . "ARE.utils/"))
-           ("data.table" (filename . "data.table/"))
-           ("shikken" (filename . "shikken/"))
-           ("buckshot" (filename . "buckshot/"))
+           ;; Analyses
+           ("MICA" (filename . "MICA-B/"))
+           ("schmidt/aPDL1" (filename . "schimdt/aPDL1"))
+           ;; by collaborator
+           ("belvin" (filename . "belvin/"))
+           ("grogan" (filename . "grogan/"))
+           ("murthy" (filename . "murthy/"))
+           ("schmidt" (filename . "schimdt/"))
+           ;; ======================================================== Catch All
            ("Programming/R" (mode . ess-mode))
+           ("rmarkdown" (filename . ".Rmd"))
+           ;; ===================================================== cBio @ MSKCC
+           ;; ("ApAcalypse" (filename . "ApAcalypse/"))
+           ;; ("TagSeqAnalysis" (filename . "TagSeqAnalysis/"))
+           ;; ("TagSeq" (filename . "TagSeq/"))
+           ;; ("SeqStore" (filename . "SeqStore/"))
+           ;; ("SeqTools" (filename . "seqtools/"))
+           ;; ("biosignals" (filename . "biosignals/"))
+           ;; ("GenomicCache" (filename . "GenomicCache/"))
+           ;; ("ARE.utils" (filename . "ARE.utils/"))
+           ;; ("data.table" (filename . "data.table/"))
+           ;; ("shikken" (filename . "shikken/"))
+           ;; ("buckshot" (filename . "buckshot/"))
+
            ;; ("ESS-help" (buffer-name . "help[R]"))
            ("Programming" ;; prog stuff not already in MyProjectX
             (or

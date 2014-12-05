@@ -485,7 +485,7 @@ Next: <a href="#Introduction" accesskey="n" rel="next">Introduction</a>, Up: <a 
 <h1 class="top">ESS: Emacs Speaks Statistics</h1>
 
 <p>ESS version
-13.09-1
+14.09
 </p>
 <div class="display">
 <pre class="display">by  A.J. Rossini,
@@ -693,7 +693,7 @@ Up: <a href="#Features" accesskey="u" rel="up">Features</a> &nbsp; [<a href="#SE
   </li><li> Manipulating and editing saved transcripts
   </li><li> Re-evaluating commands from transcript files
   </li></ul>
-</li><li> Interaction with Help Pages and other Documenation (R)
+</li><li> Interaction with Help Pages and other Documentation (R)
   <ul>
 <li> Fast Navigation
   </li><li> Sending Examples to running ESS process.
@@ -794,6 +794,35 @@ Next: <a href="#Credits" accesskey="n" rel="next">Credits</a>, Previous: <a href
 <h3 class="section">1.2 New features in ESS</h3>
 
 
+<p>Changes / Selected Bug Fixes in 14.09:
+</p><ul>
+<li> <acronym>ESS[Julia]</acronym>: Executable is changed to <code>julia</code>.
+</li><li> <acronym>ESS[Julia]</acronym>: Completion and help system was adjusted to Julia
+v.0.3.0. Julia v.0.2.x is no more supported.
+</li><li> <acronym>ESS[R]</acronym>: Running R with <code>gdb</code> debugger now works as expected
+</li><li> i<acronym>ESS</acronym><!-- /@w -->: Inferior ESS buffers are now derived from <code>comint-mode</code>
+</li><li> <acronym>ESS[R]</acronym>: <code>ess-execute-screen-options</code> uses correct screen
+width in terminal sessions
+</li><li> <acronym>ESS</acronym>: <code>ess-build-tags-for-directory</code> works when no TAGS file
+name was provided
+</li><li> <acronym>ESS</acronym>: <code>ess-continued-statement-offset</code> is now respected everywhere
+except inside of the <code>if</code> test condition.
+</li><li> <acronym>ESS</acronym>: New variable <code>ess-first-continued-statement-offset</code> for
+indentation of the first line in multiline statements.
+</li><li> <acronym>ESSR</acronym>: Starting <kbd>,</kbd> in multiline statements indentation is now
+ignored to achieve a more pleasant alignment.
+</li><li> <acronym>ESSR</acronym>: Improved behavior of <kbd>RET</kbd> in roxygen blocks.
+</li><li> <acronym>ESS[R]</acronym>: command cleaning with <kbd>C-u C-u C-y</kbd> was broken with
+lines containing &quot; + &quot;
+</li><li> <acronym>ESS[R]</acronym>: fixed &quot;empty watch window bug&quot;
+</li><li> <acronym>ESS[R]</acronym>: don&rsquo;t ask for help location on ac-quick-help (request of github #81)
+</li><li> <acronym>ESS[R]</acronym>: &quot;importClassesFrom&quot; and &quot;importMethodsFrom&quot; were added to
+the list of two-parameter roxygen commands
+</li><li> <acronym>ESS[R]</acronym>: fix vignetes display and hyperlinks (were broken in 13.09-1)
+</li><li> <acronym>ESS[Julia]</acronym>: recognize function names ending with !
+</li><li> <acronym>ESS[Julia]</acronym>: fix indentation of &quot;for&quot; comprehension syntax within brackets.
+</li></ul>
+
 <p>Changes / Selected Bug Fixes in 13.09-1:
 </p><ul>
 <li> ess-remote and TRAMP: R support code is now downloaded in binary form instead
@@ -816,15 +845,15 @@ Leading comments are automatically removed before the evaluation
  preceded by &rsquo;+&rsquo;
 </li><li> <acronym>ESS[SAS]</acronym>: Three features/fixes with special thanks to Matthew Fidler
 <a href="https://github.com/emacs-ess/ESS/pulls/mlf176f2">https://github.com/emacs-ess/ESS/pulls/mlf176f2</a>. Turn on SAS log mode
-when appropriate.  Indent comments and CARDS statement more appropriately. 
+when appropriate.  Indent comments and CARDS statement more appropriately.
 </li><li> <acronym>ESS[SAS]</acronym>: <code>ess-sas-edit-keys-toggle</code> default returns to <code>nil</code>
-</li><li> <acronym>ESS[R]</acronym>: support for <code>prettify-symbols-mode</code>: 
+</li><li> <acronym>ESS[R]</acronym>: support for <code>prettify-symbols-mode</code>:
 contribution from Rudiger Sonderfeld <a href="https://github.com/emacs-ess/ESS/pull/65">https://github.com/emacs-ess/ESS/pull/65</a>
 </li><li> <acronym>ESS[SWV]</acronym>: knitr now evaluates in the current frame
 </li><li> <acronym>ESS[developer]</acronym>: ess-developer doesn&rsquo;t kill open DESCRIPTION files anymore
 </li><li> <acronym>ESS[roxygen]</acronym>: <code>ess-roxy-preview-HTML</code> is now on <kbd>C-c C-o C-w</kbd> and
  <code>ess-roxy-preview-text</code> is now on <code>C-c C-o C-t</code>
-</li><li> <acronym>ESS</acronym>: installation with <code>make install</code> was simplified and should work 
+</li><li> <acronym>ESS</acronym>: installation with <code>make install</code> was simplified and should work
 out of the box on most *nix systems
 </li><li> <acronym>ESS</acronym> installation instructions simplified
 </li><li> fixed font-lock bug introduced in 13.09 that was causing very slow process output
@@ -1623,15 +1652,17 @@ Subversion server of the R project is
 </p>
 <div class="smallexample">
 <pre class="smallexample">Certificate information:
- - Hostname: svn.r-project.org
- - Valid: from Jul 16 08:10:01 2004 GMT until Jul 14 08:10:01 2014 GMT
- - Issuer: Department of Mathematics, ETH Zurich, Zurich, Switzerland, CH
- - Fingerprint: c9:5d:eb:f9:f2:56:d1:04:ba:44:61:f8:64:6b:d9:33:3f:93:6e:ad
+ - General name: r-project.org
+ - Serial number: 04:9D:4F:0D:53:03:DB
+ - Valid: from  03/10/2014  to  03/10/2016
+ - Issuer: Starfield Secure Certificate Authority - G2
+           http://certs.starfieldtech.com/repository/
+ - SHA1-Fingerprint: F5:15:96:DB:F1:2F:35:1B:96:06:C3:A4:2A:E2:80:78:76:4C:A4:30
+ - MD5-Fingerprint: D8:7D:4F:8F:ED:92:65:EE:EE:A5:73:2D:BB:F6:35:E6
 </pre></div>
 
-<p>(currently, there is no &ldquo;trusted certificate&rdquo;).  You can accept this
-certificate permanently and will not be asked about it anymore.
-</p>
+
+
 <a name="Git-for-development"></a>
 <h4 class="subsection">1.4.2 Git for development</h4>
 <p>For development and experimentation on new features, there is now a
@@ -2020,7 +2051,7 @@ showing on the current machine
 </li><li> Start the ESS process on the remote machine, for example with one of
 the commands &lsquo;<samp>Splus</samp>&rsquo;, or &lsquo;<samp>R</samp>&rsquo;, or &lsquo;<samp>sas -stdio</samp>&rsquo;.
 
-</li><li> Start &lsquo;<samp>M-x ess-remote</samp>&rsquo;.  
+</li><li> Start &lsquo;<samp>M-x ess-remote</samp>&rsquo;.
 You will be prompted for a program name with completion.  Choose
 one. Your process is now known to ESS.  All the usual ESS commands
 (&lsquo;<samp>C-c C-n</samp>&rsquo; and its relatives) now work with the S language
@@ -4316,8 +4347,8 @@ activation of <code>ess-tracebug</code> set <code>ess-use-tracebug</code> to nil
 </p>
 <p>Tracebug functionality can be found on <code>ess-dev-map</code>, bound to
 <kbd>C-c C-t</kbd>. Additionally, when subprocess is in a debugging state
-<code>ess-debug-minor-mode</code> is active and the following shortcuts are
-available:
+<code>ess-debug-minor-mode</code> is active and the following additional
+shortcuts are available:
 </p>
 <pre class="verbatim">* Interactive Debugging (`ess-debug-minor-mode-map'):
 
@@ -4330,7 +4361,7 @@ available:
 
 </pre>
 
-<p>Here are all the tracebug commands defined in <code>ess-dev-map</code>
+<p>These are all the tracebug commands defined in <code>ess-dev-map</code>
 (<kbd>C-c C-t ?</kbd> to show this table):
 </p>
 <pre class="verbatim">
@@ -4367,11 +4398,16 @@ available:
 ?   . Show this help		. `ess-tracebug-show-help'
 
 </pre>
+<p>To configure how electric watch window splits the display see
+<code>ess-watch-width-threshold</code> and <code>ess-watch-height-threshold</code>
+variables.
+</p>
 <p>A more detailed ess-tracebug documentation with screenshots is available
 at <a href="http://code.google.com/p/ess-tracebug/">http://code.google.com/p/ess-tracebug/</a>.
 </p>
 <p>A short tutorial is at <a href="http://code.google.com/p/ess-tracebug/wiki/GettingStarted">http://code.google.com/p/ess-tracebug/wiki/GettingStarted</a>.
 </p>
+
 <p><em>Note:</em> Currently, ess-tracebug does not detect some of R&rsquo;s debug
 related messages in non-English locales. To set your R messages to
 English add the following line to your .Rprofile init file:
@@ -4783,7 +4819,7 @@ something like:
     <code>
        Warning: Class &quot;boo&quot; is defined (with package slot âfooâ) but no
        metadata object found to revise subclass information---not exported?
-       </code>      
+       </code>
 </p>
 <p>You can safely ignore this warnings.
 </p>

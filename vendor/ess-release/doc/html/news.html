@@ -301,6 +301,35 @@ acronym[title]::after { content: "This acronym means" attr(title); speak:normal;
 
 
 
+<p>Changes / Selected Bug Fixes in 14.09:
+</p><ul>
+<li> <acronym>ESS[Julia]</acronym>: Executable is changed to <code>julia</code>.
+</li><li> <acronym>ESS[Julia]</acronym>: Completion and help system was adjusted to Julia
+v.0.3.0. Julia v.0.2.x is no more supported.
+</li><li> <acronym>ESS[R]</acronym>: Running R with <code>gdb</code> debugger now works as expected
+</li><li> i<acronym>ESS</acronym><!-- /@w -->: Inferior ESS buffers are now derived from <code>comint-mode</code>
+</li><li> <acronym>ESS[R]</acronym>: <code>ess-execute-screen-options</code> uses correct screen
+width in terminal sessions
+</li><li> <acronym>ESS</acronym>: <code>ess-build-tags-for-directory</code> works when no TAGS file
+name was provided
+</li><li> <acronym>ESS</acronym>: <code>ess-continued-statement-offset</code> is now respected everywhere
+except inside of the <code>if</code> test condition.
+</li><li> <acronym>ESS</acronym>: New variable <code>ess-first-continued-statement-offset</code> for
+indentation of the first line in multiline statements.
+</li><li> <acronym>ESSR</acronym>: Starting <kbd>,</kbd> in multiline statements indentation is now
+ignored to achieve a more pleasant alignment.
+</li><li> <acronym>ESSR</acronym>: Improved behavior of <kbd>RET</kbd> in roxygen blocks.
+</li><li> <acronym>ESS[R]</acronym>: command cleaning with <kbd>C-u C-u C-y</kbd> was broken with
+lines containing &quot; + &quot;
+</li><li> <acronym>ESS[R]</acronym>: fixed &quot;empty watch window bug&quot;
+</li><li> <acronym>ESS[R]</acronym>: don&rsquo;t ask for help location on ac-quick-help (request of github #81)
+</li><li> <acronym>ESS[R]</acronym>: &quot;importClassesFrom&quot; and &quot;importMethodsFrom&quot; were added to
+the list of two-parameter roxygen commands
+</li><li> <acronym>ESS[R]</acronym>: fix vignetes display and hyperlinks (were broken in 13.09-1)
+</li><li> <acronym>ESS[Julia]</acronym>: recognize function names ending with !
+</li><li> <acronym>ESS[Julia]</acronym>: fix indentation of &quot;for&quot; comprehension syntax within brackets.
+</li></ul>
+
 <p>Changes / Selected Bug Fixes in 13.09-1:
 </p><ul>
 <li> ess-remote and TRAMP: R support code is now downloaded in binary form instead
@@ -323,15 +352,15 @@ Leading comments are automatically removed before the evaluation
  preceded by &rsquo;+&rsquo;
 </li><li> <acronym>ESS[SAS]</acronym>: Three features/fixes with special thanks to Matthew Fidler
 <a href="https://github.com/emacs-ess/ESS/pulls/mlf176f2">https://github.com/emacs-ess/ESS/pulls/mlf176f2</a>. Turn on SAS log mode
-when appropriate.  Indent comments and CARDS statement more appropriately. 
+when appropriate.  Indent comments and CARDS statement more appropriately.
 </li><li> <acronym>ESS[SAS]</acronym>: <code>ess-sas-edit-keys-toggle</code> default returns to <code>nil</code>
-</li><li> <acronym>ESS[R]</acronym>: support for <code>prettify-symbols-mode</code>: 
+</li><li> <acronym>ESS[R]</acronym>: support for <code>prettify-symbols-mode</code>:
 contribution from Rudiger Sonderfeld <a href="https://github.com/emacs-ess/ESS/pull/65">https://github.com/emacs-ess/ESS/pull/65</a>
 </li><li> <acronym>ESS[SWV]</acronym>: knitr now evaluates in the current frame
 </li><li> <acronym>ESS[developer]</acronym>: ess-developer doesn&rsquo;t kill open DESCRIPTION files anymore
 </li><li> <acronym>ESS[roxygen]</acronym>: <code>ess-roxy-preview-HTML</code> is now on <kbd>C-c C-o C-w</kbd> and
  <code>ess-roxy-preview-text</code> is now on <code>C-c C-o C-t</code>
-</li><li> <acronym>ESS</acronym>: installation with <code>make install</code> was simplified and should work 
+</li><li> <acronym>ESS</acronym>: installation with <code>make install</code> was simplified and should work
 out of the box on most *nix systems
 </li><li> <acronym>ESS</acronym> installation instructions simplified
 </li><li> fixed font-lock bug introduced in 13.09 that was causing very slow process output

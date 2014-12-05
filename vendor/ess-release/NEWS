@@ -1,4 +1,34 @@
-Changes / Selected Bug Fixes in 13.09-1:
+Changes / Selected Bug Fixes in 14.09:
+   * ESS[Julia]: Executable is changed to 'julia'.
+   * ESS[Julia]: Completion and help system was adjusted to Julia
+     v.0.3.0.  Julia v.0.2.x is no more supported.
+   * ESS[R]: Running R with 'gdb' debugger now works as expected
+   * iESS: Inferior ESS buffers are now derived from 'comint-mode'
+   * ESS[R]: 'ess-execute-screen-options' uses correct screen width in
+     terminal sessions
+   * ESS: 'ess-build-tags-for-directory' works when no TAGS file name
+     was provided
+   * ESS: 'ess-continued-statement-offset' is now respected everywhere
+     except inside of the 'if' test condition.
+   * ESS: New variable 'ess-first-continued-statement-offset' for
+     indentation of the first line in multiline statements.
+   * ESSR: Starting ',' in multiline statements indentation is now
+     ignored to achieve a more pleasant alignment.
+   * ESSR: Improved behavior of 'RET' in roxygen blocks.
+   * ESS[R]: command cleaning with 'C-u C-u C-y' was broken with lines
+     containing " + "
+   * ESS[R]: fixed "empty watch window bug"
+   * ESS[R]: don't ask for help location on ac-quick-help (request of
+     github #81)
+   * ESS[R]: "importClassesFrom" and "importMethodsFrom" were added to
+     the list of two-parameter roxygen commands
+   * ESS[R]: fix vignetes display and hyperlinks (were broken in
+     13.09-1)
+   * ESS[Julia]: recognize function names ending with !
+   * ESS[Julia]: fix indentation of "for" comprehension syntax within
+     brackets.
+
+   Changes / Selected Bug Fixes in 13.09-1:
    * ess-remote and TRAMP: R support code is now downloaded in binary
      form instead of being injected from local machine.  The R code is
      stored in '~/.config/ESSR/' directory on the remote machine

@@ -312,7 +312,7 @@ acronym[title]::after { content: "This acronym means" attr(title); speak:normal;
 <a name="index-README"></a>
 
 <p>This is the README file for the distribution of ESS version
-13.09-1
+14.09
 </p>
 <p>ESS is a GNU Emacs and XEmacs mode for interactive statistical
 programming and data analysis.  Languages supported: the S family (S,
@@ -484,15 +484,17 @@ Subversion server of the R project is
 </p>
 <div class="smallexample">
 <pre class="smallexample">Certificate information:
- - Hostname: svn.r-project.org
- - Valid: from Jul 16 08:10:01 2004 GMT until Jul 14 08:10:01 2014 GMT
- - Issuer: Department of Mathematics, ETH Zurich, Zurich, Switzerland, CH
- - Fingerprint: c9:5d:eb:f9:f2:56:d1:04:ba:44:61:f8:64:6b:d9:33:3f:93:6e:ad
+ - General name: r-project.org
+ - Serial number: 04:9D:4F:0D:53:03:DB
+ - Valid: from  03/10/2014  to  03/10/2016
+ - Issuer: Starfield Secure Certificate Authority - G2
+           http://certs.starfieldtech.com/repository/
+ - SHA1-Fingerprint: F5:15:96:DB:F1:2F:35:1B:96:06:C3:A4:2A:E2:80:78:76:4C:A4:30
+ - MD5-Fingerprint: D8:7D:4F:8F:ED:92:65:EE:EE:A5:73:2D:BB:F6:35:E6
 </pre></div>
 
-<p>(currently, there is no &ldquo;trusted certificate&rdquo;).  You can accept this
-certificate permanently and will not be asked about it anymore.
-</p>
+
+
 <a name="Git-for-development"></a>
 <h4 class="subsection">1.4.2 Git for development</h4>
 <p>For development and experimentation on new features, there is now a
@@ -637,7 +639,7 @@ Next: <a href="#New-Features" accesskey="n" rel="next">New Features</a>, Previou
   </li><li> Manipulating and editing saved transcripts
   </li><li> Re-evaluating commands from transcript files
   </li></ul>
-</li><li> Interaction with Help Pages and other Documenation (R)
+</li><li> Interaction with Help Pages and other Documentation (R)
   <ul>
 <li> Fast Navigation
   </li><li> Sending Examples to running ESS process.
@@ -662,6 +664,35 @@ Next: <a href="#Reporting-Bugs" accesskey="n" rel="next">Reporting Bugs</a>, Pre
 <h3 class="section">1.8 New Features</h3>
 
 
+<p>Changes / Selected Bug Fixes in 14.09:
+</p><ul>
+<li> <acronym>ESS[Julia]</acronym>: Executable is changed to <code>julia</code>.
+</li><li> <acronym>ESS[Julia]</acronym>: Completion and help system was adjusted to Julia
+v.0.3.0. Julia v.0.2.x is no more supported.
+</li><li> <acronym>ESS[R]</acronym>: Running R with <code>gdb</code> debugger now works as expected
+</li><li> i<acronym>ESS</acronym><!-- /@w -->: Inferior ESS buffers are now derived from <code>comint-mode</code>
+</li><li> <acronym>ESS[R]</acronym>: <code>ess-execute-screen-options</code> uses correct screen
+width in terminal sessions
+</li><li> <acronym>ESS</acronym>: <code>ess-build-tags-for-directory</code> works when no TAGS file
+name was provided
+</li><li> <acronym>ESS</acronym>: <code>ess-continued-statement-offset</code> is now respected everywhere
+except inside of the <code>if</code> test condition.
+</li><li> <acronym>ESS</acronym>: New variable <code>ess-first-continued-statement-offset</code> for
+indentation of the first line in multiline statements.
+</li><li> <acronym>ESSR</acronym>: Starting <kbd>,</kbd> in multiline statements indentation is now
+ignored to achieve a more pleasant alignment.
+</li><li> <acronym>ESSR</acronym>: Improved behavior of <kbd>RET</kbd> in roxygen blocks.
+</li><li> <acronym>ESS[R]</acronym>: command cleaning with <kbd>C-u C-u C-y</kbd> was broken with
+lines containing &quot; + &quot;
+</li><li> <acronym>ESS[R]</acronym>: fixed &quot;empty watch window bug&quot;
+</li><li> <acronym>ESS[R]</acronym>: don&rsquo;t ask for help location on ac-quick-help (request of github #81)
+</li><li> <acronym>ESS[R]</acronym>: &quot;importClassesFrom&quot; and &quot;importMethodsFrom&quot; were added to
+the list of two-parameter roxygen commands
+</li><li> <acronym>ESS[R]</acronym>: fix vignetes display and hyperlinks (were broken in 13.09-1)
+</li><li> <acronym>ESS[Julia]</acronym>: recognize function names ending with !
+</li><li> <acronym>ESS[Julia]</acronym>: fix indentation of &quot;for&quot; comprehension syntax within brackets.
+</li></ul>
+
 <p>Changes / Selected Bug Fixes in 13.09-1:
 </p><ul>
 <li> ess-remote and TRAMP: R support code is now downloaded in binary form instead
@@ -684,15 +715,15 @@ Leading comments are automatically removed before the evaluation
  preceded by &rsquo;+&rsquo;
 </li><li> <acronym>ESS[SAS]</acronym>: Three features/fixes with special thanks to Matthew Fidler
 <a href="https://github.com/emacs-ess/ESS/pulls/mlf176f2">https://github.com/emacs-ess/ESS/pulls/mlf176f2</a>. Turn on SAS log mode
-when appropriate.  Indent comments and CARDS statement more appropriately. 
+when appropriate.  Indent comments and CARDS statement more appropriately.
 </li><li> <acronym>ESS[SAS]</acronym>: <code>ess-sas-edit-keys-toggle</code> default returns to <code>nil</code>
-</li><li> <acronym>ESS[R]</acronym>: support for <code>prettify-symbols-mode</code>: 
+</li><li> <acronym>ESS[R]</acronym>: support for <code>prettify-symbols-mode</code>:
 contribution from Rudiger Sonderfeld <a href="https://github.com/emacs-ess/ESS/pull/65">https://github.com/emacs-ess/ESS/pull/65</a>
 </li><li> <acronym>ESS[SWV]</acronym>: knitr now evaluates in the current frame
 </li><li> <acronym>ESS[developer]</acronym>: ess-developer doesn&rsquo;t kill open DESCRIPTION files anymore
 </li><li> <acronym>ESS[roxygen]</acronym>: <code>ess-roxy-preview-HTML</code> is now on <kbd>C-c C-o C-w</kbd> and
  <code>ess-roxy-preview-text</code> is now on <code>C-c C-o C-t</code>
-</li><li> <acronym>ESS</acronym>: installation with <code>make install</code> was simplified and should work 
+</li><li> <acronym>ESS</acronym>: installation with <code>make install</code> was simplified and should work
 out of the box on most *nix systems
 </li><li> <acronym>ESS</acronym> installation instructions simplified
 </li><li> fixed font-lock bug introduced in 13.09 that was causing very slow process output

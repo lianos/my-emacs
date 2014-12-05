@@ -1,3 +1,6 @@
+;; TODO: Use advice from this URL to tweak the autocompletion stuff:
+;;       https://stat.ethz.ch/pipermail/ess-help/2012-May/007835.html
+;;
 ;; It seems that if you want to add custom "launch" commands
 ;; (eg. M-x R-something) you need to define functions to do so. ESS has a hard
 ;; coded ess-r-versions-lists (eg. R-devel, R-patched, etc.) which I cannot add
