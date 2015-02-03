@@ -41,6 +41,11 @@
             (setq tab-width 2)
             (setq yas/buffer-local-condition t)))
 
+;; Tweak indentation levels. These were taken from this post:
+;;    https://stat.ethz.ch/pipermail/ess-help/2014-November/010292.html
+(setq ess-first-continued-statement-offset 2)
+(setq ess-continued-statement-offset 0)
+
 ;; disable saving history on exit
 (setq ess-history-file nil)
 
@@ -78,68 +83,3 @@
 ;; in. The "inferior-ess-mode-map" is active in the buffer running the R
 ;; process itself (not buffers that are editing R files).
 (define-key inferior-ess-mode-map (kbd "C-c w") 'ess-execute-screen-options)
-
-
-;; To get tab yasnippet expansion to work on LaTeX/Rnw files
-; (add-hook 'latex-mode-hook
-; '(lambda()
-; (local-set-key [tab] 'yas/expand)))
-
-
-;; Tweak font locking
-;; (add-hook 'ess-mode-hook
-;;  '(lambda()
-;;     (font-lock-add-keywords nil
-;;     '(("\\<\\(if\\|for\\|function\\|return\\)\\>[\n[:blank:]]*(" 1
-;;        font-lock-keyword-face) ; must go first to override highlighting below
-;;       ("\\<\\([.A-Za-z][._A-Za-z0-9]*\\)[\n[:blank:]]*(" 1
-;;        font-lock-function-name-face) ; highlight function names
-;;       ("\\([(,]\\|[\n[:blank:]]*\\)\\([.A-Za-z][._A-Za-z0-9]*\\)[\n[:blank:]]*=[^=]" 2
-;;        font-lock-reference-face) ;highlight argument names
-;;       ))
-;;     ))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Sweave with cacheSweave, taken from:
-;; http://blog.nguyenvq.com/2009/05/14/editingadding-on-to-sweave-features-in-ess/
-; (defun ess-swv-run-in-R2 (cmd &optional choose-process)
-;   "Run \\[cmd] on the current .Rnw file.  Utility function not called by user."
-;   (let* ((rnw-buf (current-buffer)))
-;     (if choose-process ;; previous behavior
-;   (ess-force-buffer-current "R process to load into: ")
-;       ;; else
-;       (update-ess-process-name-list)
-;       (cond ((= 0 (length ess-process-name-list))
-;        (message "no ESS processes running; starting R")
-;        (sit-for 1); so the user notices before the next msgs/prompt
-;        (R)
-;        (set-buffer rnw-buf)
-;        )
-;       ((not (string= "R" (ess-make-buffer-current))); e.g. Splus, need R
-;        (ess-force-buffer-current "R process to load into: "))
-;        ))
-
-;     (save-excursion
-;       (ess-execute (format "require(tools)")) ;; Make sure tools is loaded.
-;       (basic-save-buffer); do not Sweave/Stangle old version of file !
-;       (let* ((sprocess (get-ess-process ess-current-process-name))
-;        (sbuffer (process-buffer sprocess))
-;        (rnw-file (buffer-file-name))
-;        (Rnw-dir (file-name-directory rnw-file))
-;        (Sw-cmd
-;         (format
-;          "local({..od <- getwd(); setwd(%S); library(cacheSweave); %s(%S, cacheSweaveDriver()); setwd(..od) })"
-;          Rnw-dir cmd rnw-file))
-;        )
-;   (message "%s()ing %S" cmd rnw-file)
-;   (ess-execute Sw-cmd 'buffer nil nil)
-;   (switch-to-buffer rnw-buf)
-;   (ess-show-buffer (buffer-name sbuffer) nil)))))
-
-;; (defun ess-swv-weave2 ()
-;;  "Run Sweave on the current .Rnw file."
-;;  (interactive)
-;;  (ess-swv-run-in-R2 "Sweave"))
-;; (define-key noweb-minor-mode-map "\M-nw" 'ess-swv-weave2)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
