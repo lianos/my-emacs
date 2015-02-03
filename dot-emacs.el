@@ -32,6 +32,7 @@
 (vendor 'expand-region)
 (vendor 'multiple-cursors)
 (vendor 'markdown-mode)
+(vendor 'csv-mode)
 
 (load "my/globals")
 (load "my/cua")
