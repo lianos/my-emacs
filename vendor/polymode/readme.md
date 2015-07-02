@@ -1,3 +1,5 @@
+[![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
+
 ## Overview
 
 Polymode is an emacs package that offers generic support for multiple major
@@ -8,7 +10,7 @@ highly extensible. Creating new polymodes typically takes a
 Polymode also provides extensible facilities for external literate programming
 tools for exporting, weaving and tangling.
 
-- [Instalation](#intstalation)
+- [Installation](#intstalation)
 - [Polymodes Activation](#activation-of-polymodes)
 - [Basic Usage](#basic-usage)
 - [Warnings](#warning)

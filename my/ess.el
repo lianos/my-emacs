@@ -28,23 +28,22 @@
   (let ((inferior-R-program-name "~/sw/bin/R-bioc300"))
     (R)))
 
-(setq ess-default-style 'DEFAULT)
+(setq ess-default-style 'RStudio)
 (load (expand-file-name "~/.emacs.d/vendor/ess-release/lisp/ess-site"))
+
 (require 'ess-site)
 
 ;; (require 'ess-smart-underscore)
-
 ;; (load "my/ess-knitr")
-
 (add-hook 'ess-mode-hook
           (lambda ()
-            (setq tab-width 2)
+            ;; (setq tab-width 2)
             (setq yas/buffer-local-condition t)))
 
 ;; Tweak indentation levels. These were taken from this post:
 ;;    https://stat.ethz.ch/pipermail/ess-help/2014-November/010292.html
-(setq ess-first-continued-statement-offset 2)
-(setq ess-continued-statement-offset 0)
+;; (setq ess-first-continued-statement-offset 2)
+;; (setq ess-continued-statement-offset 0)
 
 ;; disable saving history on exit
 (setq ess-history-file nil)
@@ -82,4 +81,4 @@
 ;; Sets R's width and length arguments to "max out" the frame it is running
 ;; in. The "inferior-ess-mode-map" is active in the buffer running the R
 ;; process itself (not buffers that are editing R files).
-(define-key inferior-ess-mode-map (kbd "C-c w") 'ess-execute-screen-options)
+;; (define-key inferior-ess-mode-map (kbd "C-c w") 'ess-execute-screen-options)

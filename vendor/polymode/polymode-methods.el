@@ -81,9 +81,8 @@ corresponding to the type of the SPAN returned by
 
 (defmethod pm-select-buffer ((chunkmode pm-chunkmode) span)
   "Select the buffer associated with SUBMODE.
-Install a new indirect buffer if it is not already installed.
-
-For this method to work correctly, SUBMODE's class should define
+Install a new indirect buffer if it is not already installed. For
+this method to work correctly, SUBMODE's class should define
 `pm-install-buffer' and `pm-get-buffer' methods."
   (let* ((type (car span))
          (buff (pm-get-buffer chunkmode type)))
@@ -97,6 +96,8 @@ For this method to work correctly, SUBMODE's class should define
   (pm--transfer-vars-from-base))
 
 (defmethod pm-select-buffer ((config pm-polymode-multi-auto) &optional span)
+  ;; :fixme: pm-get-span on multi configs returns config as last object of
+  ;; span. That's freaking confusing.
   (if (null (car span))
       (pm-select-buffer (oref config -hostmode) span)
     (let ((type (car span))
@@ -106,8 +107,11 @@ For this method to work correctly, SUBMODE's class should define
         (goto-char (cadr span))
         (unless (eq type 'head)
           (re-search-backward (oref proto :head-reg) nil 'noerr))
-        (re-search-forward (oref proto :retriever-regexp))
-        (let* ((str (or (match-string-no-properties (oref proto :retriever-num))
+        (let* ((str (or (and (oref proto :retriever-regexp)
+			     (re-search-forward (oref proto :retriever-regexp))
+			     (match-string-no-properties (oref proto :retriever-num)))
+			(and (oref proto :retriever-function)
+			     (funcall (oref proto :retriever-function)))
                         (error "retriever subexpression didn't match")))
                (name (concat "auto-innermode:" str)))
           (setq chunkmode
@@ -119,7 +123,6 @@ For this method to work correctly, SUBMODE's class should define
                       (object-add-to-list config '-auto-innermodes new-obj)
                       new-obj)))))
       (pm-select-buffer chunkmode span))))
-
 
 (defgeneric pm-install-buffer (chunkmode &optional type)
   "Ask SUBMODE to install an indirect buffer corresponding to
@@ -150,15 +153,16 @@ slot -buffer of SUBMODE. Create this buffer if does not exist."
   (when face
     (with-current-buffer (current-buffer)
       (let ((face (or (and (numberp face)
-                           (cons 'background-color
-                                 (pm--get-adjusted-background face)))
+                           (list (cons 'background-color
+				       (pm--get-adjusted-background face))))
                       face))
             (pchange nil))
-        (while (not (eq pchange end))
-          (setq pchange (next-single-property-change beg 'face nil end))
-          (put-text-property beg pchange 'face
-                             `(,face ,@(get-text-property beg 'face)))
-          (setq beg pchange))))))
+	;; (while (not (eq pchange end))
+        ;;   (setq pchange (next-single-property-change beg 'face nil end))
+        ;;   (put-text-property beg pchange 'face
+        ;;                      `(,face ,@(get-text-property beg 'face)))
+        ;;   (setq beg pchange))
+	(font-lock-prepend-text-property beg end 'face face)))))
 
 (defun pm--adjust-visual-line-mode (vlm)
   (when (not (eq visual-line-mode vlm))
@@ -237,7 +241,7 @@ slot -buffer of SUBMODE. Create this buffer if does not exist."
       (when (and indent-line-function ; not that it should ever be nil...
                  (oref pm/chunkmode :protect-indent-line))
         (setq pm--indent-line-function-original indent-line-function)
-        (set (make-local-variable 'indent-line-function) 'pm-indent-line))
+        (set (make-local-variable 'indent-line-function) 'pm-indent-line-dispatcher))
 
       ;; Kill the base buffer along with the indirect one; careful not
       ;; to infloop.
@@ -303,7 +307,6 @@ Return newlly created buffer."
         (vc-find-file-hook))
       new-buffer)))
 
-
 
 ;;; SPAN MANIPULATION
 (defgeneric pm-get-span (chunkmode &optional pos)
@@ -313,12 +316,12 @@ is a symbol representing the type of the span surrounding
 POS (head, tail, body). BEG and END are the coordinates of the
 span. OBJECT is a sutable object which is 'responsable' for this
 span. That is, OBJECT could be dispached upon with
-`pm-select-buffer' or other methods form the interface.
+`pm-select-buffer', .. (fixme: complete list).
 
 Should return nil if there is no SUBMODE specific span around POS.")
 
 (defmethod pm-get-span (chunkmode &optional pos)
-  "Simply return nil. Base mode usually do/can not compute the span"
+  "Simply return nil. Base mode usually do not compute the span."
   nil)
 
 (defmethod pm-get-span ((config pm-polymode) &optional pos)
@@ -336,8 +339,6 @@ point."
            (pos (or pos (point)))
            (span (list nil start end nil))
            val)
-      ;; (save-restriction
-      ;;   (widen)
 
       (dolist (sm smodes)
         (setq val (pm-get-span sm pos))
@@ -357,9 +358,8 @@ point."
                   end (min (nth 2 val)
                            (nth 2 span)))
             (setcar (cdr span) start)
-            (setcar (cddr span) end)
-            )))
-      ;; )
+            (setcar (cddr span) end))))
+
       (unless (and (<= start end) (<= pos end) (>= pos start))
         (error "Bad polymode selection: %s, %s"
                (list start end) pos))
@@ -517,9 +517,14 @@ tail -  tail span"
            (pm--span-at-point-fun-fun head-matcher tail-matcher))
           (t (error "head and tail matchers should be either regexp strings or functions")))))
 
-
 
 ;;; INDENT
+
+(defun pm-indent-line-dispatcher ()
+  "Dispatch methods indent methods on current span."
+  (let ((span (pm/get-innermost-span)))
+    (pm-indent-line (car (last span)) span)))
+
 (defgeneric pm-indent-line (&optional chunkmode span)
   "Indent current line.
 Protect and call original indentation function associated with
@@ -533,11 +538,6 @@ the chunkmode.")
         (pm/narrow-to-span span)
         (funcall pm--indent-line-function-original))
     (pm--uncomment-region 1 (nth 1 span))))
-
-(defmethod pm-indent-line ()
-  "Indent line dispatcher"
-  (let ((span (pm/get-innermost-span)))
-    (pm-indent-line (car (last span)) span)))
 
 (defmethod pm-indent-line ((chunkmode pm-chunkmode) &optional span)
   (pm--indent-line span))

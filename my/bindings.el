@@ -70,3 +70,6 @@
 ;; (global-set-key "\C-z=" 'er/expand-region) ;; to enablue use over xterm
 (global-set-key [M-right] 'er/expand-region)
 (global-set-key [M-left] 'er/contract-region)
+
+;; Add code chunks to md, rmd, org:
+(global-set-key "\C-c," 'insert-code-chunk)

@@ -130,3 +130,42 @@ perform `dired-do-search' on all files in the *Find* buffer."
   (with-current-buffer "*Find*"
     (dired-toggle-marks)
     (dired-do-search regexp)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Code chunks for literate documents
+;; https://stat.ethz.ch/pipermail/ess-help/2015-February/010443.html
+;; keyboard shortcut defined in my/ess.el(?)
+(defun insert-md-code-chunk ()
+  "Insert Rmd code chunk"
+  (interactive)
+  (insert "```\n\n```")
+  (backward-char 4))
+
+(defun insert-rmd-code-chunk ()
+  "Insert Rmd code chunk"
+  (interactive)
+  (insert "```{r}\n\n```")
+  (backward-char 6))
+
+(defun insert-rnw-code-chunk ()
+  "Insert Rnw code chunk"
+  (interactive)
+  (insert "<<>>=\n\n@")
+  (backward-char 2))
+
+(defun insert-org-code-chunk ()
+  "Insert Rnw code chunk"
+  (interactive)
+  (insert "#+BEGIN_SRC R :session *R*\n\n#+END_SRC")
+  (backward-char 10))
+
+
+(defun insert-code-chunk ()
+  "Insert appropriate code chunk based on buffer extension"
+  (interactive)
+  (pcase (file-name-extension (buffer-file-name))
+    (`"Rnw" (insert-rnw-code-chunk))
+    (`"org" (insert-org-code-chunk))
+    (`"Rmd" (insert-rmd-code-chunk))
+    (`"md" (insert-md-code-chunk))
+    (code (message "Unknown buffer extension"))))
